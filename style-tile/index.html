@@ -47,6 +47,20 @@
 
   .sheet { max-width: 1180px; margin: 0 auto; padding: 48px 32px 80px; position: relative; }
 
+  /* switcher between the two style tiles — review aid, not part of the design */
+  .tile-switch {
+    display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; justify-content: center;
+    background: var(--gg-blue); color: #fff; padding: 12px 24px;
+    font-size: .95rem; text-align: center;
+  }
+  .tile-switch strong { font-family: var(--gg-display); font-weight: 600; }
+  .tile-switch a {
+    color: #fff; font-family: var(--gg-display); font-weight: 600;
+    background: rgba(255,255,255,.16); padding: 8px 18px; border-radius: 999px;
+    text-decoration: none; min-height: 44px; display: inline-flex; align-items: center;
+  }
+  .tile-switch a:hover { background: rgba(255,255,255,.28); }
+
   /* watercolor washes — abstract texture only, pure CSS */
   .wash { position: absolute; border-radius: 48% 52% 55% 45% / 55% 46% 54% 45%; filter: blur(34px); opacity: .5; pointer-events: none; z-index: 0; }
   .wash-sky    { width: 480px; height: 320px; top: -60px;  right: -120px; background: var(--gg-sky); }
@@ -255,6 +269,10 @@
 </style>
 </head>
 <body>
+<div class="tile-switch">
+  <span>You're looking at <strong>Version 1 — "The Sheet"</strong></span>
+  <a href="v2/">See Version 2 — "The Meadow" →</a>
+</div>
 <div class="sheet">
   <div class="wash wash-sky"></div>
   <div class="wash wash-green"></div>
