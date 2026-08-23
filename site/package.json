@@ -1,0 +1,17 @@
+{
+  "name": "growing-with-gritty",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@fontsource-variable/fredoka": "^5.2.0",
+    "@fontsource-variable/nunito": "^5.2.0",
+    "@fontsource/patrick-hand": "^5.2.0",
+    "astro": "^5.12.0"
+  }
+}

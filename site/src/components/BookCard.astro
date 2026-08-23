@@ -1,0 +1,35 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props { book: CollectionEntry<'books'>; headingLevel?: 2 | 3 }
+const { book, headingLevel = 3 } = Astro.props;
+const H = headingLevel === 2 ? 'h2' : 'h3';
+const { title, order, cover, ages, tagline } = book.data;
+---
+
+<article class="book-card card">
+  <a href={`/books/${book.id}`} class="cover-link">
+    <img src={cover} alt={`${title} book cover`} width="322" height="322" loading="lazy" />
+  </a>
+  <div class="meta">
+    <H class="title"><a href={`/books/${book.id}`}>{title}</a></H>
+    <p class="ages">Book {order}{ages && ` · Ages ${ages}`}</p>
+    {tagline && <p class="tagline">{tagline}</p>}
+  </div>
+</article>
+
+<style>
+  .book-card {
+    padding: 18px 18px 22px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .book-card:hover { transform: translateY(-4px) rotate(-0.6deg); box-shadow: var(--gg-shadow-lift); }
+  .cover-link { position: relative; display: block; border-radius: var(--gg-radius-small); overflow: hidden; }
+  .cover-link img { display: block; width: 100%; }
+  .meta { padding-top: 14px; }
+  .title { font-size: 1.25rem; }
+  .title a { text-decoration: none; }
+  .title a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+  .ages { font-size: 0.85rem; font-weight: 800; color: var(--gg-green-ink); margin-top: 2px; }
+  .tagline { font-size: var(--gg-text-small); color: var(--gg-ink-soft); margin-top: 6px; }
+</style>

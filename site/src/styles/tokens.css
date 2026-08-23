@@ -1,0 +1,42 @@
+/* ————————————————————————————————————————————————
+   Growing with Gritty — design tokens.
+   Source of truth: growing-with-gritty/style-tile.html (approved by Kim).
+   ———————————————————————————————————————————————— */
+:root {
+  /* color */
+  --gg-paper:      #FAF6EC;  /* watercolor paper — every page's ground   */
+  --gg-paper-deep: #F3EBD9;  /* a second sheet of paper, for inset cards */
+  --gg-card:       #FFFFFF;  /* raised cards sit on true white           */
+  --gg-blue:       #2C5F8A;  /* Gritty Blue — headings, nav, buttons     */
+  --gg-blue-deep:  #1F4666;  /* pressed/hover state of Gritty Blue       */
+  --gg-green:      #7FA86B;  /* Meadow Green — growth accents, banners   */
+  --gg-green-ink:  #4E7140;  /* meadow green dark enough for text        */
+  --gg-gold:       #D9A93F;  /* Gold Star — achievement only             */
+  --gg-gold-ink:   #8A6414;  /* gold dark enough for small text          */
+  --gg-sky:        #BDD7E7;  /* Sky Wash — soft washes and bands         */
+  --gg-ink:        #2A3238;  /* reading text                             */
+  --gg-ink-soft:   #55606A;  /* captions, secondary text (AA on paper)   */
+
+  /* type */
+  --gg-display: 'Fredoka Variable', 'Fredoka', 'Comic Sans MS', sans-serif;
+  --gg-body: 'Nunito Variable', 'Nunito', 'Trebuchet MS', sans-serif;
+  /* Patrick Hand has ONE job: Gritty's speech bubbles. Never body text. */
+  --gg-hand: 'Patrick Hand', 'Comic Sans MS', cursive;
+
+  /* type scale — generous, the audience is 4-year-olds and grandparents */
+  --gg-text-hero: clamp(2.4rem, 6vw, 3.8rem);
+  --gg-text-h1: clamp(2rem, 5vw, 2.9rem);
+  --gg-text-h2: clamp(1.5rem, 3.4vw, 1.9rem);
+  --gg-text-h3: 1.25rem;
+  --gg-text-body: 1.06rem;
+  --gg-text-small: 0.92rem;   /* the floor for anything informational */
+
+  /* shape */
+  --gg-radius: 22px;
+  --gg-radius-small: 14px;
+  --gg-shadow: 0 10px 24px -14px rgba(44, 95, 138, 0.45);
+  --gg-shadow-lift: 0 16px 32px -16px rgba(44, 95, 138, 0.55);
+
+  /* touch — little fingers and grandparents' too */
+  --gg-tap: 48px;
+}

@@ -1,0 +1,213 @@
+# Pages CMS configuration — this file is what turns the GitHub repo into
+# Kim's editing forms at app.pagescms.org. Field descriptions are written
+# for Kim, in plain language: every one says what the field does on the page.
+#
+# NOTE: Pages CMS reads this file from the ROOT of its own GitHub repo. It
+# becomes active when the site moves into the dedicated growing-with-gritty
+# repo (PLAN.md §10) — the paths below assume that repo's root is this
+# site/ folder.
+
+media:
+  input: public/images
+  output: /images
+
+content:
+  - name: books
+    label: Books
+    type: collection
+    path: src/content/books
+    view:
+      fields: [title, order]
+      sort: [order]
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: order
+        label: Number in the series
+        type: number
+        required: true
+        description: "1, 2, 3, 4 — controls the order books appear everywhere."
+      - name: cover
+        label: Cover image
+        type: image
+        required: true
+        description: The cover as it appears on cards and the book's page.
+      - name: ages
+        label: Ages
+        type: string
+        description: 'Just the range, like "4–10".'
+      - name: tagline
+        label: One-line description
+        type: string
+        description: The single line under the title on book cards.
+      - name: body
+        label: About this book
+        type: rich-text
+        description: The full description on the book's own page.
+      - name: lesson
+        label: What did Gritty learn?
+        type: text
+        description: The takeaway, shown in its own green section on the book's page.
+      - name: characters
+        label: Who's in this story?
+        type: select
+        options:
+          multiple: true
+          values:
+            - name: gritty
+              label: Gritty the Goat
+            - name: grandpa-goat
+              label: Grandpa Goat
+            - name: gabby
+              label: Gabby the Goat
+            - name: grandma-goat
+              label: Grandma Goat
+            - name: gibby
+              label: Gibby the Goat
+      - name: buyLink
+        label: Buy link
+        type: string
+        description: >-
+          Paste the full Amazon (or other store) address, starting with
+          https://. The "Buy the book" button only appears once this is
+          filled in.
+      - name: challenge
+        label: Grit challenge
+        type: text
+        description: >-
+          A question families can talk about after reading. Shows in a
+          speech bubble at the bottom of the book's page.
+
+  - name: characters
+    label: Characters
+    type: collection
+    path: src/content/characters
+    view:
+      fields: [name, order]
+      sort: [order]
+    fields:
+      - name: name
+        label: Name
+        type: string
+        required: true
+      - name: order
+        label: Order on the page
+        type: number
+        required: true
+      - name: portrait
+        label: Portrait
+        type: image
+        description: >-
+          Your drawing of this character. Until one is uploaded, the site
+          shows a friendly "portrait coming soon" circle.
+      - name: role
+        label: One-line description
+        type: string
+        description: 'Like "The little goat with big grit".'
+      - name: body
+        label: Their hello
+        type: text
+        description: >-
+          What they say to visitors, in their own voice. Shows in
+          handwriting-style lettering, so write it like they'd say it out
+          loud — quotes and all.
+
+  - name: printables
+    label: Printables
+    type: collection
+    path: src/content/printables
+    view:
+      fields: [title, kind]
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: kind
+        label: What kind is it?
+        type: select
+        required: true
+        options:
+          values:
+            - name: coloring-page
+              label: Coloring page
+            - name: discussion-cards
+              label: Discussion cards
+            - name: calm-down-cards
+              label: Calm-down cards
+            - name: poster
+              label: Poster
+            - name: journal
+              label: Grit journal
+            - name: certificate
+              label: Certificate
+            - name: book-guide
+              label: Book guide
+            - name: classroom-activity
+              label: Classroom activity
+      - name: audience
+        label: Who is it for?
+        type: select
+        options:
+          values:
+            - name: kids
+              label: Kids
+            - name: parents
+              label: Parents
+            - name: teachers
+              label: Teachers
+            - name: everyone
+              label: Everyone
+      - name: download
+        label: The PDF
+        type: file
+        required: true
+        description: The file people download and print.
+      - name: thumb
+        label: Preview picture
+        type: image
+        description: Optional small picture shown on the download card.
+
+  # Exactly one home page, so Kim gets a single form, not a list of one.
+  - name: homepage
+    label: Home page
+    type: file
+    path: src/data/homepage.json
+    fields:
+      - name: heroBubble
+        label: Gritty's welcome (speech bubble)
+        type: text
+        description: The first thing visitors read, in Gritty's handwriting bubble.
+      - name: heroHeading
+        label: Big headline
+        type: string
+      - name: heroText
+        label: Welcome paragraph
+        type: text
+      - name: reminder
+        label: Gritty's reminder (gold bubble near the bottom)
+        type: string
+
+  - name: about
+    label: About the Author
+    type: file
+    path: src/content/pages/about.md
+    fields:
+      - name: title
+        label: Page title
+        type: string
+        required: true
+      - name: headshot
+        label: Your photo
+        type: image
+      - name: photo
+        label: Second photo
+        type: image
+      - name: photoCaption
+        label: Caption for the second photo
+        type: string
+      - name: body
+        label: The page itself
+        type: rich-text

@@ -1,0 +1,35 @@
+---
+/* Gritty's speech bubble — the one place Patrick Hand is allowed.
+   variant="cheer" is the gold celebration voice.
+   tail=false for bubbles that sit away from a Gritty drawing. */
+interface Props { variant?: 'talk' | 'cheer'; tail?: boolean }
+const { variant = 'talk', tail = true } = Astro.props;
+---
+
+<p class:list={['bubble', variant, { 'no-tail': !tail }]}><slot /></p>
+
+<style>
+  .bubble {
+    position: relative;
+    background: #fff;
+    border: 3px solid var(--gg-ink);
+    border-radius: 28px 30px 30px 26px / 30px 26px 28px 30px;
+    padding: 18px 24px;
+    font-family: var(--gg-hand);
+    font-size: 1.45rem;
+    line-height: 1.35;
+    color: var(--gg-ink);
+    box-shadow: var(--gg-shadow);
+    max-width: 34ch;
+  }
+  .bubble::before, .bubble::after {
+    content: '';
+    position: absolute; left: -26px; top: 58%;
+    background: #fff; border: 3px solid var(--gg-ink); border-radius: 50%;
+  }
+  .bubble::before { width: 16px; height: 13px; }
+  .bubble::after { width: 9px; height: 8px; left: -42px; top: 70%; }
+  .cheer { border-color: var(--gg-gold-ink); color: var(--gg-gold-ink); background: #FFFDF4; }
+  .cheer::before, .cheer::after { border-color: var(--gg-gold-ink); background: #FFFDF4; }
+  .no-tail::before, .no-tail::after { display: none; }
+</style>

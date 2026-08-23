@@ -1,0 +1,120 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Bubble from '../components/Bubble.astro';
+
+const characters = (await getCollection('characters')).sort((a, b) => a.data.order - b.data.order);
+const rendered = await Promise.all(characters.map(async (c) => ({ c, Content: (await render(c)).Content })));
+
+const gritIs = [
+  { emoji: '🧩', label: 'Trying something hard' },
+  { emoji: '🧗', label: 'Keeping going' },
+  { emoji: '💡', label: 'Trying a new idea' },
+  { emoji: '🤝', label: 'Asking for help' },
+  { emoji: '🔄', label: 'Trying again' },
+  { emoji: '❤️', label: 'Believing in yourself' },
+];
+---
+
+<Base
+  title="Meet Gritty — Growing with Gritty"
+  description="Meet Gritty the Goat and his family: Grandpa Goat, Gabby, Grandma Goat, and Gibby — the characters of Kim Rekowski's book series."
+>
+  <section class="band">
+    <div class="wrap intro-grid">
+      <img
+        class="intro-art"
+        src="/images/characters/gritty-hero.webp"
+        alt="Gritty the Goat, hand-drawn by Kim Rekowski"
+        width="700" height="912"
+      />
+      <div class="intro-copy">
+        <h1>Hi! I'm Gritty!</h1>
+        <Bubble>
+          "I don't always get things right the first time. But that's okay!
+          I keep trying, learn from my mistakes, and never give up."
+        </Bubble>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band-sky">
+    <div class="wrap">
+      <p class="eyebrow">So…</p>
+      <h2>What is grit?</h2>
+      <p class="note">Grit can look like a lot of things. All of these count!</p>
+      <ul class="grit-grid" role="list">
+        {gritIs.map(({ emoji, label }) => (
+          <li class="grit-item card">
+            <span class="grit-emoji" aria-hidden="true">{emoji}</span>
+            <span>{label}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <p class="eyebrow">The whole herd</p>
+      <h2>Gritty's family &amp; friends</h2>
+      <div class="char-grid">
+        {rendered.map(({ c, Content }) => (
+          <article class="char-card card">
+            {c.data.portrait ? (
+              <img class="portrait" src={c.data.portrait} alt={`${c.data.name}, hand-drawn by Kim Rekowski`} width="320" height="416" loading="lazy" />
+            ) : (
+              <div class="portrait coming" aria-hidden="true">🐐</div>
+            )}
+            <h3>{c.data.name}</h3>
+            {c.data.role && <p class="role">{c.data.role}</p>}
+            <div class="hello"><Content /></div>
+            {!c.data.portrait && <p class="soon">Portrait coming soon — Kim's drawing is on its way!</p>}
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .intro-grid {
+    display: grid; grid-template-columns: minmax(220px, 320px) 1fr;
+    gap: 24px 48px; align-items: center;
+  }
+  .intro-copy { display: grid; gap: 20px; justify-items: start; }
+
+  .note { color: var(--gg-ink-soft); margin-top: 6px; }
+  .grit-grid {
+    list-style: none; margin-top: 24px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+  }
+  .grit-item {
+    display: grid; gap: 8px; justify-items: center; text-align: center;
+    padding: 22px 14px;
+    font-family: var(--gg-display); font-weight: 500; color: var(--gg-blue);
+  }
+  .grit-emoji { font-size: 2rem; }
+
+  .char-grid {
+    margin-top: 28px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+  }
+  .char-card { padding: 24px; display: grid; gap: 8px; justify-items: start; }
+  .portrait {
+    width: 100%; max-width: 220px; height: auto; margin-inline: auto;
+    object-fit: contain;
+  }
+  .portrait.coming {
+    aspect-ratio: 1; max-width: 180px;
+    display: grid; place-items: center; font-size: 3rem;
+    border: 3px dashed color-mix(in srgb, var(--gg-blue) 35%, transparent);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--gg-sky) 30%, #fff);
+  }
+  .role { font-size: 0.88rem; font-weight: 800; color: var(--gg-green-ink); }
+  .hello { font-family: var(--gg-hand); font-size: 1.3rem; line-height: 1.35; color: var(--gg-ink); }
+  .soon { font-size: 0.85rem; color: var(--gg-ink-soft); }
+</style>

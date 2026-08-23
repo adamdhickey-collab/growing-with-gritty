@@ -1,0 +1,38 @@
+# Serves ONLY the style-tile/ folder at
+# https://adamdhickey-collab.github.io/growing-with-gritty/style-tile/
+# (with a root redirect so the bare Pages URL lands there too).
+# The Astro site in site/ deploys via Cloudflare Pages, not from here.
+name: Deploy style tile to GitHub Pages
+on:
+  push:
+    branches: [main]
+    paths: ['style-tile/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble the deployable (style-tile only — never the repo root)
+        run: |
+          mkdir -p _pages/style-tile
+          cp -r style-tile/. _pages/style-tile/
+          printf '<!DOCTYPE html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=style-tile/"><title>Growing with Gritty</title><a href="style-tile/">Style tile</a>' > _pages/index.html
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true   # auto-enables Pages on first run
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _pages
+      - id: deployment
+        uses: actions/deploy-pages@v4

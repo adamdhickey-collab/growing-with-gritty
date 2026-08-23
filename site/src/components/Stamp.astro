@@ -1,0 +1,28 @@
+---
+/* The hand-stamped value circles. Decorative emoji + a label that carries
+   the meaning, so the emoji can stay aria-hidden. */
+interface Props { emoji: string; label: string; tone?: 'green' | 'gold' | 'blue'; tilt?: number }
+const { emoji, label, tone = 'green', tilt = 0 } = Astro.props;
+---
+
+<figure class:list={['stamp', `s-${tone}`]} style={`--tilt:${tilt}deg`}>
+  <div class="disc" aria-hidden="true">{emoji}</div>
+  <figcaption>{label}</figcaption>
+</figure>
+
+<style>
+  .stamp { text-align: center; width: 150px; }
+  .disc {
+    width: 96px; height: 96px; margin: 0 auto 12px; border-radius: 50%;
+    display: grid; place-items: center; font-size: 2.1rem;
+    border: 3px dashed; background: #fff;
+    transform: rotate(var(--tilt, 0deg));
+  }
+  figcaption { font-family: var(--gg-display); font-weight: 600; font-size: 0.98rem; }
+  .s-green .disc { border-color: var(--gg-green); background: color-mix(in srgb, var(--gg-green) 16%, #fff); }
+  .s-green figcaption { color: var(--gg-green-ink); }
+  .s-gold .disc { border-color: var(--gg-gold); background: color-mix(in srgb, var(--gg-gold) 16%, #fff); }
+  .s-gold figcaption { color: var(--gg-gold-ink); }
+  .s-blue .disc { border-color: var(--gg-blue); background: color-mix(in srgb, var(--gg-sky) 45%, #fff); }
+  .s-blue figcaption { color: var(--gg-blue); }
+</style>

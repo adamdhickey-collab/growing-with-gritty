@@ -1,0 +1,104 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+
+const printables = await getCollection('printables');
+
+const kindLabels: Record<string, string> = {
+  'coloring-page': '🖍️ Coloring page',
+  'discussion-cards': '💬 Discussion cards',
+  'calm-down-cards': '🧘 Calm-down cards',
+  'poster': '🌟 Poster',
+  'journal': '📓 Grit journal',
+  'certificate': '🏆 Certificate',
+  'book-guide': '📚 Book guide',
+  'classroom-activity': '🏫 Classroom activity',
+};
+
+const groups = [
+  { audience: 'kids', heading: 'For kids', blurb: 'Coloring pages and activities to print at home.' },
+  { audience: 'parents', heading: 'For parents', blurb: 'Conversation starters and at-home grit ideas.' },
+  { audience: 'teachers', heading: 'For teachers', blurb: 'Classroom activities and discussion guides from Kim’s own classroom.' },
+  { audience: 'everyone', heading: 'For everyone', blurb: 'Posters, certificates, and more.' },
+].map((g) => ({ ...g, items: printables.filter((p) => p.data.audience === g.audience) }))
+ .filter((g) => g.items.length > 0);
+---
+
+<Base
+  title="Grown-Up Grit Guide — Growing with Gritty"
+  description="Free printables, conversation starters, and classroom ideas for parents and teachers, from teacher and author Kim Rekowski."
+>
+  <section class="band">
+    <div class="wrap flow">
+      <p class="eyebrow">For parents &amp; teachers</p>
+      <h1>The Grown-Up Grit Guide</h1>
+      <p class="lede">Kim is an elementary teacher first — these are the same
+      kinds of materials she uses in her own classroom to talk about grit,
+      mistakes, kindness, and big feelings. Everything here is free to
+      download and print.</p>
+    </div>
+  </section>
+
+  {groups.length === 0 ? (
+    <section class="band">
+      <div class="wrap empty card">
+        <span class="big" aria-hidden="true">🖍️</span>
+        <h2>The first printables are on their way!</h2>
+        <p>Kim is getting her coloring pages, discussion cards, and posters
+        ready right now. Check back soon — or
+        <a href="/books">meet the books</a> while you wait.</p>
+      </div>
+    </section>
+  ) : (
+    groups.map((g) => (
+      <section class="band">
+        <div class="wrap">
+          <h2>{g.heading}</h2>
+          <p class="blurb">{g.blurb}</p>
+          <ul class="dl-grid" role="list">
+            {g.items.map((p) => (
+              <li class="dl card">
+                {p.data.thumb && <img src={p.data.thumb} alt="" width="280" height="200" loading="lazy" />}
+                <h3>{p.data.title}</h3>
+                <p class="kind">{kindLabels[p.data.kind] ?? p.data.kind}</p>
+                <a class="btn btn-primary" href={p.data.download}>⬇️ Download PDF</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    ))
+  )}
+
+  <section class="band band-deep">
+    <div class="wrap flow">
+      <h2>Why "grit"?</h2>
+      <p>Through Gritty and his friends, kids practice naming what grit looks
+      like: trying something hard, keeping going, trying a new idea, asking
+      for help, trying again, and believing in yourself. The books give you a
+      shared character — <em>"What would Gritty do?"</em> — that makes those
+      conversations easy to start at the dinner table or on the rug.</p>
+      <p>Every activity on this site happens right on your child's device —
+      the site collects no names, no accounts, and no personal information.</p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .lede { font-size: 1.12rem; color: var(--gg-ink-soft); }
+  .empty {
+    display: grid; gap: 12px; justify-items: center; text-align: center;
+    padding: 48px 32px;
+  }
+  .empty .big { font-size: 3rem; }
+  .empty p { color: var(--gg-ink-soft); }
+  .blurb { color: var(--gg-ink-soft); margin-top: 4px; }
+  .dl-grid {
+    list-style: none; margin-top: 20px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
+  .dl { padding: 20px; display: grid; gap: 10px; justify-items: start; }
+  .dl img { border-radius: var(--gg-radius-small); }
+  .kind { font-size: 0.88rem; font-weight: 800; color: var(--gg-green-ink); }
+</style>

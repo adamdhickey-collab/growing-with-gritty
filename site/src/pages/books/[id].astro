@@ -1,0 +1,123 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Bubble from '../../components/Bubble.astro';
+
+export async function getStaticPaths() {
+  const books = await getCollection('books');
+  return books.map((book) => ({ params: { id: book.id }, props: { book } }));
+}
+
+const { book } = Astro.props;
+const { Content } = await render(book);
+const { title, order, cover, ages, lesson, buyLink, challenge, activitySheet } = book.data;
+
+/* Characters featured in this book, in series order. Missing ids are
+   skipped rather than crashing — the CMS can't guarantee referential
+   integrity and a typo must never take the site down. */
+const characters = (
+  await Promise.all(book.data.characters.map((id) => getEntry('characters', id)))
+).filter((c) => c !== undefined).sort((a, b) => a.data.order - b.data.order);
+
+const sheet = activitySheet ? await getEntry('printables', activitySheet) : undefined;
+---
+
+<Base
+  title={`${title} — Growing with Gritty`}
+  description={`${title}, book ${order} in the Gritty the Goat series by Kim Rekowski.`}
+>
+  <article>
+    <section class="band">
+      <div class="wrap head-grid">
+        <div class="cover card">
+          <img src={cover} alt={`${title} book cover`} width="322" height="322" />
+        </div>
+        <div class="head-copy">
+          <p class="eyebrow">Book {order} in the series{ages && ` · Ages ${ages}`}</p>
+          <h1>{title}</h1>
+          <div class="story flow"><Content /></div>
+          <div class="actions">
+            {buyLink && <a class="btn btn-gold" href={buyLink}>🛒 Buy the book</a>}
+            {sheet && <a class="btn btn-ghost" href={sheet.data.download}>🖍️ Activity sheet</a>}
+            {!buyLink && <p class="soon">Buy link coming soon — ask at your favorite bookstore!</p>}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {lesson && (
+      <section class="band band-sky">
+        <div class="wrap">
+          <h2>What did Gritty learn?</h2>
+          <p class="lesson">{lesson}</p>
+        </div>
+      </section>
+    )}
+
+    {characters.length > 0 && (
+      <section class="band">
+        <div class="wrap">
+          <h2>Who's in this story?</h2>
+          <ul class="char-row" role="list">
+            {characters.map((c) => (
+              <li>
+                <a class="char-chip" href="/meet-gritty">
+                  {c.data.portrait
+                    ? <img src={c.data.portrait} alt="" width="56" height="72" loading="lazy" />
+                    : <span class="chip-emoji" aria-hidden="true">🐐</span>}
+                  {c.data.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )}
+
+    {challenge && (
+      <section class="band">
+        <div class="wrap challenge">
+          <h2 class="visually-hidden">Grit challenge</h2>
+          <p class="eyebrow">🐐 Grit challenge — talk about it together</p>
+          <Bubble tail={false}>{challenge}</Bubble>
+        </div>
+      </section>
+    )}
+  </article>
+</Base>
+
+<style>
+  .head-grid {
+    display: grid; grid-template-columns: minmax(220px, 340px) 1fr;
+    gap: 32px 56px; align-items: start;
+  }
+  .cover { padding: 16px; }
+  .cover img { display: block; width: 100%; border-radius: var(--gg-radius-small); }
+  .head-copy { display: grid; gap: 16px; justify-items: start; }
+  .story { color: var(--gg-ink); }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+  .soon { font-size: var(--gg-text-small); color: var(--gg-ink-soft); }
+
+  .lesson {
+    margin-top: 12px; font-family: var(--gg-display); font-weight: 500;
+    font-size: 1.3rem; color: var(--gg-green-ink); max-width: 46ch;
+  }
+
+  .char-row { list-style: none; display: flex; flex-wrap: wrap; gap: 14px; margin-top: 18px; }
+  .char-chip {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: #fff; border: 2px solid color-mix(in srgb, var(--gg-blue) 25%, transparent);
+    border-radius: 999px; padding: 8px 18px 8px 10px; min-height: var(--gg-tap);
+    font-family: var(--gg-display); font-weight: 500; text-decoration: none;
+  }
+  .char-chip:hover { border-color: var(--gg-blue); }
+  .char-chip img { width: 40px; height: 52px; object-fit: contain; }
+  .chip-emoji { font-size: 1.5rem; }
+
+  .challenge { display: grid; gap: 14px; justify-items: start; }
+
+  @media (max-width: 720px) {
+    .head-grid { grid-template-columns: 1fr; }
+    .cover { max-width: 300px; }
+  }
+</style>

@@ -1,0 +1,40 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer>
+  <div class="wrap inner">
+    <p class="motto">"I have grit! I don't quit!"</p>
+    <p class="tagline">Build Grit. Grow Strong. Never Quit!</p>
+    <nav aria-label="Footer">
+      <a href="/meet-gritty">Meet Gritty</a>
+      <a href="/books">Books</a>
+      <a href="/grown-ups">Grown-Ups</a>
+      <a href="/about">About Kim</a>
+    </nav>
+    <p class="legal">
+      © {year} Kim Rekowski · All character art by Kim Rekowski ·
+      This site collects no personal information — activities happen right on
+      your device.
+    </p>
+  </div>
+</footer>
+
+<style>
+  footer {
+    margin-top: 72px;
+    background: var(--gg-blue);
+    color: #fff;
+  }
+  .inner { padding-block: 44px 36px; display: grid; gap: 14px; justify-items: center; text-align: center; }
+  .motto { font-family: var(--gg-hand); font-size: 1.7rem; color: #fff; }
+  .tagline { font-family: var(--gg-display); font-weight: 500; color: var(--gg-sky); }
+  nav { display: flex; flex-wrap: wrap; gap: 4px 10px; justify-content: center; }
+  nav a {
+    color: #fff; text-decoration: none; font-family: var(--gg-display);
+    padding: 10px 14px; min-height: var(--gg-tap);
+    display: inline-flex; align-items: center; border-radius: 999px;
+  }
+  nav a:hover { background: rgba(255, 255, 255, 0.14); color: #fff; }
+  .legal { font-size: 0.88rem; color: var(--gg-sky); max-width: 60ch; }
+</style>

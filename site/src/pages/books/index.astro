@@ -1,0 +1,33 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import BookCard from '../../components/BookCard.astro';
+
+const books = (await getCollection('books')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<Base
+  title="Books — Growing with Gritty"
+  description="The Gritty the Goat series by Kim Rekowski: four picture books about grit, friendship, healthy habits, and perseverance for ages 4–10."
+>
+  <section class="band">
+    <div class="wrap">
+      <p class="eyebrow">Written &amp; illustrated by Kim Rekowski</p>
+      <h1>The Gritty the Goat books</h1>
+      <p class="lede">Four adventures for ages 4–10 — each one a story kids love
+      <em>and</em> a conversation parents and teachers can build on.</p>
+      <div class="book-grid">
+        {books.map((book) => <BookCard book={book} headingLevel={2} />)}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .lede { color: var(--gg-ink-soft); font-size: 1.12rem; margin-top: 10px; }
+  .book-grid {
+    margin-top: 32px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 24px;
+  }
+</style>

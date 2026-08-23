@@ -1,0 +1,110 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Bubble from '../components/Bubble.astro';
+import BookCard from '../components/BookCard.astro';
+import Stamp from '../components/Stamp.astro';
+import home from '../data/homepage.json';
+
+const books = (await getCollection('books')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<Base
+  title="Growing with Gritty"
+  description="Stories and activities that help kids build grit, kindness, and confidence — with Gritty the Goat, by teacher and author Kim Rekowski."
+>
+  <section class="hero band">
+    <div class="wrap hero-grid">
+      <div class="hero-art">
+        <img
+          src="/images/characters/gritty-hero.webp"
+          alt="Gritty the Goat, hand-drawn by Kim Rekowski"
+          width="700" height="912"
+          fetchpriority="high"
+        />
+      </div>
+      <div class="hero-copy">
+        <Bubble>{home.heroBubble}</Bubble>
+        <h1>{home.heroHeading}</h1>
+        <p class="lede">{home.heroText}</p>
+        <div class="cta">
+          <a class="btn btn-primary" href="/meet-gritty">🐐 Meet Gritty</a>
+          <a class="btn btn-gold" href="/books">📚 See the books</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-label="Gritty's four values">
+    <div class="wrap stamps">
+      <Stamp emoji="🌱" label="Be Determined" tone="green" tilt={-3} />
+      <Stamp emoji="💛" label="Be Kind" tone="gold" tilt={2} />
+      <Stamp emoji="⭐" label="Believe in Yourself" tone="blue" tilt={-2} />
+      <Stamp emoji="⛰️" label="Never Give Up" tone="green" tilt={3} />
+    </div>
+  </section>
+
+  <section class="band band-sky">
+    <div class="wrap">
+      <p class="eyebrow">Books by Kim Rekowski</p>
+      <h2>Four adventures, one big idea: keep trying</h2>
+      <div class="book-grid">
+        {books.map((book) => <BookCard book={book} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap grown-cta card">
+      <div>
+        <p class="eyebrow">For parents &amp; teachers</p>
+        <h2>The Grown-Up Grit Guide</h2>
+        <p>Free printables, conversation starters, and classroom ideas for
+        talking about grit, mistakes, and big feelings — straight from Kim's
+        classroom.</p>
+      </div>
+      <a class="btn btn-primary" href="/grown-ups">Visit the guide</a>
+    </div>
+  </section>
+
+  <section class="band" aria-label="A reminder from Gritty">
+    <div class="wrap reminder">
+      <Bubble variant="cheer" tail={false}>{home.reminder}</Bubble>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { padding-top: 40px; }
+  .hero-grid {
+    display: grid; grid-template-columns: minmax(240px, 380px) 1fr;
+    gap: 24px 56px; align-items: center;
+  }
+  .hero-art img { width: 100%; height: auto; }
+  .hero-copy { display: grid; gap: 22px; justify-items: start; }
+  .hero-copy h1 { font-size: var(--gg-text-hero); }
+  .lede { font-size: 1.15rem; color: var(--gg-ink-soft); max-width: 52ch; }
+  .cta { display: flex; flex-wrap: wrap; gap: 14px; }
+
+  .stamps { display: flex; flex-wrap: wrap; gap: 24px 40px; justify-content: center; }
+
+  .book-grid {
+    margin-top: 28px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+  }
+
+  .grown-cta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 20px 40px;
+    padding: 36px 40px;
+  }
+  .grown-cta > div { flex: 1; min-width: 260px; display: grid; gap: 10px; }
+  .grown-cta .btn { flex: none; }
+
+  .reminder { display: flex; justify-content: center; }
+
+  @media (max-width: 720px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero-art { max-width: 260px; margin-inline: auto; }
+  }
+</style>

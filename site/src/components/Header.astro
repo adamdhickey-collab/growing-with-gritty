@@ -1,0 +1,55 @@
+---
+const links = [
+  { href: '/meet-gritty', label: '🐐 Meet Gritty' },
+  { href: '/books', label: '📚 Books' },
+  { href: '/grown-ups', label: '👨‍👩‍👧 Grown-Ups' },
+  { href: '/about', label: '✏️ About Kim' },
+];
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+
+<header>
+  <div class="wrap bar">
+    <a class="wordmark" href="/">
+      <img src="/apple-touch-icon.png" alt="" width="44" height="44" />
+      <span>Growing <em>with</em> Gritty</span>
+    </a>
+    <nav aria-label="Main">
+      {links.map(({ href, label }) => (
+        <a href={href} aria-current={path.startsWith(href) ? 'page' : undefined}>{label}</a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<style>
+  header {
+    background: color-mix(in srgb, var(--gg-paper) 88%, #fff);
+    border-bottom: 1px solid rgba(42, 50, 56, 0.08);
+  }
+  .bar {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 8px 28px; padding-block: 14px;
+  }
+  .wordmark {
+    display: inline-flex; align-items: center; gap: 12px;
+    font-family: var(--gg-display); font-weight: 700; font-size: 1.35rem;
+    color: var(--gg-blue); text-decoration: none; min-height: var(--gg-tap);
+  }
+  .wordmark img { border-radius: 50%; }
+  .wordmark em {
+    font-style: normal; font-weight: 500; font-size: 0.72em;
+    color: var(--gg-green-ink);
+  }
+  nav { display: flex; flex-wrap: wrap; gap: 4px 8px; margin-left: auto; }
+  nav a {
+    font-family: var(--gg-display); font-weight: 500; font-size: 1.02rem;
+    color: var(--gg-blue); text-decoration: none;
+    padding: 10px 14px; border-radius: 999px;
+    min-height: var(--gg-tap); display: inline-flex; align-items: center;
+  }
+  nav a:hover { background: color-mix(in srgb, var(--gg-sky) 45%, transparent); }
+  nav a[aria-current='page'] {
+    background: var(--gg-blue); color: #fff;
+  }
+</style>
