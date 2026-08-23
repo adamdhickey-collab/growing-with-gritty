@@ -8,6 +8,7 @@ edits everything through simple web forms.
 | | |
 | --- | --- |
 | 📋 [PLAN.md](PLAN.md) | The full plan: stack, kids-safety decisions, content model, phases |
+| 🔭 [V2-PLAN.md](V2-PLAN.md) | Style tile V2: research-driven second design direction |
 | 🎨 [style-tile/](style-tile/) | The approved look, served at **[adamdhickey-collab.github.io/growing-with-gritty/style-tile](https://adamdhickey-collab.github.io/growing-with-gritty/style-tile/)** |
 | 🌱 [site/](site/) | The Astro site (Phase 1 built) — see [site/README.md](site/README.md) |
 | ✍️ [copy/](copy/) | Kim's finished prose + seed content for the interactive sections |
