@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Bubble from '../components/Bubble.astro';
+import { u } from '../lib/url';
 
 const characters = (await getCollection('characters')).sort((a, b) => a.data.order - b.data.order);
 const rendered = await Promise.all(characters.map(async (c) => ({ c, Content: (await render(c)).Content })));
@@ -24,7 +25,7 @@ const gritIs = [
     <div class="wrap intro-grid">
       <img
         class="intro-art"
-        src="/images/characters/gritty-hero.webp"
+        src={u("/images/characters/gritty-hero.webp")}
         alt="Gritty the Goat, hand-drawn by Kim Rekowski"
         width="700" height="912"
       />
@@ -62,7 +63,7 @@ const gritIs = [
         {rendered.map(({ c, Content }) => (
           <article class="char-card card">
             {c.data.portrait ? (
-              <img class="portrait" src={c.data.portrait} alt={`${c.data.name}, hand-drawn by Kim Rekowski`} width="320" height="416" loading="lazy" />
+              <img class="portrait" src={u(c.data.portrait)} alt={`${c.data.name}, hand-drawn by Kim Rekowski`} width="320" height="416" loading="lazy" />
             ) : (
               <div class="portrait coming" aria-hidden="true">🐐</div>
             )}

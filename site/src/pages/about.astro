@@ -1,6 +1,7 @@
 ---
 import { getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import { u } from '../lib/url';
 
 const about = await getEntry('pages', 'about');
 if (!about) throw new Error('src/content/pages/about.md is missing');
@@ -22,13 +23,13 @@ const { title, headshot, photo, photoCaption } = about.data;
       <aside class="photos">
         {headshot && (
           <figure class="card">
-            <img src={headshot} alt="Kim Rekowski" width="450" height="450" />
+            <img src={u(headshot)} alt="Kim Rekowski" width="450" height="450" />
             <figcaption>Kim Rekowski</figcaption>
           </figure>
         )}
         {photo && (
           <figure class="card tilt">
-            <img src={photo} alt="Kim Rekowski reading one of her books to a group of goats" width="550" height="688" loading="lazy" />
+            <img src={u(photo)} alt="Kim Rekowski reading one of her books to a group of goats" width="550" height="688" loading="lazy" />
             {photoCaption && <figcaption>{photoCaption}</figcaption>}
           </figure>
         )}

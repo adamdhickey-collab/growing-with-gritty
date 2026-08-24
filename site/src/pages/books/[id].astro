@@ -2,6 +2,7 @@
 import { getCollection, getEntry, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Bubble from '../../components/Bubble.astro';
+import { u } from '../../lib/url';
 
 export async function getStaticPaths() {
   const books = await getCollection('books');
@@ -30,7 +31,7 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
     <section class="band">
       <div class="wrap head-grid">
         <div class="cover card">
-          <img src={cover} alt={`${title} book cover`} width="322" height="322" />
+          <img src={u(cover)} alt={`${title} book cover`} width="322" height="322" />
         </div>
         <div class="head-copy">
           <p class="eyebrow">Book {order} in the series{ages && ` · Ages ${ages}`}</p>
@@ -38,7 +39,7 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
           <div class="story flow"><Content /></div>
           <div class="actions">
             {buyLink && <a class="btn btn-gold" href={buyLink}>🛒 Buy the book</a>}
-            {sheet && <a class="btn btn-ghost" href={sheet.data.download}>🖍️ Activity sheet</a>}
+            {sheet && <a class="btn btn-ghost" href={u(sheet.data.download)}>🖍️ Activity sheet</a>}
             {!buyLink && <p class="soon">Buy link coming soon — ask at your favorite bookstore!</p>}
           </div>
         </div>
@@ -61,9 +62,9 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
           <ul class="char-row" role="list">
             {characters.map((c) => (
               <li>
-                <a class="char-chip" href="/meet-gritty">
+                <a class="char-chip" href={u("/meet-gritty")}>
                   {c.data.portrait
-                    ? <img src={c.data.portrait} alt="" width="56" height="72" loading="lazy" />
+                    ? <img src={u(c.data.portrait)} alt="" width="56" height="72" loading="lazy" />
                     : <span class="chip-emoji" aria-hidden="true">🐐</span>}
                   {c.data.name}
                 </a>

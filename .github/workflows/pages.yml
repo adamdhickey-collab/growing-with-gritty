@@ -1,12 +1,15 @@
-# Serves ONLY the style-tile/ folder at
-# https://adamdhickey-collab.github.io/growing-with-gritty/style-tile/
-# (with a root redirect so the bare Pages URL lands there too).
-# The Astro site in site/ deploys via Cloudflare Pages, not from here.
-name: Deploy style tile to GitHub Pages
+# Publishes the review site to GitHub Pages:
+#   /style-tile/          the three design directions (V1, V2, V3)
+#   /preview/             the real Astro site, built from site/
+# The bare Pages URL redirects to the style tile.
+#
+# This is for review only. The production site deploys via Cloudflare Pages
+# from site/ with no base path — see PLAN.md §10.
+name: Deploy review site to GitHub Pages
 on:
   push:
     branches: [main]
-    paths: ['style-tile/**', '.github/workflows/pages.yml']
+    paths: ['style-tile/**', 'site/**', '.github/workflows/pages.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -23,16 +26,39 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - name: Assemble the deployable (style-tile only — never the repo root)
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Build the site for its subfolder
+        working-directory: site
+        env:
+          # Astro does not rewrite hard-coded absolute paths, so src/lib/url.ts
+          # prefixes them with this base. PUBLIC_TILES_URL switches on the
+          # version switcher, which ships only in the review build.
+          PREVIEW_BASE: /growing-with-gritty/preview
+          PUBLIC_TILES_URL: /growing-with-gritty/style-tile
         run: |
-          mkdir -p _pages/style-tile
+          npm ci
+          npm run build
+
+      - name: Assemble the deployable
+        run: |
+          mkdir -p _pages/style-tile _pages/preview
           cp -r style-tile/. _pages/style-tile/
+          cp -r site/dist/. _pages/preview/
           printf '<!DOCTYPE html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=style-tile/"><title>Growing with Gritty</title><a href="style-tile/">Style tile</a>' > _pages/index.html
+
       - uses: actions/configure-pages@v5
         with:
-          enablement: true   # auto-enables Pages on first run
+          enablement: true
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _pages
+
       - id: deployment
         uses: actions/deploy-pages@v4

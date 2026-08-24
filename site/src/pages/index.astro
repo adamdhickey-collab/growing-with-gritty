@@ -5,6 +5,7 @@ import Bubble from '../components/Bubble.astro';
 import BookCard from '../components/BookCard.astro';
 import Stamp from '../components/Stamp.astro';
 import home from '../data/homepage.json';
+import { u } from '../lib/url';
 
 const books = (await getCollection('books')).sort((a, b) => a.data.order - b.data.order);
 ---
@@ -17,7 +18,7 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
     <div class="wrap hero-grid">
       <div class="hero-art">
         <img
-          src="/images/characters/gritty-hero.webp"
+          src={u("/images/characters/gritty-hero.webp")}
           alt="Gritty the Goat, hand-drawn by Kim Rekowski"
           width="700" height="912"
           fetchpriority="high"
@@ -28,8 +29,8 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
         <h1>{home.heroHeading}</h1>
         <p class="lede">{home.heroText}</p>
         <div class="cta">
-          <a class="btn btn-primary" href="/meet-gritty">🐐 Meet Gritty</a>
-          <a class="btn btn-gold" href="/books">📚 See the books</a>
+          <a class="btn btn-primary" href={u("/meet-gritty")}>🐐 Meet Gritty</a>
+          <a class="btn btn-gold" href={u("/books")}>📚 See the books</a>
         </div>
       </div>
     </div>
@@ -63,7 +64,7 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
         talking about grit, mistakes, and big feelings — straight from Kim's
         classroom.</p>
       </div>
-      <a class="btn btn-primary" href="/grown-ups">Visit the guide</a>
+      <a class="btn btn-primary" href={u("/grown-ups")}>Visit the guide</a>
     </div>
   </section>
 

@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { u } from '../lib/url';
 
 interface Props { book: CollectionEntry<'books'>; headingLevel?: 2 | 3 }
 const { book, headingLevel = 3 } = Astro.props;
@@ -8,11 +9,11 @@ const { title, order, cover, ages, tagline } = book.data;
 ---
 
 <article class="book-card card">
-  <a href={`/books/${book.id}`} class="cover-link">
-    <img src={cover} alt={`${title} book cover`} width="322" height="322" loading="lazy" />
+  <a href={u(`/books/${book.id}`)} class="cover-link">
+    <img src={u(cover)} alt={`${title} book cover`} width="322" height="322" loading="lazy" />
   </a>
   <div class="meta">
-    <H class="title"><a href={`/books/${book.id}`}>{title}</a></H>
+    <H class="title"><a href={u(`/books/${book.id}`)}>{title}</a></H>
     <p class="ages">Book {order}{ages && ` · Ages ${ages}`}</p>
     {tagline && <p class="tagline">{tagline}</p>}
   </div>

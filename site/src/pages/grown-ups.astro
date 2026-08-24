@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import { u } from '../lib/url';
 
 const printables = await getCollection('printables');
 
@@ -46,7 +47,7 @@ const groups = [
         <h2>The first printables are on their way!</h2>
         <p>Kim is getting her coloring pages, discussion cards, and posters
         ready right now. Check back soon — or
-        <a href="/books">meet the books</a> while you wait.</p>
+        <a href={u("/books")}>meet the books</a> while you wait.</p>
       </div>
     </section>
   ) : (
@@ -58,10 +59,10 @@ const groups = [
           <ul class="dl-grid" role="list">
             {g.items.map((p) => (
               <li class="dl card">
-                {p.data.thumb && <img src={p.data.thumb} alt="" width="280" height="200" loading="lazy" />}
+                {p.data.thumb && <img src={u(p.data.thumb)} alt="" width="280" height="200" loading="lazy" />}
                 <h3>{p.data.title}</h3>
                 <p class="kind">{kindLabels[p.data.kind] ?? p.data.kind}</p>
-                <a class="btn btn-primary" href={p.data.download}>⬇️ Download PDF</a>
+                <a class="btn btn-primary" href={u(p.data.download)}>⬇️ Download PDF</a>
               </li>
             ))}
           </ul>

@@ -1,4 +1,5 @@
 ---
+import { u } from '../lib/url';
 const links = [
   { href: '/meet-gritty', label: '🐐 Meet Gritty' },
   { href: '/books', label: '📚 Books' },
@@ -10,13 +11,13 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 
 <header>
   <div class="wrap bar">
-    <a class="wordmark" href="/">
-      <img src="/apple-touch-icon.png" alt="" width="44" height="44" />
+    <a class="wordmark" href={u("/")}>
+      <img src={u("/apple-touch-icon.png")} alt="" width="44" height="44" />
       <span>Growing <em>with</em> Gritty</span>
     </a>
     <nav aria-label="Main">
       {links.map(({ href, label }) => (
-        <a href={href} aria-current={path.startsWith(href) ? 'page' : undefined}>{label}</a>
+        <a href={u(href)} aria-current={path.startsWith(href) ? 'page' : undefined}>{label}</a>
       ))}
     </nav>
   </div>
