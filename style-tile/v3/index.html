@@ -50,18 +50,46 @@
   }
   .wrap { max-width: 1080px; margin: 0 auto; padding-inline: 26px; }
 
+  /* ── version switcher — identical on all three tiles ──
+     Sticky so it is reachable from anywhere on a long page, and it always
+     lists all three versions so no tile is ever a dead end. Colors are
+     literal (not custom properties) so the bar is byte-identical across
+     tiles whose variable names differ. */
   .tile-switch {
-    display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center;
-    justify-content: center; background: var(--blue-deep); color: #fff;
-    padding: 11px 22px; font-size: .92rem; text-align: center;
+    position: sticky; top: 0; z-index: 300;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    gap: 6px 14px; padding: 9px 16px;
+    background: #1F4666; color: #fff;
+    font-family: "Nunito", "Trebuchet MS", sans-serif;
+    box-shadow: 0 2px 10px -4px rgba(0,0,0,.4);
   }
-  .tile-switch strong { font-family: var(--display); font-weight: 600; }
-  .tile-switch a {
-    color: #fff; font-family: var(--display); font-weight: 600;
-    background: rgba(255,255,255,.16); padding: 7px 16px; border-radius: 999px;
-    text-decoration: none; min-height: 40px; display: inline-flex; align-items: center;
+  .ts-label {
+    font-size: .72rem; font-weight: 800; letter-spacing: .14em;
+    text-transform: uppercase; color: #BDD7E7;
   }
-  .tile-switch a:hover { background: rgba(255,255,255,.3); }
+  .ts-group { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .ts-opt {
+    display: flex; align-items: baseline; gap: 6px;
+    padding: 7px 14px; border-radius: 999px; min-height: 40px;
+    text-decoration: none; color: #fff;
+    background: rgba(255,255,255,.14);
+    font-family: "Fredoka", "Comic Sans MS", cursive; font-weight: 600;
+    transition: background .15s ease, translate .15s ease;
+  }
+  .ts-opt b { font-size: .95rem; }
+  .ts-opt i { font-style: normal; font-size: .82rem; opacity: .8; font-weight: 400; }
+  .ts-opt:hover { background: rgba(255,255,255,.3); color: #fff; translate: 0 -1px; }
+  .ts-opt:focus-visible { outline: 3px solid #D9A93F; outline-offset: 2px; }
+  .ts-opt[aria-current="page"] {
+    background: #fff; color: #1F4666; cursor: default;
+    box-shadow: 0 3px 10px -4px rgba(0,0,0,.45);
+  }
+  .ts-opt[aria-current="page"] i { opacity: .68; }
+  .ts-opt[aria-current="page"]::before { content: "\25CF"; font-size: .55rem; color: #7FA86B; }
+  @media (max-width: 600px) {
+    .ts-label { width: 100%; text-align: center; }
+    .ts-opt i { display: none; }
+  }
 
   /* ═══════════ THE MEADOW ═══════════ */
   .meadow {
@@ -285,7 +313,7 @@
   footer .fine { font-size:.85rem; color:var(--sky); margin:8px auto 0; max-width:64ch }
   footer a { color:#fff }
 
-  .sound-toggle { position:fixed; top:12px; right:12px; z-index:180;
+  .sound-toggle { position:fixed; top:64px; right:12px; z-index:180;
                   font-family:var(--display); font-weight:600; font-size:.9rem;
                   background:#fff; border:2.5px solid var(--blue); color:var(--blue);
                   border-radius:999px; padding:8px 16px; min-height:44px; cursor:pointer;
@@ -301,11 +329,14 @@
 </style>
 </head>
 <body>
-<div class="tile-switch">
-  <span>You're looking at <strong>Version 3 — "Alive"</strong></span>
-  <a href="../">Version 1</a>
-  <a href="../v2/">Version 2</a>
-</div>
+<nav class="tile-switch" aria-label="Style tile versions">
+  <span class="ts-label">Style tile</span>
+  <div class="ts-group">
+    <a class="ts-opt" href="../"><b>V1</b> <i>The Sheet</i></a>
+    <a class="ts-opt" href="../v2/"><b>V2</b> <i>The Meadow</i></a>
+    <a class="ts-opt" aria-current="page"><b>V3</b> <i>Alive</i></a>
+  </div>
+</nav>
 
 <button class="sound-toggle" id="soundBtn" aria-pressed="false">
   <span aria-hidden="true">🔈</span> Gritty's ears: OFF
