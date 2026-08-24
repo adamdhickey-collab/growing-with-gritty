@@ -1,6 +1,7 @@
 # Publishes the review site to GitHub Pages:
 #   /style-tile/          the three design directions (V1, V2, V3)
 #   /preview/             the real Astro site, built from site/
+#   /deck/                the presentation PDF, so it can be linked not attached
 # The bare Pages URL redirects to the style tile.
 #
 # This is for review only. The production site deploys via Cloudflare Pages
@@ -9,7 +10,7 @@ name: Deploy review site to GitHub Pages
 on:
   push:
     branches: [main]
-    paths: ['style-tile/**', 'site/**', '.github/workflows/pages.yml']
+    paths: ['style-tile/**', 'site/**', 'deck/**', '.github/workflows/pages.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -47,9 +48,10 @@ jobs:
 
       - name: Assemble the deployable
         run: |
-          mkdir -p _pages/style-tile _pages/preview
+          mkdir -p _pages/style-tile _pages/preview _pages/deck
           cp -r style-tile/. _pages/style-tile/
           cp -r site/dist/. _pages/preview/
+          cp deck/*.pdf _pages/deck/
           printf '<!DOCTYPE html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=style-tile/"><title>Growing with Gritty</title><a href="style-tile/">Style tile</a>' > _pages/index.html
 
       - uses: actions/configure-pages@v5
