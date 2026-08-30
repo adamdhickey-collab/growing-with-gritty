@@ -12,14 +12,27 @@ edits everything through simple web forms.
 | 🌐 [DOMAIN-SETUP.md](DOMAIN-SETUP.md) | polkadotbackpack.com — current DNS, the A/B decision, and the steps |
 | 📊 [deck/](deck/) | The presentation for Kim — 11 slides with speaker notes |
 | 🎨 [style-tile/](style-tile/) | The approved look, served at **[adamdhickey-collab.github.io/growing-with-gritty/style-tile](https://adamdhickey-collab.github.io/growing-with-gritty/style-tile/)** |
-| 🌱 [site/](site/) | The Astro site (Phase 1 built) — see [site/README.md](site/README.md) |
+| 🌱 [site/](site/) | The Astro site (Phases 1–2 built) — see [site/README.md](site/README.md) |
 | ✍️ [copy/](copy/) | Kim's finished prose + seed content for the interactive sections |
 | 🖼 [reference/](reference/) | Kim's art, book covers, photos, the approved-feel mockup |
+
+## The review links
+
+Every push to `main` redeploys all four:
+
+| | |
+| --- | --- |
+| **[/site/](https://adamdhickey-collab.github.io/growing-with-gritty/site/)** | **The website, clean.** No version switcher, nothing added — share this one with anyone who is looking at the site itself. |
+| [/preview/](https://adamdhickey-collab.github.io/growing-with-gritty/preview/) | The same site with the version switcher on top, for jumping between design directions |
+| [/style-tile/](https://adamdhickey-collab.github.io/growing-with-gritty/style-tile/) | The three design directions: V1 The Sheet, V2 The Meadow, V3 Alive |
+| [/deck/](https://adamdhickey-collab.github.io/growing-with-gritty/deck/) | The presentation PDF |
 
 ## Status
 
 - **Phase 1 built**: design system, home, Meet Gritty, four book pages,
   About, Grown-Up Grit Guide, Pages CMS config, KIM-GUIDE.
+- **Phase 2 built**: Gritty's World — Grit Zone, Mistake Maker, Calm Corner —
+  plus the meadow hero, where Gritty talks back.
 - **Not yet connected**: Cloudflare Pages + domain + Pages CMS (PLAN.md §10).
 - **Open decision**: the final web address. `polkadotbackpack.com` is already
   live on Shopify — see [DOMAIN-SETUP.md](DOMAIN-SETUP.md). `site/astro.config.mjs`

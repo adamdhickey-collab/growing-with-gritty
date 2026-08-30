@@ -1,6 +1,9 @@
 # Publishes the review site to GitHub Pages:
 #   /style-tile/          the three design directions (V1, V2, V3)
-#   /preview/             the real Astro site, built from site/
+#   /preview/             the real Astro site, with the version switcher on top
+#   /site/                the same site, clean — no switcher, nothing added.
+#                         This is the one to share with anyone who is looking
+#                         at the website rather than comparing directions.
 #   /deck/                the presentation PDF, so it can be linked not attached
 # The bare Pages URL redirects to the style tile.
 #
@@ -34,23 +37,34 @@ jobs:
           cache: npm
           cache-dependency-path: site/package-lock.json
 
-      - name: Build the site for its subfolder
+      - name: Build the review copy, with the version switcher
         working-directory: site
         env:
           # Astro does not rewrite hard-coded absolute paths, so src/lib/url.ts
           # prefixes them with this base. PUBLIC_TILES_URL switches on the
-          # version switcher, which ships only in the review build.
+          # version switcher, which ships only in this copy.
           PREVIEW_BASE: /growing-with-gritty/preview
           PUBLIC_TILES_URL: /growing-with-gritty/style-tile
         run: |
           npm ci
           npm run build
+          mv dist ../_review
+
+      # The same site with no review chrome at all: no switcher markup and no
+      # switcher CSS, since PUBLIC_TILES_URL is simply absent here. Each copy
+      # needs its own build because the base path is baked into every link.
+      - name: Build the clean copy
+        working-directory: site
+        env:
+          PREVIEW_BASE: /growing-with-gritty/site
+        run: npm run build
 
       - name: Assemble the deployable
         run: |
-          mkdir -p _pages/style-tile _pages/preview _pages/deck
+          mkdir -p _pages/style-tile _pages/preview _pages/site _pages/deck
           cp -r style-tile/. _pages/style-tile/
-          cp -r site/dist/. _pages/preview/
+          cp -r _review/. _pages/preview/
+          cp -r site/dist/. _pages/site/
           cp deck/*.pdf _pages/deck/
           printf '<!DOCTYPE html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=style-tile/"><title>Growing with Gritty</title><a href="style-tile/">Style tile</a>' > _pages/index.html
 
