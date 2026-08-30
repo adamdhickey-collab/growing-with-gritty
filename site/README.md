@@ -43,21 +43,31 @@ npm run build    # → dist/
   `KIM-GUIDE.md` in the same change.
 - **Search** — `site.config.mjs` `indexable: false` drives a noindex tag on
   every page while the site is being built.
-- **The image chute** (`scripts/add-image.mjs`) — Adam's fast lane from
-  desktop to repo, same idea as lucy-learns' `pilot.mjs add`:
+- **The image chute** — Adam's fast lane from desktop to repo. A page you
+  drag pictures onto:
+
+  ```
+  npm run chute        # → http://localhost:4322
+  ```
+
+  Drop images (or paste one with ⌘V), pick the folder, and they land in
+  `public/images/`. There is a one-liner for when you're already in the
+  terminal:
 
   ```
   npm run add-image -- characters/gabby     # newest Desktop/Downloads image
   npm run add-image -- books/cover ~/Desktop/scan.png   # or name the file
   ```
 
-  It converts to webp (sharp, already here via Astro), resizes to 1400px
-  (`--width` to override), strips camera metadata, refuses duplicates and
-  accidental overwrites (`--replace` to overwrite on purpose), and prints
-  the `/images/…` URL to use. It never commits. `gritty/` is refused —
-  those are the re-inked line-boil frames, a different process. Kim's
-  route is unchanged: she uploads through Pages CMS, which lands media in
-  the same `public/images/`.
+  Both call `scripts/lib/land-image.mjs`, so the rules are the same either
+  way: convert to webp (sharp, already here via Astro), resize to 1400px,
+  strip camera metadata, refuse duplicates and accidental overwrites, and
+  print the `/images/…` path. Neither commits. `gritty/` is refused —
+  those are the re-inked line-boil frames, a different process.
+
+  The chute binds to `127.0.0.1`, so it is this Mac only. **Kim's route is
+  a real URL from anywhere:** the Pages CMS media uploader, which lands
+  files in this same folder once the CMS is connected.
 
 ## Hard rules
 
