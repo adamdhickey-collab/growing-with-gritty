@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "add-image": "node scripts/add-image.mjs"
   },
   "dependencies": {
     "@fontsource-variable/fredoka": "^5.2.0",
