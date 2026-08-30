@@ -43,8 +43,15 @@ npm run build    # → dist/
   `KIM-GUIDE.md` in the same change.
 - **Search** — `site.config.mjs` `indexable: false` drives a noindex tag on
   every page while the site is being built.
-- **The image chute** — Adam's fast lane from desktop to repo. A page you
-  drag pictures onto:
+- **The image chute** — Adam's fast lane from desktop to repo, in three
+  flavours. The hosted one is a real URL, from any machine:
+
+  **<https://adamdhickey-collab.github.io/growing-with-gritty/chute/>**
+
+  It converts in the browser and commits through the GitHub API (source:
+  [`../chute/index.html`](../chute/index.html)), so it needs a fine-grained
+  token with Contents: read/write on this repo, kept in that browser only.
+  The local one needs no token but only runs here:
 
   ```
   npm run chute        # → http://localhost:4322
@@ -59,15 +66,17 @@ npm run build    # → dist/
   npm run add-image -- books/cover ~/Desktop/scan.png   # or name the file
   ```
 
-  Both call `scripts/lib/land-image.mjs`, so the rules are the same either
-  way: convert to webp (sharp, already here via Astro), resize to 1400px,
-  strip camera metadata, refuse duplicates and accidental overwrites, and
-  print the `/images/…` path. Neither commits. `gritty/` is refused —
-  those are the re-inked line-boil frames, a different process.
+  The two local routes share `scripts/lib/land-image.mjs`; the hosted page
+  reimplements the same rules in the browser, and its comment says so —
+  change one, change the other. Every route: webp, 1400px, camera metadata
+  stripped, duplicates and accidental overwrites refused, `gritty/` off
+  limits (those are the re-inked line-boil frames, a different process).
+  The local routes write files and commit nothing; the hosted one commits
+  directly, since that is the only way a static page can reach the repo.
 
-  The chute binds to `127.0.0.1`, so it is this Mac only. **Kim's route is
-  a real URL from anywhere:** the Pages CMS media uploader, which lands
-  files in this same folder once the CMS is connected.
+  **Kim's route is neither of these:** the Pages CMS media uploader, a real
+  URL with no token to manage, landing files in this same folder once the
+  CMS is connected.
 
 ## Hard rules
 

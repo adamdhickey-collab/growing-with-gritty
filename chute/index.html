@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Image chute — Growing with Gritty</title>
+<!--
+  The hosted image chute.
+
+  GitHub Pages can only serve files, never receive them — so this page does
+  the work in the browser (resize, convert to webp) and then commits the
+  result to the repo through the GitHub API. That is the whole trick: the
+  upload never touches a server of ours, because there isn't one.
+
+  It needs a fine-grained token with Contents: read and write on this one
+  repo. The token stays in this browser's localStorage and is sent to
+  api.github.com and nowhere else. It is never logged, never put in a URL,
+  and "Forget token" erases it.
+
+  The conversion rules match site/scripts/lib/land-image.mjs deliberately:
+  1400px wide, webp quality 82, EXIF orientation baked in and metadata
+  dropped, duplicates and accidental overwrites refused. Two implementations
+  of one rule is a drift risk, and the comment is the only thing holding
+  them together — change one, change the other.
+-->
+<style>
+  :root {
+    --paper:#FAF6EC; --card:#fff; --blue:#2C5F8A; --blue-deep:#1F4666;
+    --green:#7FA86B; --green-ink:#4E7140; --gold:#D9A93F; --gold-ink:#8A6414;
+    --sky:#BDD7E7; --ink:#2A3238; --soft:#55606A; --radius:18px;
+  }
+  * { box-sizing:border-box; margin:0; }
+  body { background:var(--paper); color:var(--ink); padding:30px 20px 70px;
+         font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  .wrap { max-width:840px; margin:0 auto; }
+  h1 { font-size:1.7rem; color:var(--blue-deep); }
+  .sub { color:var(--soft); margin:6px 0 22px; }
+  code { background:#fff; padding:2px 7px; border-radius:6px; font-size:.88em; }
+
+  .panel { background:var(--card); border:1px solid rgba(42,50,56,.1);
+           border-radius:var(--radius); padding:18px 20px; margin-bottom:18px;
+           box-shadow:0 10px 24px -18px rgba(44,95,138,.5); }
+  .panel h2 { font-size:1rem; color:var(--blue-deep); margin-bottom:8px; }
+  .panel p { color:var(--soft); font-size:.93rem; }
+  .panel ol { color:var(--soft); font-size:.93rem; margin:8px 0 0 20px; }
+  .panel a { color:var(--blue); }
+
+  #zone { border:3px dashed var(--sky); border-radius:var(--radius); background:#fff;
+          padding:46px 24px; text-align:center; cursor:pointer; transition:.15s; }
+  #zone:hover, #zone.over { border-color:var(--gold); background:#FFFDF4; }
+  #zone[aria-disabled=true] { opacity:.5; cursor:not-allowed; border-color:var(--sky); }
+  #zone b { display:block; font-size:1.2rem; color:var(--blue); margin-bottom:4px; }
+  #zone span { color:var(--soft); font-size:.94rem; }
+
+  .card { background:var(--card); border:1px solid rgba(42,50,56,.1); border-radius:var(--radius);
+          box-shadow:0 10px 24px -18px rgba(44,95,138,.5); padding:16px; margin-top:16px;
+          display:grid; grid-template-columns:104px 1fr; gap:16px; align-items:start; }
+  .thumb { width:104px; height:104px; border-radius:12px; object-fit:cover; background:var(--sky); }
+  .fields { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:10px; }
+  .fields label { font-size:.78rem; font-weight:700; color:var(--soft);
+                  text-transform:uppercase; letter-spacing:.08em; width:100%; }
+  select, input { font:inherit; font-size:.95rem; padding:9px 12px; border:2px solid var(--sky);
+                  border-radius:10px; background:#fff; color:var(--ink); min-height:42px; }
+  input[type=text], input[type=password] { flex:1; min-width:160px; }
+  input[type=number] { width:96px; }
+  select:focus, input:focus { outline:3px solid var(--gold); outline-offset:1px; }
+  .slash { color:var(--soft); }
+  .name { font-weight:600; color:var(--blue-deep); word-break:break-all; }
+  .meta, .hint { color:var(--soft); font-size:.89rem; }
+
+  button { font:inherit; font-weight:600; cursor:pointer; border:none; border-radius:999px;
+           padding:10px 22px; min-height:44px; background:var(--blue); color:#fff; transition:.15s; }
+  button:hover { background:var(--blue-deep); }
+  button:disabled { opacity:.5; cursor:default; }
+  button.gold { background:var(--gold); color:#3a2a06; }
+  button.ghost { background:transparent; color:var(--blue); border:2px solid var(--blue); }
+  button.small { padding:7px 16px; min-height:38px; font-size:.9rem; }
+  .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:12px; }
+
+  .done { border-color:var(--green); background:#F7FBF4; }
+  .done .ok { color:var(--green-ink); font-weight:700; }
+  .fail { border-color:var(--gold-ink); background:#FFFDF4; }
+  .msg { color:var(--gold-ink); font-weight:600; }
+  code.url { background:var(--paper); border:1px solid var(--sky); padding:5px 10px;
+             border-radius:8px; font-size:.9rem; user-select:all; }
+  .ok-dot { color:var(--green-ink); font-weight:700; }
+</style></head>
+<body><div class="wrap">
+  <h1>Image chute</h1>
+  <p class="sub">Drop pictures here and they are resized, converted to webp, and
+     committed straight into <code>site/public/images/</code>. The review site
+     rebuilds itself a minute or two later.</p>
+
+  <div class="panel" id="auth">
+    <h2>Your GitHub token</h2>
+    <p id="authState">Checking…</p>
+    <div class="fields" id="authFields">
+      <input id="token" type="password" placeholder="github_pat_…" autocomplete="off" spellcheck="false">
+      <button id="save" class="small">Save</button>
+      <button id="forget" class="small ghost" hidden>Forget token</button>
+    </div>
+    <ol>
+      <li>Make a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">fine-grained token</a>
+          with access to <b>only</b> the <code>growing-with-gritty</code> repository.</li>
+      <li>Under Repository permissions, set <b>Contents</b> to <b>Read and write</b>. Nothing else is needed.</li>
+      <li>Paste it above. It is kept in this browser only, sent to api.github.com and nowhere else,
+          and never leaves this page otherwise. Give it a short expiry — you can always make another.</li>
+    </ol>
+  </div>
+
+  <div id="zone" tabindex="0" role="button" aria-disabled="true"
+       aria-label="Drop images, or click to choose files">
+    <b>Drop images here</b>
+    <span>or click to choose &middot; or paste one with &#8984;V</span>
+  </div>
+  <input id="file" type="file" accept="image/*" multiple hidden>
+
+  <div id="list"></div>
+
+  <p class="hint" style="margin-top:30px">
+    Kim's route is the Pages CMS media uploader — same folder, no token to manage.
+    This page is for Adam.
+  </p>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var OWNER = 'adamdhickey-collab';
+  var REPO  = 'growing-with-gritty';
+  var BRANCH = 'main';
+  var ROOT  = 'site/public/images';
+  var MAXW  = 1400;      /* matches land-image.mjs */
+  var QUALITY = 0.82;    /* matches land-image.mjs */
+  var KEY = 'gg-chute-token';
+
+  var tokenInput = document.getElementById('token');
+  var authState = document.getElementById('authState');
+  var forgetBtn = document.getElementById('forget');
+  var zone = document.getElementById('zone');
+  var picker = document.getElementById('file');
+  var list = document.getElementById('list');
+
+  var token = null;
+  var tree = null;   /* { paths: Set, shaByPath: Map, blobShas: Map(sha → path) } */
+  var folders = ['books', 'characters', 'photos'];
+
+  /* ── token, kept in this browser only ── */
+  function readToken() {
+    try { return localStorage.getItem(KEY); } catch (e) { return null; }
+  }
+  function writeToken(v) {
+    try { v ? localStorage.setItem(KEY, v) : localStorage.removeItem(KEY); } catch (e) {}
+  }
+
+  function setAuth(state, msg) {
+    authState.innerHTML = msg;
+    var live = state === 'ok';
+    zone.setAttribute('aria-disabled', String(!live));
+    forgetBtn.hidden = !live;
+    tokenInput.hidden = live;
+    document.getElementById('save').hidden = live;
+    if (live) tokenInput.value = '';
+  }
+
+  function api(path, opts) {
+    opts = opts || {};
+    return fetch('https://api.github.com' + path, {
+      method: opts.method || 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28'
+      },
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        return { ok: r.ok, status: r.status, body: j };
+      });
+    });
+  }
+
+  /* The tree gives us two things at once: which folders exist, and the git
+     sha of every image already committed — which is how a duplicate is
+     caught without downloading anything. */
+  function loadTree() {
+    return api('/repos/' + OWNER + '/' + REPO + '/git/trees/' + BRANCH + '?recursive=1')
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.body.message || ('GitHub said ' + res.status));
+        var paths = new Set(), shaByPath = new Map(), blobShas = new Map(), dirs = new Set();
+        (res.body.tree || []).forEach(function (n) {
+          if (n.path.indexOf(ROOT + '/') !== 0) return;
+          if (n.type === 'tree') {
+            var d = n.path.slice(ROOT.length + 1);
+            if (d.indexOf('/') === -1 && d !== 'gritty') dirs.add(d);
+          } else {
+            paths.add(n.path);
+            shaByPath.set(n.path, n.sha);
+            blobShas.set(n.sha, n.path);
+          }
+        });
+        if (dirs.size) folders = Array.from(dirs).sort();
+        tree = { paths: paths, shaByPath: shaByPath, blobShas: blobShas };
+      });
+  }
+
+  function connect(t) {
+    token = t;
+    setAuth('busy', 'Checking the token…');
+    return loadTree().then(function () {
+      writeToken(t);
+      setAuth('ok', '<span class="ok-dot">&#10003; Connected</span> to ' +
+        OWNER + '/' + REPO + ' — drop away.');
+    }).catch(function (e) {
+      token = null;
+      writeToken(null);
+      setAuth('bad', 'That token did not work: ' + e.message +
+        '<br>Check it has <b>Contents: read and write</b> on this repository.');
+    });
+  }
+
+  document.getElementById('save').addEventListener('click', function () {
+    var v = tokenInput.value.trim();
+    if (v) connect(v);
+  });
+  tokenInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') document.getElementById('save').click();
+  });
+  forgetBtn.addEventListener('click', function () {
+    token = null; tree = null; writeToken(null);
+    setAuth('none', 'No token saved yet.');
+  });
+
+  var saved = readToken();
+  if (saved) connect(saved);
+  else setAuth('none', 'No token saved yet.');
+
+  /* ── git's own hash, so a duplicate is caught before anything is written ── */
+  function gitBlobSha(bytes) {
+    /* git hashes "blob <size>" + a NUL + the bytes. The NUL is written as a
+       byte rather than an escape in a string, so this file stays plain text
+       that grep and git diff can read. */
+    var header = new TextEncoder().encode('blob ' + bytes.byteLength);
+    var buf = new Uint8Array(header.length + 1 + bytes.byteLength);
+    buf.set(header, 0);
+    buf[header.length] = 0;
+    buf.set(new Uint8Array(bytes), header.length + 1);
+    return crypto.subtle.digest('SHA-1', buf).then(function (d) {
+      return Array.from(new Uint8Array(d)).map(function (b) {
+        return b.toString(16).padStart(2, '0');
+      }).join('');
+    });
+  }
+
+  function b64(bytes) {
+    var s = '', a = new Uint8Array(bytes);
+    for (var i = 0; i < a.length; i += 8192) {
+      s += String.fromCharCode.apply(null, a.subarray(i, i + 8192));
+    }
+    return btoa(s);
+  }
+
+  function slug(s) {
+    return s.replace(/\.[^.]+$/, '').toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'untitled';
+  }
+
+  /* Resize and convert in the browser. imageOrientation bakes in the EXIF
+     rotation, and canvas carries no metadata forward — so the same two
+     things the local chute does with sharp. */
+  function convert(file, maxw) {
+    return createImageBitmap(file, { imageOrientation: 'from-image' })
+      .catch(function () {
+        throw new Error(/heic|heif/i.test(file.name)
+          ? 'This browser cannot read HEIC. Export it as JPEG or PNG first.'
+          : 'That file could not be read as an image.');
+      })
+      .then(function (bmp) {
+        var scale = Math.min(1, maxw / bmp.width);
+        var w = Math.round(bmp.width * scale), h = Math.round(bmp.height * scale);
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(bmp, 0, 0, w, h);
+        var from = { width: bmp.width, height: bmp.height };
+        bmp.close();
+        return new Promise(function (resolve, reject) {
+          canvas.toBlob(function (blob) {
+            if (!blob) return reject(new Error('The browser could not make a webp.'));
+            if (blob.type !== 'image/webp') {
+              return reject(new Error('This browser cannot write webp. Try Safari or Chrome.'));
+            }
+            blob.arrayBuffer().then(function (buf) {
+              resolve({ bytes: buf, width: w, height: h, from: from });
+            });
+          }, 'image/webp', QUALITY);
+        });
+      });
+  }
+
+  /* ── the drop zone ── */
+  zone.addEventListener('click', function () { if (token) picker.click(); });
+  zone.addEventListener('keydown', function (e) {
+    if ((e.key === 'Enter' || e.key === ' ') && token) { e.preventDefault(); picker.click(); }
+  });
+  picker.addEventListener('change', function () { accept(picker.files); picker.value = ''; });
+  ['dragenter', 'dragover'].forEach(function (t) {
+    zone.addEventListener(t, function (e) { e.preventDefault(); if (token) zone.classList.add('over'); });
+  });
+  ['dragleave', 'drop'].forEach(function (t) {
+    zone.addEventListener(t, function (e) { e.preventDefault(); zone.classList.remove('over'); });
+  });
+  zone.addEventListener('drop', function (e) { accept(e.dataTransfer.files); });
+  document.addEventListener('paste', function (e) {
+    if (e.clipboardData && e.clipboardData.files.length) accept(e.clipboardData.files);
+  });
+
+  function accept(files) {
+    if (!token) return;
+    Array.prototype.slice.call(files).forEach(function (f) {
+      if (/^image\//.test(f.type) || /\.(heic|heif|tiff?)$/i.test(f.name)) card(f);
+    });
+  }
+
+  function card(file) {
+    var el = document.createElement('div');
+    el.className = 'card';
+
+    var img = document.createElement('img');
+    img.className = 'thumb'; img.alt = '';
+    img.src = URL.createObjectURL(file);
+    el.appendChild(img);
+
+    var body = document.createElement('div');
+    body.innerHTML =
+      '<p class="name"></p>' +
+      '<p class="meta"></p>' +
+      '<div class="fields">' +
+        '<label>Where it lands</label>' +
+        '<select class="folder"></select>' +
+        '<input class="newfolder" type="text" placeholder="folder name" hidden>' +
+        '<span class="slash">/</span>' +
+        '<input class="nm" type="text">' +
+        '<span class="slash">.webp</span>' +
+      '</div>' +
+      '<div class="fields">' +
+        '<label>Width</label>' +
+        '<input class="w" type="number" min="80" max="4000" step="20">' +
+        '<span class="hint">pixels — only ever shrunk, never enlarged</span>' +
+      '</div>' +
+      '<div class="row"><button class="go">Add to the site</button>' +
+      '<span class="status hint"></span></div>' +
+      '<div class="note"></div>';
+    el.appendChild(body);
+
+    body.querySelector('.name').textContent = file.name;
+    body.querySelector('.meta').textContent = (file.size / 1048576).toFixed(2) + ' MB';
+    body.querySelector('.nm').value = slug(file.name);
+    body.querySelector('.w').value = MAXW;
+    var sel = body.querySelector('.folder');
+    sel.innerHTML = folders.map(function (f) {
+      return '<option value="' + f + '">' + f + '/</option>';
+    }).join('') + '<option value="__new">new folder…</option>';
+    var nf = body.querySelector('.newfolder');
+    sel.addEventListener('change', function () {
+      nf.hidden = sel.value !== '__new';
+      if (!nf.hidden) nf.focus();
+    });
+
+    list.prepend(el);
+
+    var go = body.querySelector('.go');
+    var status = body.querySelector('.status');
+    var note = body.querySelector('.note');
+
+    go.addEventListener('click', function () { send(false); });
+
+    function fail(message, hint, offerReplace) {
+      go.disabled = false;
+      status.textContent = '';
+      el.classList.add('fail');
+      note.innerHTML = '<p class="msg" style="margin-top:10px">' + message + '</p>' +
+        (hint ? '<p class="hint">' + hint + '</p>' : '');
+      if (offerReplace) {
+        var b = document.createElement('button');
+        b.className = 'gold small'; b.style.marginTop = '10px';
+        b.textContent = 'Replace it';
+        b.addEventListener('click', function () { b.remove(); send(true); });
+        note.appendChild(b);
+      }
+    }
+
+    function send(replace) {
+      var folder = sel.value === '__new' ? nf.value.trim().replace(/[^a-z0-9-]/gi, '') : sel.value;
+      var nm = slug(body.querySelector('.nm').value);
+      if (!folder) return void (status.textContent = 'Name the folder first.');
+      if (folder === 'gritty') {
+        return fail("gritty/ holds Gritty's re-inked animation frames, which the chute can't make.",
+          'For a character portrait use characters/; otherwise pick another folder.');
+      }
+      var maxw = Math.min(Math.max(Number(body.querySelector('.w').value) || MAXW, 80), 4000);
+      var path = ROOT + '/' + folder + '/' + nm + '.webp';
+
+      go.disabled = true;
+      note.innerHTML = '';
+      el.classList.remove('fail');
+      status.textContent = 'Converting…';
+
+      convert(file, maxw).then(function (out) {
+        return gitBlobSha(out.bytes).then(function (sha) {
+          var twin = tree.blobShas.get(sha);
+          if (twin && twin !== path) {
+            throw { soft: true, message: 'That is the same image as ' + twin + '.',
+                    hint: 'Nothing was committed — the site already serves it.' };
+          }
+          var exists = tree.paths.has(path);
+          if (exists && !replace) {
+            throw { soft: true, replace: true, message: path + ' already exists.',
+                    hint: 'Nothing was committed.' };
+          }
+          if (twin === path && exists) {
+            throw { soft: true, message: 'That is already exactly what is at ' + path + '.',
+                    hint: 'Nothing to change.' };
+          }
+          status.textContent = 'Committing…';
+          return api('/repos/' + OWNER + '/' + REPO + '/contents/' + path, {
+            method: 'PUT',
+            body: {
+              message: 'Add ' + folder + '/' + nm + '.webp from the chute',
+              content: b64(out.bytes),
+              branch: BRANCH,
+              sha: exists ? tree.shaByPath.get(path) : undefined
+            }
+          }).then(function (res) {
+            if (!res.ok) {
+              throw { soft: true, message: 'GitHub refused it: ' +
+                (res.body.message || res.status),
+                hint: res.status === 403 || res.status === 404
+                  ? 'That usually means the token lacks Contents: read and write on this repo.'
+                  : '' };
+            }
+            /* keep the local picture of the repo current, so a second drop
+               in the same session is checked against what is really there */
+            var newSha = res.body.content && res.body.content.sha;
+            tree.paths.add(path);
+            if (newSha) { tree.shaByPath.set(path, newSha); tree.blobShas.set(newSha, path); }
+            return { out: out, path: path, folder: folder, nm: nm };
+          });
+        });
+      }).then(function (r) {
+        if (folders.indexOf(r.folder) === -1) { folders.push(r.folder); folders.sort(); }
+        el.className = 'card done';
+        body.innerHTML =
+          '<p class="ok">&#10003; Committed</p>' +
+          '<p class="name">' + r.path + '</p>' +
+          '<p class="meta">' + r.out.from.width + '&times;' + r.out.from.height + ' &rarr; ' +
+            r.out.width + '&times;' + r.out.height + ' &middot; ' +
+            Math.round(r.out.bytes.byteLength / 1024) + ' KB</p>' +
+          '<div class="row"><code class="url">/images/' + r.folder + '/' + r.nm + '.webp</code>' +
+          '<button class="ghost small copy">Copy path</button></div>' +
+          '<p class="hint" style="margin-top:8px">The review site rebuilds in a minute or two.</p>';
+        body.querySelector('.copy').addEventListener('click', function () {
+          navigator.clipboard.writeText('/images/' + r.folder + '/' + r.nm + '.webp');
+          this.textContent = 'Copied';
+        });
+      }).catch(function (e) {
+        if (e && e.soft) fail(e.message, e.hint, e.replace);
+        else fail(e.message || 'Something went wrong.', '');
+      });
+    }
+  }
+})();
+</script>
+</body></html>

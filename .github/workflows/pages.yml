@@ -5,6 +5,7 @@
 #                         This is the one to share with anyone who is looking
 #                         at the website rather than comparing directions.
 #   /deck/                the presentation PDF, so it can be linked not attached
+#   /chute/               Adam's image drop page, which commits to the repo
 # The bare Pages URL redirects to the style tile.
 #
 # This is for review only. The production site deploys via Cloudflare Pages
@@ -13,7 +14,7 @@ name: Deploy review site to GitHub Pages
 on:
   push:
     branches: [main]
-    paths: ['style-tile/**', 'site/**', 'deck/**', '.github/workflows/pages.yml']
+    paths: ['style-tile/**', 'site/**', 'deck/**', 'chute/**', '.github/workflows/pages.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -61,10 +62,11 @@ jobs:
 
       - name: Assemble the deployable
         run: |
-          mkdir -p _pages/style-tile _pages/preview _pages/site _pages/deck
+          mkdir -p _pages/style-tile _pages/preview _pages/site _pages/deck _pages/chute
           cp -r style-tile/. _pages/style-tile/
           cp -r _review/. _pages/preview/
           cp -r site/dist/. _pages/site/
+          cp -r chute/. _pages/chute/
           cp deck/*.pdf _pages/deck/
           printf '<!DOCTYPE html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=style-tile/"><title>Growing with Gritty</title><a href="style-tile/">Style tile</a>' > _pages/index.html
 

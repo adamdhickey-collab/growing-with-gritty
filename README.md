@@ -26,6 +26,7 @@ Every push to `main` redeploys all four:
 | [/preview/](https://adamdhickey-collab.github.io/growing-with-gritty/preview/) | The same site with the version switcher on top, for jumping between design directions |
 | [/style-tile/](https://adamdhickey-collab.github.io/growing-with-gritty/style-tile/) | The three design directions: V1 The Sheet, V2 The Meadow, V3 Alive |
 | [the deck](https://adamdhickey-collab.github.io/growing-with-gritty/deck/Growing-with-Gritty-for-Kim.pdf) | The presentation PDF (the `/deck/` folder itself has no index page) |
+| [/chute/](https://adamdhickey-collab.github.io/growing-with-gritty/chute/) | **Adam's image chute** — drop pictures in and they are converted and committed to the repo. Needs a GitHub token; see [chute/index.html](chute/index.html). |
 
 ## Status
 
