@@ -22,11 +22,19 @@ npm run build    # → dist/
   of YET, the private "how did YOU have grit today?" check-in),
   `/mistake-maker`, `/calm-corner` (feeling picker, strategy cards,
   Breathe with Gritty).
+- **The meadow hero** (`src/components/MeadowHero.astro`, from style tile
+  V3 "Alive") — Gritty climbs out of the grass, kids tap him to chat and
+  answer with reply chips, and his friends visit. His line boil is Kim's
+  drawing re-inked as three frames (`public/images/gritty/`); when Kim
+  draws a mood, drop its frames in as `gritty-<mood>-1.webp` `-2` `-3`
+  (moods: happy, laugh, surprised, proud, thinking) and that mood starts
+  using her art automatically. Seasons recolor the hills by month.
 - **Content collections** (`src/content.config.ts`) — books, characters,
   printables (empty until Kim's PDFs arrive — the Grown-Ups page shows a
   friendly empty state), singleton pages, and the game content: scenarios,
-  mistakes, yet-sentences, calm-strategies. Every optional field
-  tolerates null: a half-filled CMS form must never break the build.
+  mistakes, yet-sentences, calm-strategies, meadow-chats (the hero
+  conversations). Every optional field tolerates null: a half-filled CMS
+  form must never break the build.
 - **Interactivity** — vanilla JS per page, progressively enhanced: without
   JavaScript every game renders as a readable list. Game state (the grit
   check-in) lives in `localStorage` only, wrapped in try/catch.

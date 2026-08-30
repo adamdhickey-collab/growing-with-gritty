@@ -1,0 +1,525 @@
+---
+/* The meadow hero — style tile V3 "Alive", grown into the real site.
+   Gritty (Kim's drawing, re-inked as three line-boil frames) climbs out of
+   the meadow grass; kids tap him to chat, answer with reply chips, and his
+   friends wander up the path to visit. Every conversation is CMS content
+   (the meadow-chats collection) — the shell here is built once.
+
+   Expression art: when Kim draws a mood (laughing, surprised, thinking…),
+   drop the re-inked frames into public/images/gritty/ as
+   gritty-<mood>-1.webp / -2 / -3 and that mood's reactions start using her
+   drawing automatically. Until then, moods act through motion alone —
+   never through generated art. */
+import fs from 'node:fs';
+import path from 'node:path';
+import { getCollection } from 'astro:content';
+import { u } from '../lib/url';
+
+interface Props { heading: string; bubble: string }
+const { heading, bubble } = Astro.props;
+
+const chats = (await getCollection('meadow-chats'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map(({ data: d }) => ({
+    speaker: d.speaker,
+    opener: d.opener,
+    replies: [
+      { say: d.replyA, react: d.reactionA, mood: d.moodA ?? 'happy' },
+      { say: d.replyB, react: d.reactionB, mood: d.moodB ?? 'happy' },
+      ...(d.replyC && d.reactionC
+        ? [{ say: d.replyC, react: d.reactionC, mood: d.moodC ?? 'happy' }]
+        : []),
+    ],
+  }));
+
+/* Friends' visitor cards: name, role, and portrait once Kim uploads one —
+   the same slot the character pages use. Never stand-in art. */
+const TONES: Record<string, string> = {
+  gritty: 'blue', gabby: 'gold', 'grandpa-goat': 'blue',
+  'grandma-goat': 'green', gibby: 'sky',
+};
+const characters = await getCollection('characters');
+const cast = Object.fromEntries(characters.map((c) => [c.id, {
+  name: c.data.name,
+  role: c.data.role ?? '',
+  portrait: c.data.portrait ? u(c.data.portrait) : null,
+  tone: TONES[c.id] ?? 'green',
+}]));
+
+/* Gritty's base pose ships with the site; extra moods appear the moment
+   their frames exist. cwd is site/ for both `npm run dev` and CI builds. */
+const BASE_FRAMES = [1, 2, 3].map((n) => u(`/images/gritty/gritty-boil-${n}.webp`));
+const moodFrames: Record<string, string[]> = {};
+try {
+  for (const f of fs.readdirSync(path.resolve(process.cwd(), 'public/images/gritty'))) {
+    const m = f.match(/^gritty-([a-z]+)-[0-9]\.webp$/);
+    if (m && m[1] !== 'boil') (moodFrames[m[1]] ??= []).push(u(`/images/gritty/${f}`));
+  }
+  for (const k in moodFrames) moodFrames[k].sort();
+} catch { /* no expression art yet — motion carries the moods */ }
+
+const payload = JSON.stringify({ chats, cast, moods: moodFrames })
+  .replace(/</g, '\\u003c');
+---
+
+<section class="meadow" aria-label="Gritty's Meadow" data-meadow>
+  <div class="sun" aria-hidden="true"></div>
+  <div class="cloud c1" aria-hidden="true"></div>
+  <div class="cloud c2" aria-hidden="true"></div>
+
+  <div class="hills" aria-hidden="true">
+    <svg class="hill-back" viewBox="0 0 1440 250" preserveAspectRatio="none">
+      <path d="M0,145 C220,38 430,116 650,106 C880,96 1080,19 1250,67 C1330,90 1390,116 1440,106 L1440,250 L0,250 Z" fill="var(--gg-hill-back)"/>
+    </svg>
+    <svg class="hill-mid" viewBox="0 0 1440 184" preserveAspectRatio="none">
+      <path d="M0,116 C260,29 520,135 780,97 C1000,64 1200,126 1440,68 L1440,184 L0,184 Z" fill="var(--gg-hill-mid)"/>
+    </svg>
+    <svg class="hill-front" viewBox="0 0 1440 116" preserveAspectRatio="none">
+      <path d="M0,42 C380,4 940,70 1440,21 L1440,116 L0,116 Z" fill="var(--gg-meadow)"/>
+      <g fill="var(--gg-paper)">
+        <circle cx="300" cy="89" r="3.5"/><circle cx="700" cy="97" r="4"/>
+        <circle cx="1120" cy="84" r="3"/><circle cx="1330" cy="91" r="3.5"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="hero-copy">
+    <h1>{heading}</h1>
+    <p class="motto">Build Grit. Grow Strong. Never Quit!</p>
+  </div>
+
+  <div class="stage">
+    <div class="visitor" data-visitor hidden>
+      <span class="visitor-disc" data-visitor-disc aria-hidden="true">🌼</span>
+      <p class="visitor-name">
+        <b data-visitor-name></b>
+        <span class="visitor-role" data-visitor-role></span>
+      </p>
+    </div>
+
+    <div class="say">
+      <p class="nameplate" data-nameplate hidden>Gritty</p>
+      <p class="bubble" data-say role="status">{bubble}</p>
+    </div>
+
+    <div class="chips" data-chips hidden role="group" aria-label="What do you say back?">
+      <button class="chip" data-chip hidden></button>
+      <button class="chip" data-chip hidden></button>
+      <button class="chip" data-chip hidden></button>
+    </div>
+
+    <button class="gritty" data-gritty aria-label="Tap Gritty — he wants to talk!" disabled>
+      <img src={BASE_FRAMES[0]} alt="Gritty the Goat, hand-drawn by Kim Rekowski" width="520" height="635" fetchpriority="high" />
+      <img src={BASE_FRAMES[1]} alt="" width="520" height="635" />
+      <img src={BASE_FRAMES[2]} alt="" width="520" height="635" />
+    </button>
+    <p class="tap-hint" data-hint>Tap Gritty to say hello! 👆</p>
+  </div>
+
+  <script type="application/json" data-meadow-data is:inline set:html={payload} />
+</section>
+
+<style>
+  .meadow {
+    position: relative; overflow: hidden;
+    padding: 26px 0 96px;
+    background: linear-gradient(180deg,
+      var(--gg-sky-high) 0%, var(--gg-sky) 34%, var(--gg-sky-low) 64%);
+  }
+
+  /* ── the scenery ── */
+  .sun {
+    position: absolute; top: 44px; right: 10%; width: 104px; height: 104px;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+      var(--gg-sun-core) 0%, var(--gg-sun) 55%, transparent 72%);
+  }
+  .cloud {
+    position: absolute; width: 126px; height: 32px; background: #fff;
+    border-radius: 999px; opacity: 0.58; filter: blur(2.5px);
+  }
+  .cloud::before, .cloud::after {
+    content: ''; position: absolute; background: #fff; border-radius: 50%;
+  }
+  .cloud::before { width: 52px; height: 52px; left: 19px; top: -25px; }
+  .cloud::after { width: 36px; height: 36px; left: 66px; top: -17px; }
+  .c1 { top: 28px; left: 12%; animation: drift 95s linear infinite; }
+  .c2 { top: 120px; left: 60%; transform: scale(0.82); opacity: 0.46;
+        animation: drift 130s linear infinite reverse; }
+  @keyframes drift { from { translate: -10vw 0; } to { translate: 110vw 0; } }
+
+  .hills { position: absolute; inset: 0; pointer-events: none; }
+  .hills svg { position: absolute; bottom: 0; left: -2%; width: 104%; display: block; }
+  .hill-back { height: 250px; z-index: 1; }
+  .hill-mid { height: 184px; z-index: 1; }
+  /* The front grass sits ABOVE the stage so Gritty pops out from behind it. */
+  .hill-front { height: 116px; z-index: 7; }
+
+  /* ── the words ── */
+  .hero-copy {
+    position: relative; z-index: 5; text-align: center;
+    padding-inline: 24px; display: grid; gap: 12px; justify-items: center;
+  }
+  .hero-copy h1 {
+    color: var(--gg-blue-deep);
+    font-size: clamp(2.1rem, 5.2vw, 3.4rem); line-height: 1.05;
+    text-shadow: 0 2px 0 rgba(255, 255, 255, 0.5);
+  }
+  .motto {
+    background: var(--gg-green); color: #fff;
+    font-family: var(--gg-display); font-weight: 600; font-size: 1.05rem;
+    padding: 0.45em 1.3em; border-radius: 4px 18px 4px 18px;
+    rotate: -1.5deg; box-shadow: var(--gg-shadow);
+  }
+
+  /* ── the stage ── */
+  .stage {
+    position: relative; z-index: 6;
+    display: grid; justify-items: center; gap: 10px;
+    margin-top: 14px; padding-inline: 16px;
+  }
+
+  .say { display: grid; justify-items: center; gap: 6px; min-height: 96px; }
+  .nameplate {
+    font-family: var(--gg-display); font-weight: 600;
+    font-size: var(--gg-text-small); color: var(--gg-blue-deep);
+    background: rgba(255, 255, 255, 0.7);
+    padding: 0.2em 1em; border-radius: 999px;
+  }
+  .bubble {
+    position: relative; background: #fff; border: 3px solid var(--gg-ink);
+    border-radius: 26px 30px 28px 26px / 28px 26px 30px 28px;
+    padding: 13px 20px; max-width: 44ch;
+    font-family: var(--gg-hand); font-size: 1.3rem; line-height: 1.35;
+    color: var(--gg-ink); box-shadow: var(--gg-shadow); text-align: center;
+  }
+  /* the tail points down at whoever's talking */
+  .bubble::before, .bubble::after {
+    content: ''; position: absolute; left: 50%;
+    background: #fff; border: 3px solid var(--gg-ink); border-radius: 50%;
+  }
+  .bubble::before { width: 15px; height: 12px; bottom: -17px; margin-left: -18px; }
+  .bubble::after { width: 8px; height: 7px; bottom: -28px; margin-left: -4px; }
+  .bubble.cheer { border-color: var(--gg-gold-ink); color: var(--gg-gold-ink); background: #FFFDF4; }
+  .bubble.cheer::before, .bubble.cheer::after { border-color: var(--gg-gold-ink); background: #FFFDF4; }
+  .bubble.enter { animation: bpop 420ms var(--gg-ease-back); }
+  @keyframes bpop { from { opacity: 0; scale: 0.86 0.94; } to { opacity: 1; scale: 1 1; } }
+
+  /* friend bubbles borrow the visitor's tone so each voice looks its own */
+  .bubble.tone-gold { border-color: var(--gg-gold-ink); }
+  .bubble.tone-green { border-color: var(--gg-green-ink); }
+  .bubble.tone-sky { border-color: var(--gg-blue); }
+  .bubble.tone-gold::before, .bubble.tone-gold::after { border-color: var(--gg-gold-ink); }
+  .bubble.tone-green::before, .bubble.tone-green::after { border-color: var(--gg-green-ink); }
+  .bubble.tone-sky::before, .bubble.tone-sky::after { border-color: var(--gg-blue); }
+
+  /* ── the visitor (a friend up the path) ── */
+  .visitor {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(255, 255, 255, 0.82);
+    border-radius: 999px; padding: 6px 18px 6px 6px;
+    box-shadow: var(--gg-shadow);
+    translate: -28vw 0; opacity: 0;
+    transition: translate 700ms var(--gg-ease-bouncy), opacity 300ms ease;
+  }
+  .visitor.here { translate: 0 0; opacity: 1; }
+  .visitor-disc {
+    display: grid; place-items: center; overflow: hidden;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: color-mix(in srgb, var(--gg-sky) 55%, #fff);
+    font-size: 1.4rem;
+  }
+  .visitor-disc img { width: 100%; height: 100%; object-fit: cover; }
+  .visitor-name {
+    display: grid; line-height: 1.25;
+    font-family: var(--gg-display); font-weight: 600; color: var(--gg-blue-deep);
+  }
+  .visitor-role {
+    font-family: var(--gg-body); font-weight: 600;
+    font-size: var(--gg-text-small); color: var(--gg-ink-soft);
+  }
+
+  /* ── the reply chips: what YOU say back ── */
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .chip {
+    min-height: var(--gg-tap); padding: 0.5em 1.2em;
+    background: #fff; color: var(--gg-blue);
+    border: 3px solid var(--gg-blue); border-radius: 999px;
+    font-family: var(--gg-display); font-weight: 600; font-size: 1rem;
+    cursor: pointer;
+    transition: translate 0.16s ease, scale 0.16s ease, background 0.16s ease;
+  }
+  .chip:hover { translate: 0 -2px; background: color-mix(in srgb, var(--gg-sky) 40%, #fff); }
+  .chip:active { scale: 0.95; }
+
+  /* ── Gritty ── */
+  .gritty {
+    position: relative; width: min(184px, 38vw); aspect-ratio: 520 / 635;
+    margin-bottom: -34px;
+    border: none; background: none; padding: 0; cursor: pointer;
+    filter: drop-shadow(0 12px 9px rgba(46, 60, 40, 0.28));
+    transform-origin: 50% 97%; /* hooves stay planted */
+    transition: translate 900ms var(--gg-ease-bouncy);
+  }
+  .gritty:disabled { cursor: default; }
+  .gritty:focus-visible { outline: 3px solid var(--gg-gold); outline-offset: 6px; border-radius: 18px; }
+  .gritty img { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; }
+  .gritty img:first-child { opacity: 1; }
+
+  /* When JS will run, he starts tucked behind the front hill and climbs
+     out (.arrived). Without JS — or in old browsers — he's simply there. */
+  @media (scripting: enabled) {
+    .gritty:not(.arrived) { translate: 0 130%; }
+  }
+
+  .tap-hint {
+    position: relative; z-index: 8;
+    font-family: var(--gg-display); font-weight: 600;
+    font-size: var(--gg-text-small); color: var(--gg-blue-deep);
+    background: rgba(255, 255, 255, 0.7);
+    padding: 0.3em 1.1em; border-radius: 999px;
+    transition: opacity 300ms ease;
+  }
+  @media (scripting: none) {
+    .tap-hint { display: none; } /* no JS, nothing to tap */
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* line boil — Kim's exact linework, re-inked. Stepped opacity is
+       compositor-only, so it can never jank a phone. */
+    .gritty img { animation: boil 0.39s steps(1) infinite; }
+    .gritty img:nth-child(1) { animation-delay: 0s; }
+    .gritty img:nth-child(2) { animation-delay: -0.13s; }
+    .gritty img:nth-child(3) { animation-delay: -0.26s; }
+    .gritty { animation: breathe 3.7s ease-in-out infinite; }
+  }
+  @keyframes boil { 0%, 33.32% { opacity: 1; } 33.33%, 100% { opacity: 0; } }
+  @keyframes breathe { 0%, 100% { scale: 1 1; } 50% { scale: 1 1.014; } }
+
+  /* moods, acted out in motion (his emote replaces breathing while it runs) */
+  .gritty.e-happy { animation: hop 620ms var(--gg-ease-back); }
+  .gritty.e-proud { animation: hop 560ms var(--gg-ease-back) 2; }
+  .gritty.e-laugh { animation: giggle 760ms ease-in-out; }
+  .gritty.e-surprised { animation: startle 520ms var(--gg-ease-back); }
+  .gritty.e-thinking { animation: sway 1500ms ease-in-out; }
+  @keyframes hop {
+    0% { scale: 1 1; translate: 0 0; }
+    18% { scale: 1.06 0.9; translate: 0 4px; }   /* anticipation: dip */
+    45% { scale: 0.94 1.1; translate: 0 -18px; } /* stretch going up */
+    72% { scale: 1.05 0.95; translate: 0 2px; }  /* squash on landing */
+    100% { scale: 1 1; translate: 0 0; }
+  }
+  @keyframes giggle {
+    0%, 100% { rotate: 0deg; scale: 1 1; }
+    20% { rotate: -4deg; scale: 1.03 0.96; }
+    40% { rotate: 4deg; }
+    60% { rotate: -3deg; scale: 1.02 0.97; }
+    80% { rotate: 2deg; }
+  }
+  @keyframes startle {
+    0% { scale: 1 1; translate: 0 0; }
+    30% { scale: 0.96 1.12; translate: 0 -12px; } /* jump! */
+    60% { scale: 1.04 0.94; translate: 0 1px; }
+    100% { scale: 1 1; translate: 0 0; }
+  }
+  @keyframes sway {
+    0%, 100% { rotate: 0deg; }
+    30% { rotate: -2.5deg; }
+    70% { rotate: 2deg; }
+  }
+
+  @media (max-width: 600px) {
+    .meadow { padding-bottom: 78px; }
+    .bubble { font-size: 1.15rem; }
+  }
+</style>
+
+<!-- Celebration sparks are the one thing JS creates, so their keyframes
+     must be global (scoped keyframes wouldn't reach JS-made elements). -->
+<style is:global>
+  @keyframes gg-spark {
+    0% { translate: 0 0; scale: 0; opacity: 1; }
+    20% { scale: 1; }
+    100% { translate: var(--dx) var(--dy); scale: 0.4; opacity: 0; }
+  }
+</style>
+
+<script>
+  const section = document.querySelector<HTMLElement>('[data-meadow]');
+  if (section) {
+    const data = JSON.parse(
+      section.querySelector('[data-meadow-data]')!.textContent!,
+    ) as {
+      chats: { speaker: string; opener: string;
+               replies: { say: string; react: string; mood: string }[] }[];
+      cast: Record<string, { name: string; role: string;
+                             portrait: string | null; tone: string }>;
+      moods: Record<string, string[]>;
+    };
+
+    /* seasonal meadow — automatic, cosmetic, nothing to unlock */
+    const month = new Date().getMonth();
+    if (month < 2 || month === 11) section.dataset.season = 'winter';
+    else if (month >= 8) section.dataset.season = 'autumn';
+
+    const gritty = section.querySelector<HTMLButtonElement>('[data-gritty]')!;
+    const frames = Array.from(gritty.querySelectorAll('img'));
+    const baseSrcs = frames.map((f) => f.src);
+    const say = section.querySelector<HTMLElement>('[data-say]')!;
+    const nameplate = section.querySelector<HTMLElement>('[data-nameplate]')!;
+    const chipBox = section.querySelector<HTMLElement>('[data-chips]')!;
+    const chips = Array.from(chipBox.querySelectorAll<HTMLButtonElement>('[data-chip]'));
+    const hint = section.querySelector<HTMLElement>('[data-hint]')!;
+    const visitor = section.querySelector<HTMLElement>('[data-visitor]')!;
+    const visitorDisc = section.querySelector<HTMLElement>('[data-visitor-disc]')!;
+    const visitorName = section.querySelector<HTMLElement>('[data-visitor-name]')!;
+    const visitorRole = section.querySelector<HTMLElement>('[data-visitor-role]')!;
+    const calm = matchMedia('(prefers-reduced-motion: reduce)');
+
+    const grittyChats = data.chats.filter((c) => c.speaker === 'gritty');
+    const friendChats = data.chats.filter((c) => c.speaker !== 'gritty');
+    let gi = 0; // next Gritty chat
+    let fi = 0; // next friend visit
+    let current: (typeof data.chats)[0] | null = null;
+    let friendHere = false;
+    let friendTimer = 0;
+    const TONE_CLASSES = ['tone-gold', 'tone-green', 'tone-sky'];
+
+    /* he climbs out of the meadow */
+    gritty.disabled = false;
+    setTimeout(() => gritty.classList.add('arrived'), 350);
+
+    function speak(text: string, opts: { cheer?: boolean; tone?: string } = {}) {
+      say.textContent = `"${text.replace(/^"|"$/g, '')}"`;
+      say.classList.remove('enter', 'cheer', ...TONE_CLASSES);
+      void say.offsetWidth;
+      say.classList.add('enter');
+      if (opts.cheer) say.classList.add('cheer');
+      else if (opts.tone && opts.tone !== 'blue') say.classList.add(`tone-${opts.tone}`);
+    }
+
+    function emote(mood: string) {
+      gritty.classList.remove('e-happy', 'e-proud', 'e-laugh', 'e-surprised', 'e-thinking');
+      void gritty.offsetWidth;
+      gritty.classList.add(`e-${mood}`);
+      const art = data.moods[mood];
+      if (art?.length) { /* Kim's expression drawing, once it exists */
+        frames.forEach((f, i) => { f.src = art[i % art.length]; });
+        setTimeout(() => frames.forEach((f, i) => { f.src = baseSrcs[i]; }), 1900);
+      }
+    }
+
+    /* gold sparks — celebration only, and never under reduced motion */
+    function sparks() {
+      if (calm.matches) return;
+      const r = gritty.getBoundingClientRect();
+      const box = document.createElement('div');
+      box.style.cssText =
+        `position:fixed;left:${r.left + r.width / 2}px;top:${r.top + r.height / 3}px;` +
+        'z-index:150;pointer-events:none;';
+      const hues = ['#D9A93F', '#7FA86B', '#2C5F8A', '#BDD7E7', '#F2D48A'];
+      for (let i = 0; i < 12; i++) {
+        const s = document.createElement('i');
+        const ang = (Math.PI * 2 * i) / 12;
+        const dist = 70 + (i % 3) * 26;
+        s.style.cssText =
+          'position:absolute;width:9px;height:9px;border-radius:50%;' +
+          `background:${hues[i % hues.length]};` +
+          `--dx:${Math.cos(ang) * dist}px;--dy:${Math.sin(ang) * dist - 34}px;` +
+          `animation:gg-spark 850ms ease-out ${i * 12}ms forwards;`;
+        box.appendChild(s);
+      }
+      document.body.appendChild(box);
+      setTimeout(() => box.remove(), 1300);
+    }
+
+    function showChips(replies: { say: string }[]) {
+      chips.forEach((chip, i) => {
+        const reply = replies[i];
+        chip.hidden = !reply;
+        if (reply) chip.textContent = reply.say;
+      });
+      chipBox.hidden = false;
+      chips.find((c) => !c.hidden)?.focus({ preventScroll: true });
+    }
+
+    function startChat(chat: (typeof data.chats)[0]) {
+      current = chat;
+      const who = data.cast[chat.speaker];
+      nameplate.hidden = false;
+      nameplate.textContent = who?.name ?? 'Gritty';
+      hint.style.opacity = '0';
+      speak(chat.opener, { tone: friendHere ? who?.tone : undefined });
+      showChips(chat.replies);
+    }
+
+    function friendArrives() {
+      const chat = friendChats[fi % friendChats.length];
+      fi += 1;
+      friendHere = true;
+      const who = data.cast[chat.speaker];
+      visitorName.textContent = who?.name ?? '';
+      visitorRole.textContent = who?.role ?? '';
+      visitorDisc.textContent = '🌼';
+      if (who?.portrait) {
+        const img = document.createElement('img');
+        img.src = who.portrait;
+        img.alt = '';
+        /* inline because runtime-made elements miss Astro's scoped styles */
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+        visitorDisc.replaceChildren(img);
+      }
+      visitor.hidden = false;
+      /* reflow, not rAF — rAF stalls in background tabs and the panel
+         would run its whole visit invisible */
+      void visitor.offsetWidth;
+      visitor.classList.add('here');
+      emote('surprised'); /* someone's coming up the path! */
+      setTimeout(() => startChat(chat), 650);
+    }
+
+    function friendLeaves() {
+      friendHere = false;
+      visitor.classList.remove('here');
+      setTimeout(() => { visitor.hidden = true; }, 400);
+    }
+
+    gritty.addEventListener('click', () => {
+      /* mid-question, a tap is just a giggle — the chips are the next step */
+      if (!chipBox.hidden) { emote('laugh'); return; }
+      clearTimeout(friendTimer);
+      if (friendHere) friendLeaves();
+      emote('happy');
+      startChat(grittyChats[gi % grittyChats.length]);
+      gi += 1;
+    });
+
+    chips.forEach((chip, i) => {
+      chip.addEventListener('click', () => {
+        const reply = current?.replies[i];
+        if (!reply) return;
+        chipBox.hidden = true;
+        say.textContent = '…';
+        setTimeout(() => { /* a beat of thought makes the answer feel real */
+          const who = current ? data.cast[current.speaker] : undefined;
+          speak(reply.react, {
+            cheer: reply.mood === 'proud',
+            tone: friendHere ? who?.tone : undefined,
+          });
+          emote(reply.mood);
+          if (reply.mood === 'proud') sparks();
+          gritty.focus({ preventScroll: true });
+          hint.textContent = friendChats.length
+            ? 'Tap Gritty to keep talking!'
+            : 'Tap Gritty again!';
+          hint.style.opacity = '1';
+          /* after a chat wraps up, a friend wanders over to visit */
+          if (!friendHere && friendChats.length) {
+            clearTimeout(friendTimer);
+            friendTimer = window.setTimeout(friendArrives, 2800);
+          }
+        }, 420);
+      });
+    });
+  }
+</script>

@@ -116,6 +116,35 @@ const calmStrategies = defineCollection({
   }),
 });
 
+/* How Gritty acts out a reaction in the meadow: each mood maps to a little
+   motion (hop, giggle-wiggle…) — and, once Kim draws that expression, to her
+   art (public/images/gritty/gritty-<mood>-1.webp etc.). Optional: no mood
+   means a plain happy hop. */
+const mood = z.enum(['happy', 'laugh', 'surprised', 'proud', 'thinking']).nullish();
+
+const meadowChats = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/meadow-chats' }),
+  schema: z.object({
+    order: z.number(),
+    /* Who's talking. Gritty chats when kids tap him; everyone else wanders
+       up the meadow path to visit. Ids match src/content/characters. */
+    speaker: z.enum(['gritty', 'gabby', 'grandpa-goat', 'grandma-goat', 'gibby']),
+    /* What they say to start the chat. */
+    opener: z.string(),
+    /* Two or three things a kid can tap to say back, and how the speaker
+       reacts to each. The third pair is optional. */
+    replyA: z.string(),
+    reactionA: z.string(),
+    moodA: mood,
+    replyB: z.string(),
+    reactionB: z.string(),
+    moodB: mood,
+    replyC: optionalString,
+    reactionC: optionalString,
+    moodC: mood,
+  }),
+});
+
 /* Long-prose singleton pages (about). One markdown file each so Pages CMS
    gives Kim a single form with a big text area, and the site renders real
    markdown. */
@@ -134,4 +163,5 @@ export const collections = {
   scenarios, mistakes,
   'yet-sentences': yetSentences,
   'calm-strategies': calmStrategies,
+  'meadow-chats': meadowChats,
 };

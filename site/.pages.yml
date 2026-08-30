@@ -303,6 +303,116 @@ content:
           How to do it, one step per line — each line becomes its own
           numbered step on the card.
 
+  - name: meadow-chats
+    label: Meadow chats
+    type: collection
+    path: src/content/meadow-chats
+    view:
+      fields: [opener, speaker, order]
+      sort: [order]
+    fields:
+      - name: order
+        label: Order
+        type: number
+        required: true
+        description: Chats happen lowest number first, then start over.
+      - name: speaker
+        label: Who's talking?
+        type: select
+        required: true
+        description: >-
+          Gritty chats when kids tap him on the home page. Everyone else
+          wanders up the meadow path to visit after a chat.
+        options:
+          values:
+            - name: gritty
+              label: Gritty the Goat
+            - name: gabby
+              label: Gabby the Goat
+            - name: grandpa-goat
+              label: Grandpa Goat
+            - name: grandma-goat
+              label: Grandma Goat
+            - name: gibby
+              label: Gibby the Goat
+      - name: opener
+        label: What they say first
+        type: text
+        required: true
+        description: >-
+          How the chat starts, in their own voice — a question works best,
+          so kids have something to answer.
+      - name: replyA
+        label: Reply 1 — what a kid can say back
+        type: string
+        required: true
+      - name: reactionA
+        label: Reply 1 — how they react
+        type: text
+        required: true
+      - name: moodA
+        label: Reply 1 — Gritty's mood
+        type: select
+        description: >-
+          How Gritty acts it out — a hop, a giggle, a proud double-hop with
+          gold sparkles… Leave blank for a plain happy hop.
+        options:
+          values:
+            - name: happy
+              label: "Happy — a little hop"
+            - name: laugh
+              label: "Laughing — a giggly wiggle"
+            - name: surprised
+              label: "Surprised — a startled jump"
+            - name: proud
+              label: "Proud — double hop + gold sparkles"
+            - name: thinking
+              label: "Thinking — a slow sway"
+      - name: replyB
+        label: Reply 2 — what a kid can say back
+        type: string
+        required: true
+      - name: reactionB
+        label: Reply 2 — how they react
+        type: text
+        required: true
+      - name: moodB
+        label: Reply 2 — Gritty's mood
+        type: select
+        options:
+          values:
+            - name: happy
+              label: "Happy — a little hop"
+            - name: laugh
+              label: "Laughing — a giggly wiggle"
+            - name: surprised
+              label: "Surprised — a startled jump"
+            - name: proud
+              label: "Proud — double hop + gold sparkles"
+            - name: thinking
+              label: "Thinking — a slow sway"
+      - name: replyC
+        label: Reply 3 — what a kid can say back (optional)
+        type: string
+      - name: reactionC
+        label: Reply 3 — how they react
+        type: text
+      - name: moodC
+        label: Reply 3 — Gritty's mood
+        type: select
+        options:
+          values:
+            - name: happy
+              label: "Happy — a little hop"
+            - name: laugh
+              label: "Laughing — a giggly wiggle"
+            - name: surprised
+              label: "Surprised — a startled jump"
+            - name: proud
+              label: "Proud — double hop + gold sparkles"
+            - name: thinking
+              label: "Thinking — a slow sway"
+
   # Exactly one home page, so Kim gets a single form, not a list of one.
   - name: homepage
     label: Home page

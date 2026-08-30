@@ -57,6 +57,27 @@ The entries in there now are starters to show how each form works — edit
 them, replace them, make them yours. Your students' favorite scenarios
 belong here.
 
+## The talking Gritty on the home page
+
+Gritty stands in the meadow at the top of the home page. When kids tap
+him, he chats — and his friends wander up the path to join in. Every one
+of those conversations lives in **Meadow chats** in the sidebar:
+
+1. Pick **who's talking** — Gritty chats when kids tap him; anyone else
+   (Gabby, Grandpa, Grandma, Gibby) shows up as a visitor.
+2. Write **what they say first**. A question works best, so kids have
+   something to answer.
+3. Fill in two or three **replies** a kid can tap, and **how the
+   character reacts** to each one. Write reactions the way they'd say
+   them out loud.
+4. Pick a **mood** for each reaction — that's how Gritty acts it out
+   (a hop, a giggle, a proud double-hop with gold sparkles…).
+
+Bonus, whenever you feel like drawing: if you draw Gritty **laughing**,
+**surprised**, or **thinking**, send it to Adam — Gritty's face will
+actually change to your drawing when that mood plays. Until then he acts
+moods out with his whole body, using only your original drawing.
+
 ## Editing the home page or About page
 
 Click **Home page** or **About the Author** in the sidebar — one form each.

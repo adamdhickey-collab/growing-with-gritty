@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Bubble from '../components/Bubble.astro';
 import BookCard from '../components/BookCard.astro';
+import MeadowHero from '../components/MeadowHero.astro';
 import Stamp from '../components/Stamp.astro';
 import home from '../data/homepage.json';
 import { u } from '../lib/url';
@@ -14,24 +15,14 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
   title="Growing with Gritty"
   description="Stories and activities that help kids build grit, kindness, and confidence — with Gritty the Goat, by teacher and author Kim Rekowski."
 >
-  <section class="hero band">
-    <div class="wrap hero-grid">
-      <div class="hero-art">
-        <img
-          src={u("/images/characters/gritty-hero.webp")}
-          alt="Gritty the Goat, hand-drawn by Kim Rekowski"
-          width="700" height="912"
-          fetchpriority="high"
-        />
-      </div>
-      <div class="hero-copy">
-        <Bubble>{home.heroBubble}</Bubble>
-        <h1>{home.heroHeading}</h1>
-        <p class="lede">{home.heroText}</p>
-        <div class="cta">
-          <a class="btn btn-primary" href={u("/meet-gritty")}>🐐 Meet Gritty</a>
-          <a class="btn btn-gold" href={u("/books")}>📚 See the books</a>
-        </div>
+  <MeadowHero heading={home.heroHeading} bubble={home.heroBubble} />
+
+  <section class="band welcome">
+    <div class="wrap welcome-inner">
+      <p class="lede">{home.heroText}</p>
+      <div class="cta">
+        <a class="btn btn-primary" href={u("/meet-gritty")}>🐐 Meet Gritty</a>
+        <a class="btn btn-gold" href={u("/books")}>📚 See the books</a>
       </div>
     </div>
   </section>
@@ -105,16 +96,12 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
 </Base>
 
 <style>
-  .hero { padding-top: 40px; }
-  .hero-grid {
-    display: grid; grid-template-columns: minmax(240px, 380px) 1fr;
-    gap: 24px 56px; align-items: center;
+  .welcome { padding-block: 44px; }
+  .welcome-inner {
+    display: grid; gap: 22px; justify-items: center; text-align: center;
   }
-  .hero-art img { width: 100%; height: auto; }
-  .hero-copy { display: grid; gap: 22px; justify-items: start; }
-  .hero-copy h1 { font-size: var(--gg-text-hero); }
-  .lede { font-size: 1.15rem; color: var(--gg-ink-soft); max-width: 52ch; }
-  .cta { display: flex; flex-wrap: wrap; gap: 14px; }
+  .lede { font-size: 1.15rem; color: var(--gg-ink-soft); max-width: 58ch; }
+  .cta { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
 
   .stamps { display: flex; flex-wrap: wrap; gap: 24px 40px; justify-content: center; }
 
@@ -147,9 +134,4 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
   .grown-cta .btn { flex: none; }
 
   .reminder { display: flex; justify-content: center; }
-
-  @media (max-width: 720px) {
-    .hero-grid { grid-template-columns: 1fr; }
-    .hero-art { max-width: 260px; margin-inline: auto; }
-  }
 </style>

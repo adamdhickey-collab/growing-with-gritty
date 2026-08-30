@@ -17,6 +17,15 @@
   --gg-ink:        #2A3238;  /* reading text                             */
   --gg-ink-soft:   #55606A;  /* captions, secondary text (AA on paper)   */
 
+  /* the meadow — hero scene palette, from style tile V3 "Alive" */
+  --gg-sky-high:  #A7CBE3;  /* top of the hero sky                      */
+  --gg-sky-low:   #DCE9E4;  /* where sky melts into the hills           */
+  --gg-sun:       #F2D48A;  /* the meadow sun (and celebration sparks)  */
+  --gg-sun-core:  #F7E1A8;  /* its bright center                        */
+  --gg-hill-back: #B9CFA4;  /* farthest hill                            */
+  --gg-hill-mid:  #97BA80;  /* middle hill                              */
+  --gg-meadow:    #6E9A5C;  /* the front grass Gritty stands in         */
+
   /* type */
   --gg-display: 'Fredoka Variable', 'Fredoka', 'Comic Sans MS', sans-serif;
   --gg-body: 'Nunito Variable', 'Nunito', 'Trebuchet MS', sans-serif;
@@ -39,4 +48,14 @@
 
   /* touch — little fingers and grandparents' too */
   --gg-tap: 48px;
+
+  /* motion — springs sampled from a damped harmonic oscillator at authoring
+     time; cubic-bezier mathematically cannot bounce more than once. */
+  --gg-ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --gg-ease-bouncy: linear(0,0.062,0.218,0.427,0.651,0.86,1.033,1.159,1.235,1.265,1.255,1.219,1.165,1.106,1.049,1,0.964,0.941,0.931,0.931,0.939,0.953,0.968,0.984,0.997,1.008,1.015,1.018,1.019,1.017,1.013,1.009,1.005,1.001,0.999,0.996,0.995,0.995,0.996,0.997,0.998,0.999,1,1.001,1.001,1.001,1.001,1.001,1);
 }
+
+/* seasonal meadow — automatic, cosmetic, nothing to unlock. The hero sets
+   data-season by month; palettes stay here so tokens.css owns every color. */
+[data-season='autumn'] { --gg-hill-back: #D8C69A; --gg-hill-mid: #C4A867; --gg-meadow: #B08A46; }
+[data-season='winter'] { --gg-hill-back: #DCE6EC; --gg-hill-mid: #C2D3DE; --gg-meadow: #A9BECB; }
