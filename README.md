@@ -25,7 +25,7 @@ Every push to `main` redeploys all four:
 | **[/site/](https://adamdhickey-collab.github.io/growing-with-gritty/site/)** | **The website, clean.** No version switcher, nothing added — share this one with anyone who is looking at the site itself. |
 | [/preview/](https://adamdhickey-collab.github.io/growing-with-gritty/preview/) | The same site with the version switcher on top, for jumping between design directions |
 | [/style-tile/](https://adamdhickey-collab.github.io/growing-with-gritty/style-tile/) | The three design directions: V1 The Sheet, V2 The Meadow, V3 Alive |
-| [/deck/](https://adamdhickey-collab.github.io/growing-with-gritty/deck/) | The presentation PDF |
+| [the deck](https://adamdhickey-collab.github.io/growing-with-gritty/deck/Growing-with-Gritty-for-Kim.pdf) | The presentation PDF (the `/deck/` folder itself has no index page) |
 
 ## Status
 
