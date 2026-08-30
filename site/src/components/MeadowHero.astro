@@ -263,7 +263,11 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames })
   }
   .gritty:disabled { cursor: default; }
   .gritty:focus-visible { outline: 3px solid var(--gg-gold); outline-offset: 6px; border-radius: 18px; }
-  .gritty img { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; }
+  /* contain, not fill: the expression drawings are a hair squarer than the
+     base frames, and stretching Gritty for a fifth of a second is the kind
+     of wrongness you feel without being able to name it. */
+  .gritty img { position: absolute; inset: 0; width: 100%; height: 100%;
+                object-fit: contain; opacity: 0; }
   .gritty img:first-child { opacity: 1; }
 
   /* When JS will run, he starts tucked behind the front hill and climbs

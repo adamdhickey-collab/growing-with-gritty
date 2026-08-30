@@ -8,6 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "chute": "node scripts/chute-server.mjs",
+    "library": "node scripts/build-image-index.mjs",
     "add-image": "node scripts/add-image.mjs"
   },
   "dependencies": {

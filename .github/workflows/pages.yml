@@ -6,6 +6,7 @@
 #                         at the website rather than comparing directions.
 #   /deck/                the presentation PDF, so it can be linked not attached
 #   /chute/               Adam's image drop page, which commits to the repo
+#   /library/             every image the site holds, and where each is used
 # The bare Pages URL redirects to the style tile.
 #
 # This is for review only. The production site deploys via Cloudflare Pages
@@ -68,6 +69,10 @@ jobs:
           cp -r site/dist/. _pages/site/
           cp -r chute/. _pages/chute/
           cp deck/*.pdf _pages/deck/
+          # generated last, so it lists exactly what was just deployed;
+          # thumbnails point at the clean copy's own images
+          node site/scripts/build-image-index.mjs \
+            --out _pages/library/index.html --base ../site/images
           printf '<!DOCTYPE html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=style-tile/"><title>Growing with Gritty</title><a href="style-tile/">Style tile</a>' > _pages/index.html
 
       - uses: actions/configure-pages@v5

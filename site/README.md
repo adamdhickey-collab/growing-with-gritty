@@ -77,6 +77,20 @@ npm run build    # → dist/
   **Kim's route is neither of these:** the Pages CMS media uploader, a real
   URL with no token to manage, landing files in this same folder once the
   CMS is connected.
+- **The image library** (`scripts/build-image-index.mjs`) — one page listing
+  every image, grouped by folder, each saying which source files reference
+  it, with anything unreferenced flagged:
+
+  ```
+  npm run library      # → site/.image-library/index.html
+  ```
+
+  The deploy regenerates it at
+  [/library/](https://adamdhickey-collab.github.io/growing-with-gritty/library/),
+  so it is never out of date. Two things are loaded by pattern rather than
+  by name — the boil frames and the expression frames — and the script names
+  them explicitly, because an image reported unused is an image someone
+  eventually deletes.
 
 ## Hard rules
 

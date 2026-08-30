@@ -2,3 +2,5 @@ node_modules/
 dist/
 .astro/
 .DS_Store
+# the image library, regenerated on demand and at every deploy
+.image-library/
