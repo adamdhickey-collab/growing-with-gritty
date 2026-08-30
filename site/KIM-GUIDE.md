@@ -38,6 +38,25 @@ will look like.)*
    a scan is better. The site handles the rest.
 3. Save. The "portrait coming soon" circle is replaced everywhere.
 
+## Adding to Gritty's World (the games)
+
+Every game reads its content from one of four lists in the sidebar. Adding
+an entry adds it to the game on the site, about two minutes after you save:
+
+- **Grit Zone challenges** — a situation, three choices, which choice shows
+  grit, and Gritty's cheer. Mix up where the grit choice sits (A, B, or C) —
+  kids notice patterns fast!
+- **Mistake Maker oopses** — Gritty's funny mistake, plus the "I learned…"
+  flip side kids reveal with the big gold button.
+- **Power of YET sentences** — just the "I can't…" part. The site adds the
+  big gold YET!
+- **Calm Corner strategies** — a name, an emoji, and the steps (one per
+  line).
+
+The entries in there now are starters to show how each form works — edit
+them, replace them, make them yours. Your students' favorite scenarios
+belong here.
+
 ## Editing the home page or About page
 
 Click **Home page** or **About the Author** in the sidebar — one form each.

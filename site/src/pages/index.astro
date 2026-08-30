@@ -55,6 +55,35 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
     </div>
   </section>
 
+  <section class="band" aria-labelledby="world-h">
+    <div class="wrap">
+      <p class="eyebrow">Gritty's World</p>
+      <h2 id="world-h">Play with Gritty</h2>
+      <p class="world-note">Games and quiet corners for practicing grit —
+      everything happens right on your device.</p>
+      <div class="world-grid">
+        <a class="world-card card" href={u("/grit-zone")}>
+          <span class="world-emoji" aria-hidden="true">💪</span>
+          <h3>The Grit Zone</h3>
+          <p>Help Gritty choose what grit looks like — then feel the Power
+          of YET!</p>
+        </a>
+        <a class="world-card card" href={u("/mistake-maker")}>
+          <span class="world-emoji" aria-hidden="true">🧠</span>
+          <h3>The Mistake Maker</h3>
+          <p>Press the button for a funny oops — and turn it into
+          "I learned!"</p>
+        </a>
+        <a class="world-card card" href={u("/calm-corner")}>
+          <span class="world-emoji" aria-hidden="true">🧘</span>
+          <h3>The Calm Corner</h3>
+          <p>Pick a feeling, find a calm-down idea, and breathe with
+          Gritty.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <section class="band">
     <div class="wrap grown-cta card">
       <div>
@@ -94,6 +123,21 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
     display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 24px;
   }
+
+  .world-note { color: var(--gg-ink-soft); margin-top: 6px; }
+  .world-grid {
+    margin-top: 24px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+  }
+  .world-card {
+    padding: 28px 26px; display: grid; gap: 10px; justify-items: start;
+    text-decoration: none; color: var(--gg-ink);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .world-card:hover { transform: translateY(-3px); box-shadow: var(--gg-shadow-lift); color: var(--gg-ink); }
+  .world-card p { color: var(--gg-ink-soft); }
+  .world-emoji { font-size: 2.2rem; }
 
   .grown-cta {
     display: flex; flex-wrap: wrap; align-items: center; gap: 20px 40px;

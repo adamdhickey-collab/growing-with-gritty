@@ -1,0 +1,236 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Bubble from '../components/Bubble.astro';
+import { u } from '../lib/url';
+
+const strategies = (await getCollection('calm-strategies')).sort((a, b) => a.data.order - b.data.order);
+
+/* The feeling picker is fixed vocabulary (from Kim's doc), not CMS content —
+   each answer is Gritty naming the feeling as okay before offering calm. */
+const feelings = [
+  { emoji: '😡', label: 'Angry', response: "It's okay to feel angry. Anger means something felt unfair. Let's help your body cool down." },
+  { emoji: '😢', label: 'Sad', response: "It's okay to feel sad. Even goats have rainy days. Let's be extra gentle with ourselves." },
+  { emoji: '😟', label: 'Worried', response: "It's okay to feel worried. Worries get smaller after a slow breath. Want to try one together?" },
+  { emoji: '😩', label: 'Frustrated', response: "It's okay to feel frustrated. That means you're doing something HARD — and hard things take grit." },
+  { emoji: '😴', label: 'Tired', response: "It's okay to feel tired. Bodies and brains need rest to grow. Let's find a slow, quiet calm-down." },
+  { emoji: '😬', label: 'Nervous', response: "It's okay to feel nervous. Nervous and excited are almost the same wiggle! A slow breath helps both." },
+];
+---
+
+<Base
+  title="The Calm Corner — Growing with Gritty"
+  description="Pick the face that matches your feeling, choose a calm-down strategy, and breathe along with Gritty the Goat. Big feelings happen to everyone."
+>
+  <section class="band">
+    <div class="wrap intro">
+      <p class="eyebrow">Gritty's World</p>
+      <h1>The Calm Corner 🧘</h1>
+      <Bubble tail={false}>
+        "Big feelings happen to everyone. Let's help your body feel calm."
+      </Bubble>
+    </div>
+  </section>
+
+  <section class="band band-sky" aria-labelledby="feel-h">
+    <div class="wrap feel-wrap">
+      <h2 id="feel-h">How are you feeling?</h2>
+      <div class="feelings" role="group" aria-label="Pick a feeling">
+        {feelings.map((f) => (
+          <button
+            type="button"
+            class="feeling"
+            data-feeling
+            data-response={f.response}
+            aria-pressed="false"
+          >
+            <span class="feel-emoji" aria-hidden="true">{f.emoji}</span>
+            <span>{f.label}</span>
+          </button>
+        ))}
+      </div>
+      <div class="feel-answer">
+        <Bubble tail={false}>
+          <span data-feel-response role="status">Every feeling is okay to
+          have. Pick the face that matches yours — or head straight to a
+          calm-down idea below.</span>
+        </Bubble>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="ideas-h">
+    <div class="wrap">
+      <h2 id="ideas-h">Pick a calm-down idea</h2>
+      <p class="note">Tap one to see how it works. They all work for every
+      feeling — pick whichever sounds good right now.</p>
+      <div class="strategies">
+        {strategies.map((s) => (
+          <details class="strategy card">
+            <summary>
+              <span class="strat-emoji" aria-hidden="true">{s.data.emoji ?? '🌿'}</span>
+              <span class="strat-name">{s.data.name}</span>
+              <span class="strat-chevron" aria-hidden="true">▾</span>
+            </summary>
+            {s.data.steps && (
+              <ol class="steps">
+                {s.data.steps.split('\n').map((line) => line.trim()).filter(Boolean).map((line) => (
+                  <li>{line}</li>
+                ))}
+              </ol>
+            )}
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="band band-deep" aria-labelledby="breathe-h">
+    <div class="wrap breathe-wrap" data-breathe>
+      <h2 id="breathe-h">Breathe with Gritty</h2>
+      <p class="note">Five slow breaths, together. Smell the flower… blow
+      out the candle.</p>
+      <div class="breath-circle" data-circle aria-hidden="true"><span>🐐</span></div>
+      <p class="breath-cue" data-cue role="status">Ready when you are.</p>
+      <button type="button" class="btn btn-primary" data-breathe-btn>
+        🌬️ Breathe with Gritty
+      </button>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap next-up card">
+      <p>Feeling calm and ready for a challenge? Gritty could use your help.</p>
+      <a class="btn btn-primary" href={u('/grit-zone')}>💪 Visit the Grit Zone</a>
+    </div>
+  </section>
+</Base>
+
+<script>
+  /* ——— feeling picker ——— */
+  const feelingBtns = [...document.querySelectorAll<HTMLButtonElement>('[data-feeling]')];
+  const feelOut = document.querySelector<HTMLElement>('[data-feel-response]');
+  feelingBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      feelingBtns.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      if (feelOut) feelOut.textContent = btn.dataset.response ?? '';
+    });
+  });
+
+  /* ——— Breathe with Gritty ———
+     The circle grows and shrinks with CSS transitions (which the global
+     reduced-motion kill switch turns off — the paced text cues still work),
+     while timeouts drive the pacing: in 4s, out 6s, five rounds. */
+  const breathe = document.querySelector<HTMLElement>('[data-breathe]');
+  if (breathe) {
+    const circle = breathe.querySelector<HTMLElement>('[data-circle]')!;
+    const cue = breathe.querySelector<HTMLElement>('[data-cue]')!;
+    const btn = breathe.querySelector<HTMLElement>('[data-breathe-btn]')!;
+    const ROUNDS = 5;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let running = false;
+
+    const stop = (message: string) => {
+      running = false;
+      clearTimeout(timer);
+      circle.classList.remove('in');
+      btn.textContent = '🌬️ Breathe with Gritty';
+      cue.textContent = message;
+    };
+
+    const round = (n: number) => {
+      if (n > ROUNDS) {
+        stop('You did it! How does your body feel? 💛');
+        return;
+      }
+      cue.textContent = `Breath ${n} of ${ROUNDS} — smell the flower… breathe in…`;
+      circle.classList.add('in');
+      timer = setTimeout(() => {
+        cue.textContent = '…now blow out the candle. Slow and soft…';
+        circle.classList.remove('in');
+        timer = setTimeout(() => round(n + 1), 6000);
+      }, 4000);
+    };
+
+    btn.addEventListener('click', () => {
+      if (running) {
+        stop("That's okay — come back any time.");
+        return;
+      }
+      running = true;
+      btn.textContent = 'Stop';
+      round(1);
+    });
+  }
+</script>
+
+<style>
+  .intro { display: grid; gap: 18px; justify-items: start; }
+  .note { color: var(--gg-ink-soft); margin-top: 6px; }
+
+  /* — feelings — */
+  .feel-wrap { display: grid; gap: 22px; justify-items: start; }
+  .feelings { display: flex; flex-wrap: wrap; gap: 12px; }
+  .feeling {
+    display: grid; gap: 4px; justify-items: center;
+    min-width: 96px; min-height: var(--gg-tap); padding: 14px 16px;
+    font-family: var(--gg-display); font-weight: 500; font-size: 0.98rem;
+    color: var(--gg-blue); background: var(--gg-card);
+    border: 2.5px solid rgba(44, 95, 138, 0.25);
+    border-radius: var(--gg-radius-small); cursor: pointer;
+    transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
+  }
+  .feeling:hover { border-color: var(--gg-blue); transform: translateY(-2px); }
+  .feeling[aria-pressed='true'] {
+    border-color: var(--gg-blue); background: color-mix(in srgb, var(--gg-sky) 45%, #fff);
+  }
+  .feel-emoji { font-size: 1.9rem; }
+
+  /* — strategies — */
+  .strategies {
+    margin-top: 24px; display: grid; gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+  .strategy { overflow: hidden; align-self: start; }
+  .strategy summary {
+    list-style: none; cursor: pointer;
+    display: flex; gap: 14px; align-items: center;
+    min-height: var(--gg-tap); padding: 18px 22px;
+    font-family: var(--gg-display); font-weight: 600; font-size: 1.08rem;
+    color: var(--gg-blue);
+  }
+  .strategy summary::-webkit-details-marker { display: none; }
+  .strategy summary:hover { background: color-mix(in srgb, var(--gg-sky) 30%, transparent); }
+  .strat-emoji { font-size: 1.6rem; flex: none; }
+  .strat-name { flex: 1; }
+  .strat-chevron { transition: rotate 0.2s ease; color: var(--gg-ink-soft); }
+  .strategy[open] .strat-chevron { rotate: 180deg; }
+  .steps {
+    margin: 0 22px 20px 22px; padding-left: 26px;
+    display: grid; gap: 8px;
+  }
+
+  /* — breathing — */
+  .breathe-wrap { display: grid; gap: 18px; justify-items: center; text-align: center; }
+  .breath-circle {
+    width: 150px; height: 150px; margin-block: 20px; border-radius: 50%;
+    display: grid; place-items: center; font-size: 3rem;
+    background: radial-gradient(circle at 35% 30%, #fff, var(--gg-sky));
+    border: 3px solid var(--gg-blue);
+    box-shadow: var(--gg-shadow);
+    transform: scale(1);
+    transition: transform 6s ease-in-out;
+  }
+  .breath-circle.in { transform: scale(1.45); transition-duration: 4s; }
+  .breath-cue {
+    font-family: var(--gg-hand); font-size: 1.5rem; color: var(--gg-blue);
+    min-height: 2.2em;
+  }
+
+  .next-up {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px;
+    padding: 28px 36px;
+  }
+  .next-up p { flex: 1; min-width: 240px; }
+  .next-up .btn { flex: none; }
+</style>

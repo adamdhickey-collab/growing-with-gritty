@@ -1,0 +1,425 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Bubble from '../components/Bubble.astro';
+import { u } from '../lib/url';
+
+const scenarios = (await getCollection('scenarios')).sort((a, b) => a.data.order - b.data.order);
+const yets = (await getCollection('yet-sentences')).sort((a, b) => a.data.order - b.data.order);
+
+/* The private "How did YOU have grit today?" checklist. Fixed list, not CMS:
+   it mirrors the "what is grit" vocabulary used across the site. */
+const checkin = [
+  { emoji: '🔁', label: 'Kept trying' },
+  { emoji: '✨', label: 'Tried something new' },
+  { emoji: '💡', label: 'Learned from a mistake' },
+  { emoji: '🤝', label: 'Asked for help' },
+  { emoji: '🫶', label: 'Helped someone' },
+  { emoji: '🧘', label: 'Took a calming break' },
+  { emoji: '💛', label: 'Was kind' },
+  { emoji: '⭐', label: 'Believed in myself' },
+];
+---
+
+<Base
+  title="The Grit Zone — Growing with Gritty"
+  description="Help Gritty the Goat choose what grit looks like, feel the Power of YET, and tell Gritty how you showed grit today — right on your own device."
+>
+  <section class="band">
+    <div class="wrap intro">
+      <p class="eyebrow">Gritty's World</p>
+      <h1>The Grit Zone 💪</h1>
+      <Bubble tail={false}>
+        "Sometimes I'm not sure what to do. Can you help me? Let's practice
+        grit together!"
+      </Bubble>
+    </div>
+  </section>
+
+  <section class="band band-sky" aria-labelledby="quiz-h">
+    <div class="wrap">
+      <h2 id="quiz-h">Can you help Gritty?</h2>
+      <p class="note">Pick what a goat with grit would do. There are no
+      points and no timers — just you and Gritty, figuring it out.</p>
+
+      <noscript>
+        <p class="note"><strong>Psst:</strong> the ⭐ shows the grit choice!</p>
+        <style is:inline>
+          .scenario[data-answer='a'] .choice[data-key='a']::after,
+          .scenario[data-answer='b'] .choice[data-key='b']::after,
+          .scenario[data-answer='c'] .choice[data-key='c']::after { content: ' ⭐'; }
+          .scenario [data-cheer][hidden] { display: block; }
+        </style>
+      </noscript>
+
+      <div class="quiz" data-quiz>
+        <p class="progress" data-progress hidden></p>
+        {scenarios.map((s, i) => (
+          <article class="scenario card" data-scenario data-answer={s.data.answer}>
+            <h3 class="situation">
+              <span class="q-num" aria-hidden="true">{i + 1}</span>
+              {s.data.situation}
+            </h3>
+            <div class="choices" role="group" aria-label="What should Gritty do?">
+              {([['a', s.data.choiceA], ['b', s.data.choiceB], ['c', s.data.choiceC]] as const).map(([key, text]) => (
+                <button type="button" class="choice" data-key={key}>
+                  <b aria-hidden="true">{key.toUpperCase()}</b>
+                  <span>{text}</span>
+                </button>
+              ))}
+            </div>
+            <p class="nudge" data-nudge role="status" hidden>
+              Hmm — would that help Gritty keep going? Try another one!
+            </p>
+            <p class="cheer" data-cheer role="status" hidden>
+              ⭐ {s.data.cheer ?? "That's grit! I have grit — I don't quit!"}
+            </p>
+            <button type="button" class="btn btn-gold" data-next hidden>
+              {i + 1 < scenarios.length ? 'Next challenge ➡️' : 'See how you did! 🌟'}
+            </button>
+          </article>
+        ))}
+        <div class="finale card" data-finale tabindex="-1" hidden>
+          <span class="finale-emoji" aria-hidden="true">🌟</span>
+          <h3>You helped Gritty {scenarios.length} times!</h3>
+          <p>You know what grit looks like: trying again, taking a breath,
+          asking for help, and never giving up.</p>
+          <p class="finale-motto">"I have grit! I don't quit!"</p>
+          <button type="button" class="btn btn-primary" data-replay>🔁 Play again</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="yet-h">
+    <div class="wrap yet-wrap">
+      <h2 id="yet-h">The Power of YET</h2>
+      <p class="note">One little word turns "I can't" into "not yet."
+      Press the big gold button and watch it work.</p>
+
+      <ul class="yet-list" data-yet-static role="list">
+        {yets.map((y) => (
+          <li data-sentence={y.data.sentence}>
+            {y.data.sentence} <b class="yet-gold">YET!</b>
+          </li>
+        ))}
+      </ul>
+
+      <div class="yet-machine card" data-yet hidden>
+        <p class="yet-line">
+          <span data-yet-sentence></span>
+          <b class="yet-gold yet-word" data-yet-word hidden>YET!</b>
+        </p>
+        <p class="yet-cheer" data-yet-cheer role="status" hidden>
+          YET is a magic word — it means your brain is still growing! 🧠
+        </p>
+        <div class="yet-buttons">
+          <button type="button" class="btn btn-gold yet-press" data-yet-press>YET!</button>
+          <button type="button" class="btn btn-ghost" data-yet-next hidden>Another one ➡️</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band-deep" aria-labelledby="checkin-h">
+    <div class="wrap checkin-wrap">
+      <h2 id="checkin-h">How did YOU have grit today?</h2>
+      <p class="note">Tap everything you did today — Gritty wants to hear it!</p>
+      <ul class="checkin" role="list" data-checkin>
+        {checkin.map(({ emoji, label }) => (
+          <li>
+            <label class="check-chip">
+              <input type="checkbox" data-check={label} />
+              <span class="chip-emoji" aria-hidden="true">{emoji}</span>
+              <span>Today I… {label.toLowerCase()}</span>
+            </label>
+          </li>
+        ))}
+      </ul>
+      <p class="checkin-cheer" data-checkin-cheer role="status" hidden>
+        🎉 WOW! You showed grit today!
+      </p>
+      <p class="streak" data-streak role="status" hidden></p>
+      <p class="privacy">This stays right here on your device — only you can
+      see it. Nothing is ever sent anywhere.</p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap next-up card">
+      <p>Made a mistake today? Lucky you — mistakes are how brains grow.</p>
+      <a class="btn btn-primary" href={u('/mistake-maker')}>🧠 Visit the Mistake Maker</a>
+    </div>
+  </section>
+</Base>
+
+<script>
+  /* ——— Can you help Gritty? — one scenario at a time ——— */
+  const quiz = document.querySelector<HTMLElement>('[data-quiz]');
+  if (quiz) {
+    const cards = [...quiz.querySelectorAll<HTMLElement>('[data-scenario]')];
+    const progress = quiz.querySelector<HTMLElement>('[data-progress]')!;
+    const finale = quiz.querySelector<HTMLElement>('[data-finale]')!;
+
+    const show = (i: number, focus = false) => {
+      cards.forEach((c, j) => { c.hidden = j !== i; });
+      progress.hidden = false;
+      progress.textContent = `Challenge ${i + 1} of ${cards.length}`;
+      if (focus) cards[i].querySelector<HTMLElement>('.situation')?.focus?.();
+    };
+
+    cards.forEach((card, i) => {
+      card.querySelector('.situation')?.setAttribute('tabindex', '-1');
+      const nudge = card.querySelector<HTMLElement>('[data-nudge]')!;
+      const cheer = card.querySelector<HTMLElement>('[data-cheer]')!;
+      const next = card.querySelector<HTMLElement>('[data-next]')!;
+
+      card.querySelectorAll<HTMLButtonElement>('.choice').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (card.classList.contains('solved')) return;
+          if (btn.dataset.key === card.dataset.answer) {
+            card.classList.add('solved');
+            btn.classList.add('is-grit');
+            nudge.hidden = true;
+            cheer.hidden = false;
+            next.hidden = false;
+          } else {
+            btn.classList.add('tried');
+            nudge.hidden = false;
+          }
+        });
+      });
+
+      next.addEventListener('click', () => {
+        if (i + 1 < cards.length) {
+          show(i + 1, true);
+        } else {
+          cards.forEach((c) => { c.hidden = true; });
+          progress.hidden = true;
+          finale.hidden = false;
+          finale.focus();
+        }
+      });
+    });
+
+    quiz.querySelector('[data-replay]')?.addEventListener('click', () => {
+      cards.forEach((card) => {
+        card.classList.remove('solved');
+        card.querySelectorAll('.choice').forEach((b) => b.classList.remove('tried', 'is-grit'));
+        card.querySelector<HTMLElement>('[data-nudge]')!.hidden = true;
+        card.querySelector<HTMLElement>('[data-cheer]')!.hidden = true;
+        card.querySelector<HTMLElement>('[data-next]')!.hidden = true;
+      });
+      finale.hidden = true;
+      show(0, true);
+    });
+
+    show(0);
+  }
+
+  /* ——— The Power of YET ——— */
+  const yetMachine = document.querySelector<HTMLElement>('[data-yet]');
+  const yetStatic = document.querySelector<HTMLElement>('[data-yet-static]');
+  if (yetMachine && yetStatic) {
+    const sentences = [...yetStatic.querySelectorAll<HTMLElement>('li')]
+      .map((li) => li.dataset.sentence ?? '');
+    if (sentences.length > 0) {
+      yetStatic.hidden = true;
+      yetMachine.hidden = false;
+
+      const sentenceEl = yetMachine.querySelector<HTMLElement>('[data-yet-sentence]')!;
+      const wordEl = yetMachine.querySelector<HTMLElement>('[data-yet-word]')!;
+      const cheerEl = yetMachine.querySelector<HTMLElement>('[data-yet-cheer]')!;
+      const pressBtn = yetMachine.querySelector<HTMLElement>('[data-yet-press]')!;
+      const nextBtn = yetMachine.querySelector<HTMLElement>('[data-yet-next]')!;
+      let i = 0;
+
+      const load = (n: number) => {
+        sentenceEl.textContent = sentences[n];
+        wordEl.hidden = true;
+        cheerEl.hidden = true;
+        nextBtn.hidden = true;
+        pressBtn.hidden = false;
+      };
+
+      pressBtn.addEventListener('click', () => {
+        wordEl.hidden = false;
+        wordEl.classList.remove('pop');
+        void wordEl.offsetWidth; /* restart the pop animation */
+        wordEl.classList.add('pop');
+        cheerEl.hidden = false;
+        pressBtn.hidden = true;
+        nextBtn.hidden = false;
+        nextBtn.focus();
+      });
+
+      nextBtn.addEventListener('click', () => {
+        i = (i + 1) % sentences.length;
+        load(i);
+        pressBtn.focus();
+      });
+
+      load(0);
+    }
+  }
+
+  /* ——— How did YOU have grit today? — saved to this device only ——— */
+  const checkinList = document.querySelector<HTMLElement>('[data-checkin]');
+  if (checkinList) {
+    const boxes = [...checkinList.querySelectorAll<HTMLInputElement>('input')];
+    const cheer = document.querySelector<HTMLElement>('[data-checkin-cheer]')!;
+    const streakEl = document.querySelector<HTMLElement>('[data-streak]')!;
+    const KEY = 'gg-grit-checkin';
+    const today = new Date().toLocaleDateString('en-CA'); /* YYYY-MM-DD, local */
+
+    /* localStorage can throw (private windows, blocked storage) — the
+       checklist must keep working without it. */
+    const read = (): any => {
+      try { return JSON.parse(localStorage.getItem(KEY) ?? 'null'); } catch { return null; }
+    };
+    const write = (s: unknown) => {
+      try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* fine */ }
+    };
+
+    let state = read();
+    if (!state || typeof state !== 'object') state = { days: 0, lastDate: null, checked: [] };
+    if (state.lastDate === today && Array.isArray(state.checked)) {
+      boxes.forEach((b) => { b.checked = state.checked.includes(b.dataset.check); });
+    }
+
+    const refresh = () => {
+      const checked = boxes.filter((b) => b.checked).map((b) => b.dataset.check);
+      cheer.hidden = checked.length === 0;
+      if (checked.length > 0 && state.lastDate !== today) {
+        state.days = (state.days ?? 0) + 1;
+        state.lastDate = today;
+      }
+      state.checked = checked;
+      write(state);
+      if ((state.days ?? 0) >= 2) {
+        streakEl.hidden = false;
+        streakEl.textContent = `⛰️ You've shown grit on ${state.days} different days. Amazing!`;
+      }
+    };
+
+    boxes.forEach((b) => b.addEventListener('change', refresh));
+    refresh();
+  }
+</script>
+
+<style>
+  .intro { display: grid; gap: 18px; justify-items: start; }
+  .note { color: var(--gg-ink-soft); margin-top: 6px; }
+
+  /* — quiz — */
+  .quiz { margin-top: 24px; display: grid; gap: 16px; max-width: 720px; }
+  .progress {
+    font-family: var(--gg-display); font-weight: 600;
+    color: var(--gg-green-ink); font-size: var(--gg-text-small);
+  }
+  .scenario { padding: 28px; display: grid; gap: 16px; }
+  .situation { display: flex; gap: 14px; align-items: baseline; }
+  .situation:focus { outline: none; }
+  .q-num {
+    flex: none; width: 34px; height: 34px; border-radius: 50%;
+    display: inline-grid; place-items: center; align-self: center;
+    background: var(--gg-sky); color: var(--gg-blue);
+    font-size: 1rem; font-weight: 700;
+  }
+  .choices { display: grid; gap: 10px; }
+  .choice {
+    display: flex; gap: 14px; align-items: center; text-align: left;
+    min-height: var(--gg-tap); padding: 12px 18px;
+    font-family: var(--gg-body); font-size: 1.05rem; color: var(--gg-ink);
+    background: var(--gg-paper); border: 2.5px solid rgba(44, 95, 138, 0.25);
+    border-radius: var(--gg-radius-small); cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+  }
+  .choice:hover { border-color: var(--gg-blue); transform: translateY(-1px); }
+  .choice b {
+    flex: none; width: 30px; height: 30px; border-radius: 50%;
+    display: inline-grid; place-items: center;
+    background: var(--gg-blue); color: #fff; font-size: 0.9rem;
+  }
+  .choice.tried { opacity: 0.45; border-style: dashed; }
+  .choice.is-grit { border-color: var(--gg-gold); background: #FFFDF4; }
+  .choice.is-grit b { background: var(--gg-gold); }
+  .solved .choice { cursor: default; }
+  .solved .choice:hover { transform: none; }
+  .nudge { color: var(--gg-ink-soft); font-style: italic; }
+  .cheer {
+    font-family: var(--gg-hand); font-size: 1.4rem; line-height: 1.35;
+    color: var(--gg-gold-ink);
+    background: #FFFDF4; border: 3px solid var(--gg-gold);
+    border-radius: var(--gg-radius-small); padding: 14px 18px;
+  }
+  .scenario .btn { justify-self: start; }
+  .finale {
+    padding: 40px 32px; display: grid; gap: 12px;
+    justify-items: center; text-align: center;
+  }
+  .finale:focus { outline: none; }
+  .finale-emoji { font-size: 3rem; }
+  .finale-motto { font-family: var(--gg-hand); font-size: 1.6rem; color: var(--gg-blue); }
+
+  /* — the Power of YET — */
+  .yet-wrap { display: grid; justify-items: start; }
+  .yet-gold { color: var(--gg-gold-ink); font-weight: 800; }
+  .yet-list {
+    list-style: none; margin-top: 20px; display: grid; gap: 10px;
+    font-family: var(--gg-hand); font-size: 1.5rem;
+  }
+  .yet-machine {
+    margin-top: 24px; padding: 36px 32px; width: min(100%, 640px);
+    display: grid; gap: 18px; justify-items: center; text-align: center;
+  }
+  .yet-line {
+    font-family: var(--gg-hand); font-size: clamp(1.7rem, 4.5vw, 2.4rem);
+    line-height: 1.3;
+  }
+  .yet-word { display: inline-block; font-family: var(--gg-display); }
+  .yet-word.pop { animation: yet-pop 0.45s cubic-bezier(0.2, 1.6, 0.4, 1); }
+  @keyframes yet-pop {
+    0% { transform: scale(0.2) rotate(-8deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+  .yet-cheer { color: var(--gg-green-ink); font-weight: 700; }
+  .yet-buttons { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .yet-press { font-size: 1.5rem; padding: 0.6em 1.8em; }
+
+  /* — check-in — */
+  .checkin-wrap { display: grid; gap: 16px; justify-items: start; }
+  .checkin {
+    list-style: none; display: grid; gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    width: 100%; max-width: 860px;
+  }
+  .check-chip {
+    display: flex; gap: 12px; align-items: center;
+    min-height: var(--gg-tap); padding: 12px 16px; cursor: pointer;
+    background: var(--gg-card); border: 2.5px solid rgba(44, 95, 138, 0.25);
+    border-radius: var(--gg-radius-small);
+    font-family: var(--gg-display); font-weight: 500; color: var(--gg-blue);
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .check-chip:hover { border-color: var(--gg-blue); }
+  .check-chip:has(input:checked) {
+    border-color: var(--gg-green); background: color-mix(in srgb, var(--gg-green) 14%, #fff);
+    color: var(--gg-green-ink);
+  }
+  .check-chip:has(input:focus-visible) { outline: 3px solid var(--gg-gold); outline-offset: 3px; }
+  .check-chip input { width: 22px; height: 22px; accent-color: var(--gg-green-ink); flex: none; }
+  .chip-emoji { font-size: 1.4rem; }
+  .checkin-cheer {
+    font-family: var(--gg-hand); font-size: 1.5rem; color: var(--gg-gold-ink);
+  }
+  .streak { font-weight: 800; color: var(--gg-green-ink); }
+  .privacy { font-size: var(--gg-text-small); color: var(--gg-ink-soft); }
+
+  .next-up {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px;
+    padding: 28px 36px;
+  }
+  .next-up p { flex: 1; min-width: 240px; }
+  .next-up .btn { flex: none; }
+</style>

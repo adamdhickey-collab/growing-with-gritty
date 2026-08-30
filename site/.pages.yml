@@ -170,6 +170,139 @@ content:
         type: image
         description: Optional small picture shown on the download card.
 
+  # ——— Gritty's World: the game content ———
+  # Each game on the site reads from one of these lists. Adding an entry
+  # adds it to the game — no code involved, ever.
+
+  - name: scenarios
+    label: Grit Zone challenges
+    type: collection
+    path: src/content/scenarios
+    view:
+      fields: [situation, order]
+      sort: [order]
+    fields:
+      - name: order
+        label: Order
+        type: number
+        required: true
+        description: Challenges appear lowest number first.
+      - name: situation
+        label: The situation
+        type: text
+        required: true
+        description: >-
+          What's happening to Gritty? End with the question, like
+          "What should he do?"
+      - name: choiceA
+        label: Choice A
+        type: string
+        required: true
+      - name: choiceB
+        label: Choice B
+        type: string
+        required: true
+      - name: choiceC
+        label: Choice C
+        type: string
+        required: true
+      - name: answer
+        label: Which choice shows grit?
+        type: select
+        required: true
+        description: >-
+          Mix it up between A, B, and C — if the grit choice is always in
+          the same spot, kids figure that out fast!
+        options:
+          values:
+            - name: a
+              label: Choice A
+            - name: b
+              label: Choice B
+            - name: c
+              label: Choice C
+      - name: cheer
+        label: Gritty's cheer
+        type: text
+        description: >-
+          What Gritty shouts when they pick the grit choice. If you leave it
+          blank he says "That's grit! I have grit — I don't quit!"
+
+  - name: mistakes
+    label: Mistake Maker oopses
+    type: collection
+    path: src/content/mistakes
+    view:
+      fields: [oops, order]
+      sort: [order]
+    fields:
+      - name: order
+        label: Order
+        type: number
+        required: true
+      - name: oops
+        label: The funny oops
+        type: text
+        required: true
+        description: >-
+          Gritty's mistake, like "Gritty tried to draw a square… but it
+          looks more like a potato!"
+      - name: learned
+        label: I learned…
+        type: text
+        description: >-
+          The flip side, shown when kids press the big gold button. Finish
+          the sentence "I learned:" — if you leave it blank, Gritty says
+          "Mistakes help my brain learn!"
+
+  - name: yet-sentences
+    label: Power of YET sentences
+    type: collection
+    path: src/content/yet-sentences
+    view:
+      fields: [sentence, order]
+      sort: [order]
+    fields:
+      - name: order
+        label: Order
+        type: number
+        required: true
+      - name: sentence
+        label: The "I can't" part
+        type: string
+        required: true
+        description: >-
+          Just the tricky part, ending with … — like "I can't ride my
+          bike…" The site adds the big gold YET!
+
+  - name: calm-strategies
+    label: Calm Corner strategies
+    type: collection
+    path: src/content/calm-strategies
+    view:
+      fields: [name, order]
+      sort: [order]
+    fields:
+      - name: order
+        label: Order
+        type: number
+        required: true
+      - name: name
+        label: Name
+        type: string
+        required: true
+        description: 'Like "Take 5 slow breaths".'
+      - name: emoji
+        label: Emoji
+        type: string
+        description: One emoji for the card, like 🌬️.
+      - name: steps
+        label: The steps
+        type: text
+        description: >-
+          How to do it, one step per line — each line becomes its own
+          numbered step on the card.
+
   # Exactly one home page, so Kim gets a single form, not a list of one.
   - name: homepage
     label: Home page

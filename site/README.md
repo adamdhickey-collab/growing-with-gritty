@@ -12,17 +12,24 @@ npm run dev      # http://localhost:4321 (respects PORT)
 npm run build    # → dist/
 ```
 
-## What's here (Phase 1)
+## What's here (Phases 1 & 2)
 
 - **Design system** — `src/styles/tokens.css` (source of truth: the approved
   style tile), `global.css`, and the `Bubble` / `Stamp` / `BookCard`
   components.
 - **Pages** — home, `/meet-gritty`, `/books` + four book pages, `/about`,
-  `/grown-ups`.
+  `/grown-ups`, and Gritty's World: `/grit-zone` (scenario quiz, the Power
+  of YET, the private "how did YOU have grit today?" check-in),
+  `/mistake-maker`, `/calm-corner` (feeling picker, strategy cards,
+  Breathe with Gritty).
 - **Content collections** (`src/content.config.ts`) — books, characters,
   printables (empty until Kim's PDFs arrive — the Grown-Ups page shows a
-  friendly empty state), and singleton pages. Every optional field
+  friendly empty state), singleton pages, and the game content: scenarios,
+  mistakes, yet-sentences, calm-strategies. Every optional field
   tolerates null: a half-filled CMS form must never break the build.
+- **Interactivity** — vanilla JS per page, progressively enhanced: without
+  JavaScript every game renders as a readable list. Game state (the grit
+  check-in) lives in `localStorage` only, wrapped in try/catch.
 - **CMS config** — `.pages.yml`, field descriptions written for Kim.
   Never rename a schema field without updating `.pages.yml` and
   `KIM-GUIDE.md` in the same change.

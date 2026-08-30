@@ -1,0 +1,178 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Bubble from '../components/Bubble.astro';
+import Stamp from '../components/Stamp.astro';
+import { u } from '../lib/url';
+
+const mistakes = (await getCollection('mistakes')).sort((a, b) => a.data.order - b.data.order);
+const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
+---
+
+<Base
+  title="The Mistake Maker — Growing with Gritty"
+  description="Press the button for one of Gritty the Goat's funny mistakes — then turn his OOPS into I LEARNED! Mistakes are how brains grow."
+>
+  <section class="band">
+    <div class="wrap intro">
+      <p class="eyebrow">Gritty's World</p>
+      <h1>The Mistake Maker 🧠</h1>
+      <Bubble tail={false}>
+        "Everyone makes mistakes — even me! Mistakes don't mean I'm bad at
+        something. Mistakes help my brain learn!"
+      </Bubble>
+    </div>
+  </section>
+
+  <section class="band band-sky" aria-labelledby="machine-h">
+    <div class="wrap machine-wrap">
+      <h2 id="machine-h">Ready for a silly one?</h2>
+      <p class="note">Press the button to hear one of Gritty's mistakes —
+      then flip it into something he learned.</p>
+
+      {/* Without JavaScript, the whole collection reads as a friendly list —
+          each oops with its lesson right underneath. */}
+      <div class="mistake-list" data-mistake-static>
+        {mistakes.map((m) => (
+          <article
+            class="mistake card"
+            data-oops={m.data.oops}
+            data-learned={m.data.learned ?? FALLBACK_LEARNED}
+          >
+            <p class="oops-line">😜 {m.data.oops}</p>
+            <p class="learned-line">💡 {m.data.learned ?? FALLBACK_LEARNED}</p>
+          </article>
+        ))}
+      </div>
+
+      <div class="machine card" data-machine hidden>
+        <button type="button" class="btn btn-primary big-btn" data-make>
+          😜 Oops! I made a mistake!
+        </button>
+        <div class="stage" data-stage hidden>
+          <p class="oops-line" data-stage-oops role="status"></p>
+          <button type="button" class="btn btn-gold big-btn" data-turn>
+            🔄 Turn my OOPS into I LEARNED!
+          </button>
+          <p class="learned-line" data-stage-learned role="status" hidden></p>
+          <button type="button" class="btn btn-ghost" data-again hidden>
+            😜 Another mistake, please!
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="moves-h">
+    <div class="wrap moves-wrap">
+      <h2 id="moves-h">Gritty's four moves</h2>
+      <p class="note">When a mistake happens, a goat with grit can always
+      pick one of these.</p>
+      <div class="moves">
+        <Stamp emoji="🔄" label="Try Again" tone="blue" tilt={-3} />
+        <Stamp emoji="💡" label="Learn From It" tone="gold" tilt={2} />
+        <Stamp emoji="🤝" label="Ask for Help" tone="green" tilt={-2} />
+        <Stamp emoji="🧘" label="Take a Break" tone="blue" tilt={3} />
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap next-up card">
+      <p>Sometimes a mistake brings a big feeling with it. That's okay too.</p>
+      <a class="btn btn-primary" href={u('/calm-corner')}>🧘 Visit the Calm Corner</a>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const staticList = document.querySelector<HTMLElement>('[data-mistake-static]');
+  const machine = document.querySelector<HTMLElement>('[data-machine]');
+  if (staticList && machine) {
+    const entries = [...staticList.querySelectorAll<HTMLElement>('[data-oops]')]
+      .map((el) => ({ oops: el.dataset.oops ?? '', learned: el.dataset.learned ?? '' }));
+
+    if (entries.length > 0) {
+      staticList.hidden = true;
+      machine.hidden = false;
+
+      const makeBtn = machine.querySelector<HTMLElement>('[data-make]')!;
+      const stage = machine.querySelector<HTMLElement>('[data-stage]')!;
+      const oopsEl = machine.querySelector<HTMLElement>('[data-stage-oops]')!;
+      const turnBtn = machine.querySelector<HTMLElement>('[data-turn]')!;
+      const learnedEl = machine.querySelector<HTMLElement>('[data-stage-learned]')!;
+      const againBtn = machine.querySelector<HTMLElement>('[data-again]')!;
+
+      /* Start somewhere different each visit, then cycle in order. */
+      let i = Math.floor(Math.random() * entries.length);
+
+      const showOops = () => {
+        stage.hidden = false;
+        oopsEl.textContent = `😜 ${entries[i].oops}`;
+        learnedEl.hidden = true;
+        againBtn.hidden = true;
+        turnBtn.hidden = false;
+      };
+
+      makeBtn.addEventListener('click', () => {
+        makeBtn.hidden = true;
+        showOops();
+        turnBtn.focus();
+      });
+
+      turnBtn.addEventListener('click', () => {
+        turnBtn.hidden = true;
+        learnedEl.textContent = `💡 I learned: ${entries[i].learned}`;
+        learnedEl.hidden = false;
+        againBtn.hidden = false;
+        againBtn.focus();
+      });
+
+      againBtn.addEventListener('click', () => {
+        i = (i + 1) % entries.length;
+        showOops();
+        turnBtn.focus();
+      });
+    }
+  }
+</script>
+
+<style>
+  .intro { display: grid; gap: 18px; justify-items: start; }
+  .note { color: var(--gg-ink-soft); margin-top: 6px; }
+
+  .machine-wrap { display: grid; justify-items: start; }
+  .mistake-list { margin-top: 24px; display: grid; gap: 16px; max-width: 680px; }
+  .mistake { padding: 26px 28px; display: grid; gap: 12px; }
+
+  .machine {
+    margin-top: 24px; padding: 40px 32px; width: min(100%, 680px);
+    display: grid; gap: 20px; justify-items: center; text-align: center;
+  }
+  .stage { display: grid; gap: 18px; justify-items: center; }
+  .big-btn { font-size: 1.2rem; }
+
+  .oops-line {
+    font-family: var(--gg-hand); font-size: clamp(1.4rem, 3.5vw, 1.8rem);
+    line-height: 1.35;
+  }
+  .learned-line {
+    font-weight: 700; color: var(--gg-gold-ink);
+    background: #FFFDF4; border: 3px solid var(--gg-gold);
+    border-radius: var(--gg-radius-small); padding: 14px 18px;
+    max-width: 48ch;
+  }
+
+  .moves-wrap { display: grid; gap: 8px; }
+  .moves {
+    margin-top: 20px; display: flex; flex-wrap: wrap;
+    gap: 24px 40px; justify-content: center;
+  }
+
+  .next-up {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px;
+    padding: 28px 36px;
+  }
+  .next-up p { flex: 1; min-width: 240px; }
+  .next-up .btn { flex: none; }
+</style>

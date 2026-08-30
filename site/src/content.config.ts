@@ -62,6 +62,60 @@ const printables = defineCollection({
   }),
 });
 
+/* ——— Gritty's World: the game content (PLAN.md §5) ———
+   Every interactive activity is just a collection: the game shells are built
+   once, and Kim adds challenges through the same forms she uses for books. */
+
+const scenarios = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/scenarios' }),
+  schema: z.object({
+    /* Challenges appear lowest number first. */
+    order: z.number(),
+    /* "Gritty is trying to build a tower… What should he do?" */
+    situation: z.string(),
+    choiceA: z.string(),
+    choiceB: z.string(),
+    choiceC: z.string(),
+    /* Which choice shows grit. */
+    answer: z.enum(['a', 'b', 'c']),
+    /* Gritty's celebration when they pick it; falls back to the motto. */
+    cheer: optionalString,
+  }),
+});
+
+const mistakes = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/mistakes' }),
+  schema: z.object({
+    order: z.number(),
+    /* The funny mistake: "…but it looks more like a potato!" */
+    oops: z.string(),
+    /* The flip side revealed by the big gold button; optional because the
+       page has a friendly default ("Mistakes help my brain learn!"). */
+    learned: optionalString,
+  }),
+});
+
+const yetSentences = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/yet-sentences' }),
+  schema: z.object({
+    order: z.number(),
+    /* Just the "I can't…" part — the site adds the big gold YET! */
+    sentence: z.string(),
+  }),
+});
+
+const calmStrategies = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/calm-strategies' }),
+  schema: z.object({
+    order: z.number(),
+    name: z.string(),
+    emoji: optionalString,
+    /* One step per line — the page turns lines into a numbered list, so a
+       plain-text CMS field can never produce broken markdown. */
+    steps: optionalString,
+  }),
+});
+
 /* Long-prose singleton pages (about). One markdown file each so Pages CMS
    gives Kim a single form with a big text area, and the site renders real
    markdown. */
@@ -75,4 +129,9 @@ const pages = defineCollection({
   }),
 });
 
-export const collections = { books, characters, printables, pages };
+export const collections = {
+  books, characters, printables, pages,
+  scenarios, mistakes,
+  'yet-sentences': yetSentences,
+  'calm-strategies': calmStrategies,
+};
