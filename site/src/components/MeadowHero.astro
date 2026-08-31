@@ -63,47 +63,21 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
 ---
 
 <section class="meadow" aria-label="Gritty's Meadow" data-meadow>
-  <div class="sun" aria-hidden="true"></div>
-  <div class="cloud c1" aria-hidden="true"></div>
-  <div class="cloud c2" aria-hidden="true"></div>
+  <img class="sun" src={u("/images/scenery/sun.webp")} alt="" aria-hidden="true"
+       width="1254" height="1254" fetchpriority="high" />
+  <img class="cloud c1" src={u("/images/scenery/cloud-puffy.webp")} alt="" aria-hidden="true"
+       width="1448" height="1086" />
+  <img class="cloud c2" src={u("/images/scenery/cloud-flat.webp")} alt="" aria-hidden="true"
+       width="1448" height="1086" />
 
   <div class="hills" aria-hidden="true">
-    <svg class="hill-back" viewBox="0 0 1440 250" preserveAspectRatio="none">
-      <path d="M0,145 C220,38 430,116 650,106 C880,96 1080,19 1250,67 C1330,90 1390,116 1440,106 L1440,250 L0,250 Z" fill="var(--gg-hill-back)"/>
-    </svg>
-    <svg class="hill-mid" viewBox="0 0 1440 184" preserveAspectRatio="none">
-      <path d="M0,116 C260,29 520,135 780,97 C1000,64 1200,126 1440,68 L1440,184 L0,184 Z" fill="var(--gg-hill-mid)"/>
-    </svg>
-    <!-- The front grass keeps its own aspect ratio for the daisies' sake:
-         a stretched circle is an oval, and an oval is not a flower. -->
-    <svg class="hill-front" viewBox="0 0 1440 116" preserveAspectRatio="none">
-      <path d="M0,42 C380,4 940,70 1440,21 L1440,116 L0,116 Z" fill="var(--gg-meadow)"/>
-    </svg>
-    <svg class="daisies" viewBox="0 0 1440 116" preserveAspectRatio="xMidYMax slice">
-      <defs>
-        <!-- five petals around a gold middle, drawn once -->
-        <g id="gg-daisy">
-          <g fill="var(--gg-paper)">
-            <ellipse cx="0" cy="-4.6" rx="2.5" ry="3.6"/>
-            <ellipse cx="4.4" cy="-1.4" rx="2.5" ry="3.6" transform="rotate(72)"/>
-            <ellipse cx="2.7" cy="3.7" rx="2.5" ry="3.6" transform="rotate(144)"/>
-            <ellipse cx="-2.7" cy="3.7" rx="2.5" ry="3.6" transform="rotate(216)"/>
-            <ellipse cx="-4.4" cy="-1.4" rx="2.5" ry="3.6" transform="rotate(288)"/>
-          </g>
-          <circle r="2" fill="var(--gg-sun)"/>
-        </g>
-      </defs>
-      <g class="daisy-field">
-        <use href="#gg-daisy" x="118" y="74"/>
-        <use href="#gg-daisy" x="300" y="89" transform="translate(0,0) scale(1.15)" style="transform-origin:300px 89px"/>
-        <use href="#gg-daisy" x="418" y="66"/>
-        <use href="#gg-daisy" x="700" y="97"/>
-        <use href="#gg-daisy" x="812" y="80" transform="scale(0.85)" style="transform-origin:812px 80px"/>
-        <use href="#gg-daisy" x="1120" y="84"/>
-        <use href="#gg-daisy" x="1236" y="99" transform="scale(1.15)" style="transform-origin:1236px 99px"/>
-        <use href="#gg-daisy" x="1330" y="91"/>
-      </g>
-    </svg>
+    <img class="hill-drawn back" src={u("/images/scenery/hills-daisies.webp")} alt=""
+         width="2172" height="724" />
+    <img class="school" src={u("/images/scenery/erin-school.webp")} alt=""
+         width="1448" height="1086" />
+    <img class="hill-drawn front" src={u("/images/scenery/hills-flowers.webp")} alt=""
+         width="2172" height="724" />
+    <div class="grass-border"></div>
   </div>
 
   <div class="hero-copy">
@@ -150,41 +124,39 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
       var(--gg-sky-high) 0%, var(--gg-sky) 34%, var(--gg-sky-low) 64%);
   }
 
-  /* ── the scenery ── */
+  /* ── the scenery: Kim-candidate drawn bands, layered back to front ── */
   .sun {
-    position: absolute; top: 44px; right: 10%; width: 104px; height: 104px;
-    border-radius: 50%;
-    background: radial-gradient(circle,
-      var(--gg-sun-core) 0%, var(--gg-sun) 55%, transparent 72%);
+    position: absolute; top: 8px; right: 5%; z-index: 0;
+    width: clamp(88px, 11vw, 150px); height: auto;
   }
-  .cloud {
-    position: absolute; width: 126px; height: 32px; background: #fff;
-    border-radius: 999px; opacity: 0.58; filter: blur(2.5px);
-  }
-  .cloud::before, .cloud::after {
-    content: ''; position: absolute; background: #fff; border-radius: 50%;
-  }
-  .cloud::before { width: 52px; height: 52px; left: 19px; top: -25px; }
-  .cloud::after { width: 36px; height: 36px; left: 66px; top: -17px; }
-  .c1 { top: 28px; left: 12%; animation: drift 95s linear infinite; }
-  .c2 { top: 120px; left: 60%; transform: scale(0.82); opacity: 0.46;
+  .cloud { position: absolute; height: auto; z-index: 0; }
+  .c1 { top: 26px; left: 9%; width: clamp(110px, 14vw, 190px);
+        animation: drift 95s linear infinite; }
+  .c2 { top: 128px; left: 56%; width: clamp(88px, 10vw, 145px); opacity: 0.9;
         animation: drift 130s linear infinite reverse; }
   @keyframes drift { from { translate: -10vw 0; } to { translate: 110vw 0; } }
 
   .hills { position: absolute; inset: 0; pointer-events: none; }
-  .hills svg { position: absolute; bottom: 0; left: -2%; width: 104%; display: block; }
-  .hill-back { height: 250px; z-index: 1; }
-  .hill-mid { height: 184px; z-index: 1; }
-  /* The front grass sits ABOVE the stage so Gritty pops out from behind it. */
-  .hill-front { height: 116px; z-index: 7; }
-  .daisies { height: 116px; z-index: 8; }
-  @media (prefers-reduced-motion: no-preference) {
-    /* the lightest breeze — one sway shared by the whole field */
-    .daisy-field { animation: breeze 6.5s ease-in-out infinite; transform-origin: 50% 100%; }
+  /* The bands stretch across, exactly as the SVG hills did — a hill has no
+     detail that stretching can spoil. */
+  .hills .hill-drawn {
+    position: absolute; left: -2%; width: 104%; display: block;
+    object-fit: fill;
   }
-  @keyframes breeze {
-    0%, 100% { rotate: -0.5deg; }
-    50% { rotate: 0.5deg; }
+  .hills .hill-drawn.back { z-index: 1; bottom: 92px; height: 150px; opacity: 0.9; }
+  .hills .hill-drawn.front { z-index: 2; bottom: 34px; height: 132px; }
+
+  .hills .school {
+    position: absolute; z-index: 3; right: 6%; bottom: 150px;
+    width: clamp(120px, 17vw, 250px); height: auto; display: block;
+  }
+
+  /* The grass border sits ABOVE the stage so Gritty stands *in* it, and it
+     repeats at its own aspect so the daisies stay round. */
+  .grass-border {
+    position: absolute; z-index: 7; left: 0; right: 0; bottom: -6px;
+    height: 78px;
+    background: url("/images/scenery/grass-border.webp") repeat-x bottom center / auto 78px;
   }
 
   /* ── the words ── */
