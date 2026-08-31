@@ -71,17 +71,18 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
        width="340" height="255" />
 
   <div class="hills" aria-hidden="true">
-    <svg class="hill-back" viewBox="0 0 1440 250" preserveAspectRatio="none">
-      <path d="M0,145 C220,38 430,116 650,106 C880,96 1080,19 1250,67 C1330,90 1390,116 1440,106 L1440,250 L0,250 Z" fill="var(--gg-hill-back)"/>
-    </svg>
-    <svg class="hill-mid" viewBox="0 0 1440 184" preserveAspectRatio="none">
-      <path d="M0,116 C260,29 520,135 780,97 C1000,64 1200,126 1440,68 L1440,184 L0,184 Z" fill="var(--gg-hill-mid)"/>
-    </svg>
-    <img class="school" src={u("/images/scenery/erin-school.webp")} alt=""
-         width="520" height="390" />
-    <svg class="hill-front" viewBox="0 0 1440 116" preserveAspectRatio="none">
-      <path d="M0,42 C380,4 940,70 1440,21 L1440,116 L0,116 Z" fill="var(--gg-meadow)"/>
-    </svg>
+    <img class="band far" src={u("/images/scenery/hills-far.webp")} alt=""
+         width="1600" height="384" />
+    <img class="band near" src={u("/images/scenery/hills-near.webp")} alt=""
+         width="1600" height="271" />
+    <img class="tree" src={u("/images/scenery/tree.webp")} alt=""
+         width="420" height="573" loading="lazy" />
+    <div class="school">
+      <img src={u("/images/scenery/erin-school.webp")} alt="" width="560" height="354" />
+      <span class="school-sign">Erin School</span>
+    </div>
+    <img class="bushes" src={u("/images/scenery/bushes.webp")} alt=""
+         width="460" height="292" loading="lazy" />
     <div class="grass-border"></div>
   </div>
 
@@ -142,27 +143,57 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
   @keyframes drift { from { translate: -10vw 0; } to { translate: 110vw 0; } }
 
   .hills { position: absolute; inset: 0; pointer-events: none; }
-  .hills svg { position: absolute; bottom: 0; left: -2%; width: 104%; display: block; }
-  .hill-back { height: 250px; z-index: 1; }
-  .hill-mid { height: 184px; z-index: 1; }
-  /* The front grass sits ABOVE the stage so Gritty pops out from behind it. */
-  .hill-front { height: 116px; z-index: 7; }
 
-  /* Erin School stands on the middle hill — behind the front grass, so the
-     meadow still closes in front of it. Scenery, not a link. */
-  .school {
-    position: absolute; z-index: 2; right: 6%; bottom: 96px;
-    width: clamp(120px, 17vw, 240px); height: auto; display: block;
+  /* The bands are open-bottomed landforms — only their ridge is drawn — so
+     they stack and bleed off both sides without ever reading as ribbons. */
+  .band {
+    position: absolute; left: -3%; width: 106%; display: block;
+    /* max-width:none beats the global img rule, which would otherwise cap
+       these at 100% and leave bare sky down the right-hand edge. */
+    max-width: none; object-fit: fill;
+  }
+  .band.far { z-index: 1; bottom: 96px; height: 210px; }
+  .band.near { z-index: 3; bottom: 6px; height: 152px; }
+
+  /* The tree and the school stand on the far ground with the near band
+     closing in front of their bases — the oldest trick in scenery. */
+  .tree {
+    position: absolute; z-index: 2; left: 4%; bottom: 146px;
+    width: clamp(70px, 9vw, 126px); height: auto;
   }
 
-  /* The drawn grass border is the frontmost detail, in front of the green
-     band and of Gritty, so he stands *in* the meadow. It repeats at its own
-     aspect ratio — a stretched daisy is an oval, and an oval is not a
-     flower. */
+  /* Erin School stands between the two bands, so the near ground closes in
+     front of it. The sign is live text, not baked into the drawing: it
+     scales with the building through container units. */
+  .school {
+    position: absolute; z-index: 2; right: 6%; bottom: 148px;
+    width: clamp(120px, 17vw, 232px);
+    container-type: inline-size;
+  }
+  .school img { width: 100%; height: auto; display: block; }
+  /* Placed on the green sign panel in the drawing, in percentages of the
+     building so it holds at every width. cqw ties the type to the
+     building, not the viewport. */
+  .school-sign {
+    position: absolute; left: 65%; top: 23.2%; translate: -50% 0;
+    width: 38%; text-align: center;
+    font-family: var(--gg-display); font-weight: 600;
+    font-size: 4.1cqw; line-height: 1; letter-spacing: 0.01em;
+    color: #fff; white-space: nowrap;
+  }
+
+  .bushes {
+    position: absolute; z-index: 4; right: 24%; bottom: 58px;
+    width: clamp(58px, 7vw, 104px); height: auto;
+  }
+
+  /* The grass border is the frontmost detail, ahead of Gritty himself, so
+     he stands *in* the meadow rather than on it. It repeats at its own
+     aspect ratio — a stretched daisy is an oval. */
   .grass-border {
-    position: absolute; z-index: 8; left: 0; right: 0; bottom: -4px;
-    height: 74px;
-    background: url("/images/scenery/grass-border.webp") repeat-x bottom center / auto 74px;
+    position: absolute; z-index: 7; left: 0; right: 0; bottom: -4px;
+    height: 82px;
+    background: url("/images/scenery/grass-border.webp") repeat-x bottom center / auto 82px;
   }
 
   /* ── the words ── */
