@@ -76,7 +76,7 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
   <div class="hills" aria-hidden="true">
     <div class="ground"></div>
     <img class="band far" src={u("/images/scenery/hills-far.webp")} alt=""
-         width="1600" height="384" />
+         width="4800" height="384" />
     <div class="school">
       <img src={u("/images/scenery/erin-school.webp")} alt="" width="560" height="354" />
       <span class="school-sign">Erin School</span>
@@ -84,7 +84,7 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     <img class="tree" src={u("/images/scenery/tree.webp")} alt=""
          width="420" height="573" loading="lazy" />
     <img class="band near" src={u("/images/scenery/hills-near.webp")} alt=""
-         width="1600" height="271" />
+         width="4800" height="271" />
     <img class="bushes" src={u("/images/scenery/bushes.webp")} alt=""
          width="460" height="292" loading="lazy" />
     <div class="grass-border"></div>
@@ -92,7 +92,6 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
 
   <div class="hero-copy">
     <h1>{heading}</h1>
-    <p class="motto">Build Grit. Grow Strong. Never Quit!</p>
   </div>
 
   <div class="stage">
@@ -135,7 +134,7 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
 
   /* ── the scenery ── */
   .sun {
-    position: absolute; top: 8px; right: 5%; z-index: 0;
+    position: absolute; top: 8px; left: 4%; z-index: 0;
     width: clamp(88px, 11vw, 150px); height: auto;
   }
 
@@ -143,7 +142,7 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
      all travel the same way, because wind blows in one direction. Negative
      delays scatter them across the width from the first paint. */
   .cloud { position: absolute; height: auto; z-index: 0; }
-  .c1 { top: 148px; left: 5%; width: clamp(104px, 12vw, 176px);
+  .c1 { top: 148px; left: 68%; width: clamp(104px, 12vw, 176px);
         animation: drift 110s linear -12s infinite; }
   .c2 { top: 236px; left: 18%; width: clamp(84px, 9vw, 136px); opacity: 0.95;
         animation: drift 140s linear -100s infinite; }
@@ -168,12 +167,15 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
 
   /* The bands are open-bottomed landforms — only their ridge is drawn — so
      they stack and bleed off both sides without ever reading as ribbons. */
-  /* cover + top anchor: the ridge stays at true aspect at every width and
-     the crop happens in the flat fill, whose colour the ground continues —
-     fill was stretching the brushwork into long smears on wide screens */
+  /* The band sources are mirror-tiled to 4800px so cover is always
+     height-dominated: the full ridge shows at true aspect at any width,
+     and the crop trims the mirrored wings, never the drawing's height.
+     (Top-anchored cover looked right on paper and shipped floating ridge
+     fragments on real desktops — width-dominated scaling showed only the
+     transparent sky above the ridge.) */
   .band {
     position: absolute; left: -3%; width: 106%; display: block;
-    max-width: none; object-fit: cover; object-position: 50% 0;
+    max-width: none; object-fit: cover; object-position: 50% 50%;
   }
   .band.far { z-index: 1; bottom: 96px; height: 210px; }
   .band.near { z-index: 3; bottom: 6px; height: 152px; }
@@ -223,19 +225,23 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
   /* ── the meadow breathes: all compositor-only, all optional ── */
   @media (prefers-reduced-motion: no-preference) {
     .sun { animation: sun-glow 6s ease-in-out infinite; }
-    .tree { animation: tree-sway 9s ease-in-out infinite; }
-    .bushes { animation: tree-sway 11s ease-in-out -4s infinite; }
-    .grass-border { animation: grass-lean 7s ease-in-out infinite; }
+    .tree { animation: tree-sway 7s ease-in-out infinite; }
+    .bushes { animation: tree-sway 8.5s ease-in-out -4s infinite; }
+    .grass-border { animation: grass-lean 5.5s ease-in-out infinite; }
+    .hint-arrow { animation: arrow-nudge 1.8s var(--gg-ease-back) infinite; }
+  }
+  @keyframes arrow-nudge {
+    0%, 100% { translate: 0 0; } 45% { translate: -7px 7px; }
   }
   @keyframes sun-glow {
-    0%, 100% { scale: 1; } 50% { scale: 1.035; }
+    0%, 100% { scale: 1; } 50% { scale: 1.06; }
   }
   @keyframes tree-sway {
-    0%, 100% { rotate: -0.7deg; } 50% { rotate: 0.7deg; }
+    0%, 100% { rotate: -2.2deg; } 50% { rotate: 2.2deg; }
   }
   /* blades lean rather than slide — a skew from the roots reads as wind */
   @keyframes grass-lean {
-    0%, 100% { transform: skewX(-0.8deg); } 50% { transform: skewX(0.8deg); }
+    0%, 100% { transform: skewX(-2.1deg); } 50% { transform: skewX(2.1deg); }
   }
 
   /* ── the words: the title carries the hero, the motto whispers ── */
@@ -247,11 +253,6 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     color: var(--gg-blue-deep);
     font-size: clamp(2.3rem, 6vw, 4rem); line-height: 1.04;
     text-shadow: 0 2px 0 rgba(255, 255, 255, 0.5);
-  }
-  .motto {
-    font-family: var(--gg-display); font-weight: 600;
-    font-size: clamp(0.95rem, 1.6vw, 1.15rem); letter-spacing: 0.06em;
-    color: var(--gg-green-ink);
   }
 
   /* ── the stage ── */
@@ -360,7 +361,7 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
        compositor-only, so it can never jank a phone. */
     .gritty { animation: breathe 3.7s ease-in-out infinite; }
   }
-  @keyframes breathe { 0%, 100% { scale: 1 1; } 50% { scale: 1 1.014; } }
+  @keyframes breathe { 0%, 100% { scale: 1 1; } 50% { scale: 1 1.03; } }
 
   /* moods, acted out in motion (his emote replaces breathing while it runs) */
   .gritty.e-happy { animation: hop 620ms var(--gg-ease-back); }
@@ -442,7 +443,7 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     .c2 { top: 300px; }
     /* the headline wraps to two full-width lines here, so the sun ducks
        into the corner instead of sitting behind the words */
-    .sun { width: 64px; top: 4px; right: 3%; }
+    .sun { width: 64px; top: 4px; left: 3%; }
     /* school and tree shrink and tuck so Gritty keeps the stage */
     .school { width: clamp(200px, 56vw, 270px); left: -3%; bottom: 96px; }
     .tree { width: clamp(70px, 19vw, 104px); right: 2%; bottom: 116px; }

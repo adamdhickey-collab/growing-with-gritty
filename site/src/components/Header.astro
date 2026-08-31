@@ -19,8 +19,11 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 <header>
   <div class="wrap bar">
     <a class="wordmark" href={u("/")}>
-      <img src={u("/apple-touch-icon.png")} alt="" width="52" height="52" />
-      <span>Growing <em>with</em> Gritty</span>
+      <img src={u("/icon.png")} alt="" width="58" height="58" />
+      <span class="wordmark-text">
+        <span class="site-name">Growing <em>with</em> Gritty</span>
+        <span class="site-motto">Build Grit. Grow Strong. Never Quit!</span>
+      </span>
     </a>
     <nav aria-label="Main">
       {links.map(({ href, label, icon }) => (
@@ -43,13 +46,20 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     gap: 10px 28px; padding-block: 12px;
   }
   .wordmark {
-    display: inline-flex; align-items: center; gap: 12px;
-    font-family: var(--gg-display); font-weight: 700; font-size: 1.4rem;
+    display: inline-flex; align-items: center; gap: 13px;
+    font-family: var(--gg-display); font-weight: 700; font-size: 1.65rem;
     color: var(--gg-blue); text-decoration: none; min-height: var(--gg-tap);
   }
-  .wordmark img { border-radius: 50%; }
+  .wordmark img { width: 58px; height: 58px; object-fit: contain; }
+  .wordmark-text { display: grid; gap: 1px; line-height: 1.15; }
   .wordmark em {
     font-style: normal; font-weight: 500; font-size: 0.72em;
+    color: var(--gg-green-ink);
+  }
+  /* the motto rides under the name — the site introduces itself in full */
+  .site-motto {
+    font-family: var(--gg-display); font-weight: 600;
+    font-size: 0.72rem; letter-spacing: 0.05em;
     color: var(--gg-green-ink);
   }
 
