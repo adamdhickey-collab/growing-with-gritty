@@ -1,13 +1,17 @@
 ---
+/* The header is the first thing a child sees, so the nav speaks their
+   language: Kim-style drawings first, words underneath. Each destination
+   gets its own icon (public/images/nav/), big enough that the crayon
+   detail actually reads. */
 import { u } from '../lib/url';
 const links = [
-  { href: '/meet-gritty', label: '🐐 Meet Gritty' },
-  { href: '/books', label: '📚 Books' },
-  { href: '/grit-zone', label: '💪 Grit Zone' },
-  { href: '/mistake-maker', label: '🧠 Mistake Maker' },
-  { href: '/calming-corner', label: '🧘 Calming Corner' },
-  { href: '/grown-ups', label: '👨‍👩‍👧 Grown-Ups' },
-  { href: '/about', label: '✏️ About Kim' },
+  { href: '/meet-gritty', label: 'Meet Gritty', icon: 'meet-gritty' },
+  { href: '/books', label: 'Books', icon: 'books' },
+  { href: '/grit-zone', label: 'Grit Zone', icon: 'grit-zone' },
+  { href: '/mistake-maker', label: 'Mistake Maker', icon: 'mistake-maker' },
+  { href: '/calming-corner', label: 'Calming Corner', icon: 'calming-corner' },
+  { href: '/grown-ups', label: 'Grown-Ups', icon: 'grown-ups' },
+  { href: '/about', label: 'About Kim', icon: 'about-kim' },
 ];
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
@@ -15,12 +19,15 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 <header>
   <div class="wrap bar">
     <a class="wordmark" href={u("/")}>
-      <img src={u("/apple-touch-icon.png")} alt="" width="44" height="44" />
+      <img src={u("/apple-touch-icon.png")} alt="" width="52" height="52" />
       <span>Growing <em>with</em> Gritty</span>
     </a>
     <nav aria-label="Main">
-      {links.map(({ href, label }) => (
-        <a href={u(href)} aria-current={path.startsWith(href) ? 'page' : undefined}>{label}</a>
+      {links.map(({ href, label, icon }) => (
+        <a href={u(href)} aria-current={path.startsWith(href) ? 'page' : undefined}>
+          <img src={u(`/images/nav/${icon}.webp`)} alt="" width="64" height="64" loading="eager" />
+          <span>{label}</span>
+        </a>
       ))}
     </nav>
   </div>
@@ -33,11 +40,11 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
   }
   .bar {
     display: flex; flex-wrap: wrap; align-items: center;
-    gap: 8px 28px; padding-block: 14px;
+    gap: 10px 28px; padding-block: 12px;
   }
   .wordmark {
     display: inline-flex; align-items: center; gap: 12px;
-    font-family: var(--gg-display); font-weight: 700; font-size: 1.35rem;
+    font-family: var(--gg-display); font-weight: 700; font-size: 1.4rem;
     color: var(--gg-blue); text-decoration: none; min-height: var(--gg-tap);
   }
   .wordmark img { border-radius: 50%; }
@@ -45,15 +52,39 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     font-style: normal; font-weight: 500; font-size: 0.72em;
     color: var(--gg-green-ink);
   }
-  nav { display: flex; flex-wrap: wrap; gap: 4px 8px; margin-left: auto; }
+
+  nav { display: flex; flex-wrap: wrap; gap: 2px; margin-left: auto; }
+
+  /* Picture over word: each link is a little card a child can read before
+     they can read. The icon is the star; the label confirms it. */
   nav a {
-    font-family: var(--gg-display); font-weight: 500; font-size: 1.02rem;
-    color: var(--gg-blue); text-decoration: none;
-    padding: 10px 14px; border-radius: 999px;
-    min-height: var(--gg-tap); display: inline-flex; align-items: center;
+    display: grid; justify-items: center; gap: 3px;
+    padding: 8px 10px 7px; border-radius: 16px;
+    min-width: 76px; min-height: var(--gg-tap);
+    font-family: var(--gg-display); font-weight: 600;
+    font-size: 0.8rem; line-height: 1.1; text-align: center;
+    color: var(--gg-blue-deep); text-decoration: none;
+    transition: background 0.15s ease, translate 0.15s ease;
   }
-  nav a:hover { background: color-mix(in srgb, var(--gg-sky) 45%, transparent); }
+  nav a img { width: 48px; height: 48px; object-fit: contain;
+              transition: rotate 0.18s var(--gg-ease-back), scale 0.18s var(--gg-ease-back); }
+  nav a:hover { background: color-mix(in srgb, var(--gg-sky) 45%, transparent); translate: 0 -2px; }
+  nav a:hover img { rotate: -5deg; scale: 1.12; }
+  nav a:focus-visible { outline: 3px solid var(--gg-gold); outline-offset: 2px; }
   nav a[aria-current='page'] {
     background: var(--gg-blue); color: #fff;
+  }
+  /* his own drawing shouldn't tilt while you're standing on its page */
+  nav a[aria-current='page'] img { rotate: 0deg; scale: 1; }
+
+  @media (max-width: 900px) {
+    .bar { justify-content: center; }
+    nav { margin-left: 0; justify-content: center; }
+    nav a { min-width: 68px; font-size: 0.75rem; }
+    nav a img { width: 38px; height: 38px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    nav a, nav a img { transition: none; }
   }
 </style>

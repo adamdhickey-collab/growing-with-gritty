@@ -35,6 +35,8 @@ const BASE = argOf('--base', null); // URL prefix for the thumbnails
 /* Files loaded by pattern rather than by name — the only two places a path
    is assembled at runtime. Keep this in step with MeadowHero.astro. */
 const DYNAMIC = [
+  { test: /^nav\/[a-z-]+\.webp$/,
+    why: 'The header — its URL is assembled from the link\'s icon name in Header.astro.' },
   { test: /^gritty\/gritty-backpack-1\.webp$/,
     why: 'The meadow hero — Gritty\'s standing pose, always on screen.' },
   { test: /^gritty\/gritty-backpack-(happy|laugh|surprised|proud|thinking)-\d\.webp$/,
@@ -93,7 +95,8 @@ const entries = await Promise.all(images.map(async (rel) => {
 const folders = [...new Set(entries.map((e) => e.folder))].sort();
 const LABELS = {
   gritty: 'Gritty', characters: 'Characters', books: 'Book covers',
-  scenes: 'Scenes', spreads: 'Book spreads',
+  scenes: 'Scenes', spreads: 'Book spreads', scenery: 'Meadow scenery',
+  nav: 'Navigation icons',
   photos: 'Photos', '(loose)': 'Loose files',
 };
 const NOTES = {
