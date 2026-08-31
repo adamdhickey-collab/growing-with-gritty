@@ -10,6 +10,11 @@ characters:
   - grandpa-goat
   - gibby
 challenge: Think of a time something you built or made didn't work the first time. What new way could you try?
+spreads:
+  - /images/spreads/gritty-builds-a-tree-house-spread-1.webp
+  - /images/spreads/gritty-builds-a-tree-house-spread-2.webp
+  - /images/spreads/gritty-builds-a-tree-house-spread-3.webp
+  - /images/spreads/gritty-builds-a-tree-house-spread-4.webp
 ---
 Kim's newest book is a colorful, rhyming adventure featuring Gritty,
 Grandpa Goat, and Gritty's cousin Gibby. As they work together to build a

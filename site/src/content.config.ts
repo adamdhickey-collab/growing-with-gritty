@@ -29,6 +29,11 @@ const books = defineCollection({
     /* A printable id (file name in src/content/printables) to feature as
        this book's activity sheet. */
     activitySheet: optionalString,
+    /* Interior spreads for "look inside", in reading order. A picture book's
+       inside art is the product, so this is the one place a cover can't do
+       the job. Empty until Kim's spreads are scanned — the section simply
+       doesn't render. */
+    spreads: z.array(z.string()).nullish().transform((v) => v ?? []),
   }),
 });
 
@@ -80,6 +85,9 @@ const scenarios = defineCollection({
     answer: z.enum(['a', 'b', 'c']),
     /* Gritty's celebration when they pick it; falls back to the motto. */
     cheer: optionalString,
+    /* What Gritty suggests when a kid presses "Ask Gritty for an idea" —
+       a strategy, never the answer. No hint, no button. */
+    hint: optionalString,
   }),
 });
 
@@ -101,6 +109,9 @@ const yetSentences = defineCollection({
     order: z.number(),
     /* Just the "I can't…" part — the site adds the big gold YET! */
     sentence: z.string(),
+    /* One thing to try, shown after the YET. Falls back to the general
+       "YET is a magic word" line. */
+    tip: optionalString,
   }),
 });
 

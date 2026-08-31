@@ -48,7 +48,10 @@ const checkin = [
           .scenario[data-answer='a'] .choice[data-key='a']::after,
           .scenario[data-answer='b'] .choice[data-key='b']::after,
           .scenario[data-answer='c'] .choice[data-key='c']::after { content: ' ⭐'; }
-          .scenario [data-cheer][hidden] { display: block; }
+          .scenario [data-cheer][hidden] { display: grid; }
+          /* nothing to press, so Gritty's idea is simply already said */
+          .scenario [data-ask] { display: none; }
+          .scenario [data-ask-said][hidden] { display: block; }
         </style>
       </noscript>
 
@@ -68,12 +71,28 @@ const checkin = [
                 </button>
               ))}
             </div>
+            {s.data.hint && (
+              <div class="ask">
+                <button type="button" class="ask-btn" data-ask>
+                  <img src={u("/images/gritty/gritty-face.webp")} alt=""
+                       width="34" height="34" loading="lazy" />
+                  Ask Gritty for an idea
+                </button>
+                <p class="ask-said" data-ask-said role="status" hidden>
+                  "{s.data.hint}"
+                </p>
+              </div>
+            )}
             <p class="nudge" data-nudge role="status" hidden>
               Hmm — would that help Gritty keep going? Try another one!
             </p>
-            <p class="cheer" data-cheer role="status" hidden>
-              ⭐ {s.data.cheer ?? "That's grit! I have grit — I don't quit!"}
-            </p>
+            <div class="cheer" data-cheer role="status" hidden>
+              <p class="cheer-title">⭐ Gritty's Grit Choice!</p>
+              <p class="cheer-motto">"I have grit! I don't quit!"</p>
+              {s.data.cheer && <p class="cheer-why">{s.data.cheer}</p>}
+              <p class="cheer-what">Grit means we keep trying, learn from
+              mistakes, and use strategies when something is difficult.</p>
+            </div>
             <button type="button" class="btn btn-gold" data-next hidden>
               {i + 1 < scenarios.length ? 'Next challenge ➡️' : 'See how you did! 🌟'}
             </button>
@@ -99,8 +118,9 @@ const checkin = [
 
       <ul class="yet-list" data-yet-static role="list">
         {yets.map((y) => (
-          <li data-sentence={y.data.sentence}>
+          <li data-sentence={y.data.sentence} data-tip={y.data.tip ?? ''}>
             {y.data.sentence} <b class="yet-gold">YET!</b>
+            {y.data.tip && <span class="yet-tip-static">Gritty says: "{y.data.tip}"</span>}
           </li>
         ))}
       </ul>
@@ -113,6 +133,7 @@ const checkin = [
         <p class="yet-cheer" data-yet-cheer role="status" hidden>
           YET is a magic word — it means your brain is still growing! 🧠
         </p>
+        <p class="yet-tip" data-yet-tip hidden></p>
         <div class="yet-buttons">
           <button type="button" class="btn btn-gold yet-press" data-yet-press>YET!</button>
           <button type="button" class="btn btn-ghost" data-yet-next hidden>Another one ➡️</button>
@@ -174,6 +195,14 @@ const checkin = [
       const cheer = card.querySelector<HTMLElement>('[data-cheer]')!;
       const next = card.querySelector<HTMLElement>('[data-next]')!;
 
+      /* "Ask Gritty for an idea" — a strategy, offered before the choice */
+      const ask = card.querySelector<HTMLButtonElement>('[data-ask]');
+      const askSaid = card.querySelector<HTMLElement>('[data-ask-said]');
+      ask?.addEventListener('click', () => {
+        askSaid!.hidden = false;
+        ask.hidden = true;
+      });
+
       card.querySelectorAll<HTMLButtonElement>('.choice').forEach((btn) => {
         btn.addEventListener('click', () => {
           if (card.classList.contains('solved')) return;
@@ -209,6 +238,11 @@ const checkin = [
         card.querySelector<HTMLElement>('[data-nudge]')!.hidden = true;
         card.querySelector<HTMLElement>('[data-cheer]')!.hidden = true;
         card.querySelector<HTMLElement>('[data-next]')!.hidden = true;
+        const askBtn = card.querySelector<HTMLElement>('[data-ask]');
+        if (askBtn) {
+          askBtn.hidden = false;
+          card.querySelector<HTMLElement>('[data-ask-said]')!.hidden = true;
+        }
       });
       finale.hidden = true;
       show(0, true);
@@ -222,7 +256,7 @@ const checkin = [
   const yetStatic = document.querySelector<HTMLElement>('[data-yet-static]');
   if (yetMachine && yetStatic) {
     const sentences = [...yetStatic.querySelectorAll<HTMLElement>('li')]
-      .map((li) => li.dataset.sentence ?? '');
+      .map((li) => ({ text: li.dataset.sentence ?? '', tip: li.dataset.tip ?? '' }));
     if (sentences.length > 0) {
       yetStatic.hidden = true;
       yetMachine.hidden = false;
@@ -230,14 +264,16 @@ const checkin = [
       const sentenceEl = yetMachine.querySelector<HTMLElement>('[data-yet-sentence]')!;
       const wordEl = yetMachine.querySelector<HTMLElement>('[data-yet-word]')!;
       const cheerEl = yetMachine.querySelector<HTMLElement>('[data-yet-cheer]')!;
+      const tipEl = yetMachine.querySelector<HTMLElement>('[data-yet-tip]')!;
       const pressBtn = yetMachine.querySelector<HTMLElement>('[data-yet-press]')!;
       const nextBtn = yetMachine.querySelector<HTMLElement>('[data-yet-next]')!;
       let i = 0;
 
       const load = (n: number) => {
-        sentenceEl.textContent = sentences[n];
+        sentenceEl.textContent = sentences[n].text;
         wordEl.hidden = true;
         cheerEl.hidden = true;
+        tipEl.hidden = true;
         nextBtn.hidden = true;
         pressBtn.hidden = false;
       };
@@ -248,6 +284,10 @@ const checkin = [
         void wordEl.offsetWidth; /* restart the pop animation */
         wordEl.classList.add('pop');
         cheerEl.hidden = false;
+        /* Gritty's one idea to try — only when Kim has written one */
+        const tip = sentences[i].tip;
+        tipEl.hidden = !tip;
+        if (tip) tipEl.textContent = `Gritty says: "${tip}"`;
         pressBtn.hidden = true;
         nextBtn.hidden = false;
         nextBtn.focus();
@@ -347,11 +387,45 @@ const checkin = [
   .solved .choice { cursor: default; }
   .solved .choice:hover { transform: none; }
   .nudge { color: var(--gg-ink-soft); font-style: italic; }
+
+  /* — Ask Gritty for an idea — */
+  .ask { display: grid; gap: 12px; justify-items: start; }
+  .ask-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    min-height: var(--gg-tap); padding: 8px 20px 8px 8px;
+    background: #fff; color: var(--gg-blue);
+    border: 2.5px solid var(--gg-blue); border-radius: 999px;
+    font-family: var(--gg-display); font-weight: 600; font-size: 1rem;
+    cursor: pointer; transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .ask-btn img { border-radius: 50%; background: var(--gg-sky); }
+  .ask-btn:hover { background: color-mix(in srgb, var(--gg-sky) 40%, #fff); transform: translateY(-1px); }
+  .ask-said {
+    font-family: var(--gg-hand); font-size: 1.3rem; line-height: 1.35;
+    color: var(--gg-blue-deep);
+    background: color-mix(in srgb, var(--gg-sky) 30%, #fff);
+    border: 3px solid var(--gg-sky);
+    border-radius: var(--gg-radius-small); padding: 12px 18px;
+  }
+
   .cheer {
-    font-family: var(--gg-hand); font-size: 1.4rem; line-height: 1.35;
-    color: var(--gg-gold-ink);
+    display: grid; gap: 6px;
     background: #FFFDF4; border: 3px solid var(--gg-gold);
-    border-radius: var(--gg-radius-small); padding: 14px 18px;
+    border-radius: var(--gg-radius-small); padding: 16px 18px;
+  }
+  .cheer-title {
+    font-family: var(--gg-display); font-weight: 600; font-size: 1.3rem;
+    color: var(--gg-gold-ink);
+  }
+  .cheer-motto {
+    font-family: var(--gg-hand); font-size: 1.5rem; line-height: 1.3;
+    color: var(--gg-gold-ink);
+  }
+  .cheer-why { color: var(--gg-ink); }
+  .cheer-what {
+    font-size: var(--gg-text-small); color: var(--gg-ink-soft);
+    border-top: 1.5px dashed color-mix(in srgb, var(--gg-gold) 55%, transparent);
+    padding-top: 10px; margin-top: 4px;
   }
   .scenario .btn { justify-self: start; }
   .finale {
@@ -384,6 +458,17 @@ const checkin = [
     100% { transform: scale(1) rotate(0deg); }
   }
   .yet-cheer { color: var(--gg-green-ink); font-weight: 700; }
+  .yet-tip {
+    font-family: var(--gg-hand); font-size: 1.3rem; line-height: 1.35;
+    color: var(--gg-blue-deep);
+    background: color-mix(in srgb, var(--gg-sky) 30%, #fff);
+    border: 3px solid var(--gg-sky);
+    border-radius: var(--gg-radius-small); padding: 12px 18px;
+  }
+  .yet-tip-static {
+    display: block; font-family: var(--gg-body); font-size: var(--gg-text-small);
+    color: var(--gg-ink-soft);
+  }
   .yet-buttons { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
   .yet-press { font-size: 1.5rem; padding: 0.6em 1.8em; }
 

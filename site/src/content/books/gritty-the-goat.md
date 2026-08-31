@@ -9,6 +9,10 @@ characters:
   - gritty
   - grandpa-goat
 challenge: What is something that felt scary the first time you tried it? What helped you be brave?
+spreads:
+  - /images/spreads/gritty-the-goat-spread-1.webp
+  - /images/spreads/gritty-the-goat-spread-2.webp
+  - /images/spreads/gritty-the-goat-spread-3.webp
 ---
 Readers ages 4–10 join Gritty on his first day of school. Nervous and unsure
 of what to expect, Gritty receives some wise advice from Grandpa Goat:

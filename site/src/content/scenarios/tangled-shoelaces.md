@@ -1,11 +1,13 @@
 ---
 order: 5
 situation: >-
-  Gritty's shoelaces are in one big tangle, and he really wants to go play.
-  What should he do?
-choiceA: Slow down and untangle one loop at a time.
-choiceB: Yell at the laces.
-choiceC: Throw the shoes in the pond.
-answer: a
-cheer: "That's grit! Slow and steady untangles anything."
+  Gritty's shoe comes untied, but he can't tie his shoes yet. What
+  should Gritty do?
+choiceA: Walk around with his shoes untied and maybe trip and fall.
+choiceB: Ask a friend or adult to teach him, and then practice at home.
+choiceC: Never wear shoes with laces again!
+answer: b
+hint: >-
+  The only way I'm going to get better at tying my shoes is practicing.
+  It will get easier every time!
 ---

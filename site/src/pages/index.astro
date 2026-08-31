@@ -15,14 +15,27 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
   title="Growing with Gritty"
   description="Stories and activities that help kids build grit, kindness, and confidence — with Gritty the Goat, by teacher and author Kim Rekowski."
 >
-  <MeadowHero heading={home.heroHeading} bubble={home.heroBubble} />
+  <MeadowHero
+    heading={home.heroHeading}
+    bubble={home.heroBubble}
+    sayings={home.heroSayings}
+  />
 
   <section class="band welcome">
     <div class="wrap welcome-inner">
-      <p class="lede">{home.heroText}</p>
-      <div class="cta">
-        <a class="btn btn-primary" href={u("/meet-gritty")}>🐐 Meet Gritty</a>
-        <a class="btn btn-gold" href={u("/books")}>📚 See the books</a>
+      <img
+        class="welcome-art"
+        src={u("/images/scenes/gritty-backpack.webp")}
+        alt="Gritty the Goat wearing a blue backpack, ready for school"
+        width="600" height="576" loading="lazy"
+      />
+      <div class="welcome-copy">
+        <p class="lede">{home.heroText}</p>
+        <p class="tagline">{home.heroTagline}</p>
+        <div class="cta">
+          <a class="btn btn-primary" href={u("/meet-gritty")}>🐐 Meet Gritty</a>
+          <a class="btn btn-gold" href={u("/books")}>📚 See the books</a>
+        </div>
       </div>
     </div>
   </section>
@@ -49,29 +62,41 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
   <section class="band" aria-labelledby="world-h">
     <div class="wrap">
       <p class="eyebrow">Gritty's World</p>
-      <h2 id="world-h">Play with Gritty</h2>
+      <h2 id="world-h">Where do you want to go?</h2>
       <p class="world-note">Games and quiet corners for practicing grit —
       everything happens right on your device.</p>
       <div class="world-grid">
+        <a class="world-card card" href={u("/books")}>
+          <img src={u("/images/scenes/gritty-reading.webp")}
+               alt="" width="600" height="600" loading="lazy" />
+          <h3>Read</h3>
+          <p>Look inside all four books, then find your favorite.</p>
+        </a>
         <a class="world-card card" href={u("/grit-zone")}>
-          <span class="world-emoji" aria-hidden="true">💪</span>
-          <h3>The Grit Zone</h3>
+          <img src={u("/images/scenes/gritty-building-blocks.webp")}
+               alt="" width="600" height="600" loading="lazy" />
+          <h3>Play</h3>
           <p>Help Gritty choose what grit looks like — then feel the Power
           of YET!</p>
         </a>
-        <a class="world-card card" href={u("/mistake-maker")}>
-          <span class="world-emoji" aria-hidden="true">🧠</span>
-          <h3>The Mistake Maker</h3>
-          <p>Press the button for a funny oops — and turn it into
-          "I learned!"</p>
+        <a class="world-card card" href={u("/grown-ups")}>
+          <img src={u("/images/scenes/gritty-coloring.webp")}
+               alt="" width="600" height="600" loading="lazy" />
+          <h3>Make</h3>
+          <p>Coloring sheets and bookmarks to print at home.</p>
         </a>
         <a class="world-card card" href={u("/calm-corner")}>
-          <span class="world-emoji" aria-hidden="true">🧘</span>
-          <h3>The Calm Corner</h3>
+          <img src={u("/images/scenes/gritty-calm.webp")}
+               alt="" width="600" height="600" loading="lazy" />
+          <h3>Calm Corner</h3>
           <p>Pick a feeling, find a calm-down idea, and breathe with
           Gritty.</p>
         </a>
       </div>
+      <p class="world-more">
+        Made a mistake today? Lucky you —
+        <a href={u("/mistake-maker")}>visit the Mistake Maker 🧠</a>
+      </p>
     </div>
   </section>
 
@@ -98,10 +123,27 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
 <style>
   .welcome { padding-block: 44px; }
   .welcome-inner {
-    display: grid; gap: 22px; justify-items: center; text-align: center;
+    display: grid; grid-template-columns: minmax(0, 230px) minmax(0, 1fr);
+    gap: 12px 40px; align-items: center; justify-content: center;
   }
-  .lede { font-size: 1.15rem; color: var(--gg-ink-soft); max-width: 58ch; }
-  .cta { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+  .welcome-art { width: 100%; height: auto; display: block; }
+  .welcome-copy { display: grid; gap: 18px; justify-items: start; }
+  .lede { font-size: 1.15rem; color: var(--gg-ink-soft); max-width: 52ch; }
+  .tagline {
+    font-family: var(--gg-display); font-weight: 600; font-size: 1.35rem;
+    color: var(--gg-green-ink); max-width: 20ch;
+  }
+  .cta { display: flex; flex-wrap: wrap; gap: 14px; }
+
+  @media (max-width: 700px) {
+    .welcome-inner {
+      grid-template-columns: 1fr; justify-items: center; text-align: center;
+    }
+    .welcome-art { max-width: 220px; }
+    .welcome-copy { justify-items: center; }
+    .tagline { max-width: none; }
+    .cta { justify-content: center; }
+  }
 
   .stamps { display: flex; flex-wrap: wrap; gap: 24px 40px; justify-content: center; }
 
@@ -118,13 +160,21 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
     gap: 20px;
   }
   .world-card {
-    padding: 28px 26px; display: grid; gap: 10px; justify-items: start;
-    text-decoration: none; color: var(--gg-ink);
+    padding: 0 0 26px; display: grid; gap: 10px; justify-items: start;
+    text-decoration: none; color: var(--gg-ink); overflow: hidden;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
   .world-card:hover { transform: translateY(-3px); box-shadow: var(--gg-shadow-lift); color: var(--gg-ink); }
+  .world-card > * { padding-inline: 26px; }
+  /* Kim's scene art is the button — square, sitting flush at the top */
+  .world-card img {
+    padding: 0; width: 100%; height: auto; aspect-ratio: 1 / 1;
+    object-fit: cover; display: block; background: var(--gg-sky);
+  }
+  .world-card h3 { margin-top: 18px; }
   .world-card p { color: var(--gg-ink-soft); }
-  .world-emoji { font-size: 2.2rem; }
+
+  .world-more { margin-top: 22px; color: var(--gg-ink-soft); }
 
   .grown-cta {
     display: flex; flex-wrap: wrap; align-items: center; gap: 20px 40px;

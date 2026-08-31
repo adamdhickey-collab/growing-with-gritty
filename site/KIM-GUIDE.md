@@ -45,17 +45,29 @@ an entry adds it to the game on the site, about two minutes after you save:
 
 - **Grit Zone challenges** — a situation, three choices, which choice shows
   grit, and Gritty's cheer. Mix up where the grit choice sits (A, B, or C) —
-  kids notice patterns fast!
+  kids notice patterns fast! Fill in **Ask Gritty — his idea** and a child
+  who's stuck can press a button to hear a strategy from Gritty before they
+  choose. Leave it blank and that challenge simply has no button.
 - **Mistake Maker oopses** — Gritty's funny mistake, plus the "I learned…"
   flip side kids reveal with the big gold button.
 - **Power of YET sentences** — just the "I can't…" part. The site adds the
-  big gold YET!
+  big gold YET! **Gritty's idea** is the one thing he suggests trying after
+  the YET lands.
 - **Calm Corner strategies** — a name, an emoji, and the steps (one per
   line).
 
 The entries in there now are starters to show how each form works — edit
 them, replace them, make them yours. Your students' favorite scenarios
 belong here.
+
+## Showing the inside of a book
+
+A cover can't show what's inside a picture book, so each book's page has a
+**Look inside** strip kids can swipe through before the buy button.
+
+Open the book in **Books** and upload your two-page spreads to **Look
+inside — the spreads**, in reading order. Add as many or as few as you
+like; a book with none just doesn't show the strip.
 
 ## The talking Gritty on the home page
 
@@ -81,7 +93,9 @@ moods out with his whole body, using only your original drawing.
 ## Editing the home page or About page
 
 Click **Home page** or **About the Author** in the sidebar — one form each.
-What you type in "Gritty's welcome" is exactly what his speech bubble says.
+What you type in "Gritty's welcome" is exactly what his speech bubble says
+first. **Gritty's sayings** is the list his bubble cycles through while he
+waits to be tapped — add, reorder, or remove lines freely.
 
 ## Rules of thumb
 

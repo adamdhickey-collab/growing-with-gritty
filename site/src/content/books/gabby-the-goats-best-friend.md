@@ -9,6 +9,10 @@ characters:
   - gabby
   - gritty
 challenge: Who is a friend who cares about you? What is one kind thing you could do for them today?
+spreads:
+  - /images/spreads/gabby-the-goats-best-friend-spread-1.webp
+  - /images/spreads/gabby-the-goats-best-friend-spread-2.webp
+  - /images/spreads/gabby-the-goats-best-friend-spread-3.webp
 ---
 The third book explores the joys and challenges of friendship. Gabby helps
 young readers discover how to navigate friendships, appreciate the people

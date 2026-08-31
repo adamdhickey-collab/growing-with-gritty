@@ -9,6 +9,10 @@ characters:
   - gritty
   - grandpa-goat
 challenge: What is something you are growing or working on a little bit at a time? What do you do to take care of it?
+spreads:
+  - /images/spreads/gritty-grows-a-garden-spread-1.webp
+  - /images/spreads/gritty-grows-a-garden-spread-2.webp
+  - /images/spreads/gritty-grows-a-garden-spread-3.webp
 ---
 The second book in the Gritty the Goat series follows Gritty as he works
 with Grandpa Goat to grow a garden. Along the way, he discovers that

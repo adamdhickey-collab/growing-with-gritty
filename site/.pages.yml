@@ -79,6 +79,14 @@ content:
         description: >-
           A question families can talk about after reading. Shows in a
           speech bubble at the bottom of the book's page.
+      - name: spreads
+        label: Look inside — the spreads
+        type: image
+        list: true
+        description: >-
+          A few inside pages, in reading order. Kids swipe through these
+          before the buy button. Upload the two-page spreads exactly as
+          they appear in the book — this is the part a cover can't show.
 
   - name: characters
     label: Characters
@@ -227,6 +235,13 @@ content:
         description: >-
           What Gritty shouts when they pick the grit choice. If you leave it
           blank he says "That's grit! I have grit — I don't quit!"
+      - name: hint
+        label: Ask Gritty — his idea
+        type: text
+        description: >-
+          What Gritty says when a child presses "Ask Gritty for an idea",
+          in his own voice. Give a strategy to try, never the answer. Leave
+          it blank and the button doesn't appear for this challenge.
 
   - name: mistakes
     label: Mistake Maker oopses
@@ -274,6 +289,13 @@ content:
         description: >-
           Just the tricky part, ending with … — like "I can't ride my
           bike…" The site adds the big gold YET!
+      - name: tip
+        label: Gritty's idea
+        type: text
+        description: >-
+          One thing to try, shown after the gold YET — like "Read the word
+          part by part." Leave it blank and Gritty says "YET is a magic
+          word — it means your brain is still growing!"
 
   - name: calm-strategies
     label: Calm Corner strategies
@@ -422,9 +444,21 @@ content:
       - name: heroBubble
         label: Gritty's welcome (speech bubble)
         type: text
-        description: The first thing visitors read, in Gritty's handwriting bubble.
+        description: >-
+          The first thing visitors read, in Gritty's handwriting bubble,
+          before anyone taps him.
+      - name: heroSayings
+        label: Gritty's sayings (they take turns)
+        type: string
+        list: true
+        description: >-
+          The lines Gritty's bubble cycles through while he waits to be
+          tapped. Add or reorder freely — the first one shows first.
       - name: heroHeading
         label: Big headline
+        type: string
+      - name: heroTagline
+        label: The line under the welcome paragraph
         type: string
       - name: heroText
         label: Welcome paragraph

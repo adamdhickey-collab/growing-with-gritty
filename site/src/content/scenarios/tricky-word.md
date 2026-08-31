@@ -1,11 +1,13 @@
 ---
 order: 2
 situation: >-
-  Gritty is reading a book and comes to a big, tricky word. What should he
-  do?
-choiceA: Sound it out bit by bit, and ask for help if it's still tricky.
-choiceB: Slam the book shut.
-choiceC: Skip every page that has big words in it.
-answer: a
-cheer: "That's grit! Big words get smaller every time you try them."
+  Gritty is reading a story and comes to a word he doesn't know. What
+  should Gritty do?
+choiceA: Skip the word and keep reading without trying.
+choiceB: Look at the letters, sound it out, and try again.
+choiceC: Close his book because the story is too hard.
+answer: b
+hint: >-
+  I can think about the vowel teams and patterns I've learned to stretch
+  out the word.
 ---

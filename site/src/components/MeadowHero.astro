@@ -15,8 +15,8 @@ import path from 'node:path';
 import { getCollection } from 'astro:content';
 import { u } from '../lib/url';
 
-interface Props { heading: string; bubble: string }
-const { heading, bubble } = Astro.props;
+interface Props { heading: string; bubble: string; sayings?: string[] }
+const { heading, bubble, sayings = [] } = Astro.props;
 
 const chats = (await getCollection('meadow-chats'))
   .sort((a, b) => a.data.order - b.data.order)
@@ -58,7 +58,7 @@ try {
   for (const k in moodFrames) moodFrames[k].sort();
 } catch { /* no expression art yet — motion carries the moods */ }
 
-const payload = JSON.stringify({ chats, cast, moods: moodFrames })
+const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
   .replace(/</g, '\\u003c');
 ---
 
@@ -74,11 +74,34 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames })
     <svg class="hill-mid" viewBox="0 0 1440 184" preserveAspectRatio="none">
       <path d="M0,116 C260,29 520,135 780,97 C1000,64 1200,126 1440,68 L1440,184 L0,184 Z" fill="var(--gg-hill-mid)"/>
     </svg>
+    <!-- The front grass keeps its own aspect ratio for the daisies' sake:
+         a stretched circle is an oval, and an oval is not a flower. -->
     <svg class="hill-front" viewBox="0 0 1440 116" preserveAspectRatio="none">
       <path d="M0,42 C380,4 940,70 1440,21 L1440,116 L0,116 Z" fill="var(--gg-meadow)"/>
-      <g fill="var(--gg-paper)">
-        <circle cx="300" cy="89" r="3.5"/><circle cx="700" cy="97" r="4"/>
-        <circle cx="1120" cy="84" r="3"/><circle cx="1330" cy="91" r="3.5"/>
+    </svg>
+    <svg class="daisies" viewBox="0 0 1440 116" preserveAspectRatio="xMidYMax slice">
+      <defs>
+        <!-- five petals around a gold middle, drawn once -->
+        <g id="gg-daisy">
+          <g fill="var(--gg-paper)">
+            <ellipse cx="0" cy="-4.6" rx="2.5" ry="3.6"/>
+            <ellipse cx="4.4" cy="-1.4" rx="2.5" ry="3.6" transform="rotate(72)"/>
+            <ellipse cx="2.7" cy="3.7" rx="2.5" ry="3.6" transform="rotate(144)"/>
+            <ellipse cx="-2.7" cy="3.7" rx="2.5" ry="3.6" transform="rotate(216)"/>
+            <ellipse cx="-4.4" cy="-1.4" rx="2.5" ry="3.6" transform="rotate(288)"/>
+          </g>
+          <circle r="2" fill="var(--gg-sun)"/>
+        </g>
+      </defs>
+      <g class="daisy-field">
+        <use href="#gg-daisy" x="118" y="74"/>
+        <use href="#gg-daisy" x="300" y="89" transform="translate(0,0) scale(1.15)" style="transform-origin:300px 89px"/>
+        <use href="#gg-daisy" x="418" y="66"/>
+        <use href="#gg-daisy" x="700" y="97"/>
+        <use href="#gg-daisy" x="812" y="80" transform="scale(0.85)" style="transform-origin:812px 80px"/>
+        <use href="#gg-daisy" x="1120" y="84"/>
+        <use href="#gg-daisy" x="1236" y="99" transform="scale(1.15)" style="transform-origin:1236px 99px"/>
+        <use href="#gg-daisy" x="1330" y="91"/>
       </g>
     </svg>
   </div>
@@ -99,7 +122,7 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames })
 
     <div class="say">
       <p class="nameplate" data-nameplate hidden>Gritty</p>
-      <p class="bubble" data-say role="status">{bubble}</p>
+      <p class="bubble" data-say role="status">"{bubble.replace(/^"|"$/g, '')}"</p>
     </div>
 
     <div class="chips" data-chips hidden role="group" aria-label="What do you say back?">
@@ -154,6 +177,15 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames })
   .hill-mid { height: 184px; z-index: 1; }
   /* The front grass sits ABOVE the stage so Gritty pops out from behind it. */
   .hill-front { height: 116px; z-index: 7; }
+  .daisies { height: 116px; z-index: 8; }
+  @media (prefers-reduced-motion: no-preference) {
+    /* the lightest breeze — one sway shared by the whole field */
+    .daisy-field { animation: breeze 6.5s ease-in-out infinite; transform-origin: 50% 100%; }
+  }
+  @keyframes breeze {
+    0%, 100% { rotate: -0.5deg; }
+    50% { rotate: 0.5deg; }
+  }
 
   /* ── the words ── */
   .hero-copy {
@@ -359,6 +391,7 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames })
       cast: Record<string, { name: string; role: string;
                              portrait: string | null; tone: string }>;
       moods: Record<string, string[]>;
+      sayings: string[];
     };
 
     /* seasonal meadow — automatic, cosmetic, nothing to unlock */
@@ -401,6 +434,28 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames })
       if (opts.cheer) say.classList.add('cheer');
       else if (opts.tone && opts.tone !== 'blue') say.classList.add(`tone-${opts.tone}`);
     }
+
+    /* ——— Kim's sayings, taking turns while nobody has tapped him ———
+       An idle carousel must not narrate itself: aria-live goes quiet for
+       the rotation and comes back on for anything a kid actually caused. */
+    let idleTimer = 0;
+    let si = 0;
+    function stopIdle() {
+      clearInterval(idleTimer);
+      idleTimer = 0;
+      say.setAttribute('aria-live', 'polite');
+    }
+    function startIdle() {
+      if (data.sayings.length < 2 || idleTimer) return;
+      say.setAttribute('aria-live', 'off');
+      idleTimer = window.setInterval(() => {
+        si = (si + 1) % data.sayings.length;
+        speak(data.sayings[si]);
+      }, 6000);
+    }
+    /* the bubble ships with sayings[0], so the rotation picks up from there */
+    si = Math.max(0, data.sayings.indexOf(say.textContent!.replace(/^"|"$/g, '')));
+    startIdle();
 
     function emote(mood: string) {
       gritty.classList.remove('e-happy', 'e-proud', 'e-laugh', 'e-surprised', 'e-thinking');
@@ -448,6 +503,7 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames })
     }
 
     function startChat(chat: (typeof data.chats)[0]) {
+      stopIdle(); /* a real conversation outranks the waiting sayings */
       current = chat;
       const who = data.cast[chat.speaker];
       nameplate.hidden = false;

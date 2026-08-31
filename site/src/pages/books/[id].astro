@@ -11,7 +11,7 @@ export async function getStaticPaths() {
 
 const { book } = Astro.props;
 const { Content } = await render(book);
-const { title, order, cover, ages, lesson, buyLink, challenge, activitySheet } = book.data;
+const { title, order, cover, ages, lesson, buyLink, challenge, activitySheet, spreads } = book.data;
 
 /* Characters featured in this book, in series order. Missing ids are
    skipped rather than crashing — the CMS can't guarantee referential
@@ -45,6 +45,29 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
         </div>
       </div>
     </section>
+
+    {spreads.length > 0 && (
+      <section class="band" aria-labelledby="inside-h">
+        <div class="wrap">
+          <h2 id="inside-h">📖 Look inside</h2>
+          <p class="inside-note">Swipe through a few real pages from the
+          book.</p>
+          <ol class="spreads" role="list">
+            {spreads.map((src, i) => (
+              <li>
+                <img src={u(src)} alt={`${title} — inside pages, spread ${i + 1} of ${spreads.length}`}
+                     width="1369" height="690" loading="lazy" />
+              </li>
+            ))}
+          </ol>
+          {buyLink && (
+            <p class="inside-buy">
+              <a class="btn btn-gold" href={buyLink}>🛒 Order {title}</a>
+            </p>
+          )}
+        </div>
+      </section>
+    )}
 
     {lesson && (
       <section class="band band-sky">
@@ -98,6 +121,23 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
   .story { color: var(--gg-ink); }
   .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
   .soon { font-size: var(--gg-text-small); color: var(--gg-ink-soft); }
+
+  /* — look inside — */
+  .inside-note { color: var(--gg-ink-soft); margin-top: 6px; }
+  .spreads {
+    list-style: none; margin-top: 20px;
+    display: grid; grid-auto-flow: column; grid-auto-columns: min(88%, 660px);
+    gap: 18px; overflow-x: auto; overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory; padding-bottom: 12px;
+  }
+  .spreads li { scroll-snap-align: center; }
+  .spreads img {
+    width: 100%; height: auto; display: block;
+    border-radius: var(--gg-radius-small);
+    border: 3px solid #fff; box-shadow: var(--gg-shadow);
+    background: #fff;
+  }
+  .inside-buy { margin-top: 20px; }
 
   .lesson {
     margin-top: 12px; font-family: var(--gg-display); font-weight: 500;
