@@ -1,6 +1,7 @@
 ---
 name: Grandma Goat
 order: 4
+portrait: /images/characters/grandma-goat.webp
 role: The warm heart of the family
 ---
 "Every little goat grows in their own time. Keep growing, keep learning,
