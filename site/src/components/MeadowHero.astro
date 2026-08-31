@@ -1,8 +1,8 @@
 ---
 /* The meadow hero — style tile V3 "Alive", grown into the real site.
-   Gritty (Kim's drawing, re-inked as three line-boil frames) climbs out of
-   the meadow grass; kids tap him to chat, answer with reply chips, and his
-   friends wander up the path to visit. Every conversation is CMS content
+   Gritty (Kim's drawing) climbs out of the meadow grass; kids tap him to
+   chat, answer with reply chips, and his friends wander up the path to
+   visit. Every conversation is CMS content
    (the meadow-chats collection) — the shell here is built once.
 
    Expression art: when Kim draws a mood (laughing, surprised, thinking…),
@@ -11,15 +11,12 @@
    drawing automatically. Until then, moods act through motion alone —
    never through generated art.
 
-   The backpack: Kim wants Gritty wearing it in the meadow, and her
-   backpack drawing is a single pose. Two things follow, both automatic.
-   The three-frame line boil has nothing to cycle, so it rests. And her
-   four expression drawings have no backpack on them, so swapping to one
-   mid-reaction would make the pack blink out — while the backpack is the
-   base, moods act through motion alone, exactly as they did before any
-   expression art existed. Drop in gritty-backpack-<mood>-1.webp and that
-   mood starts using her art again; delete gritty-backpack-1.webp and the
-   boil and the plain expressions both come straight back. */
+   The backpack: Kim wants Gritty wearing it in the meadow, always, and
+   wearing it through his reactions too. So every frame here is a
+   gritty-backpack-* drawing, and the line boil is retired — her backpack
+   pose is one drawing, and three frames of the same picture is not a
+   boil. His moods still act through motion as well as through her faces,
+   which is what carries the moods she has not drawn (happy). */
 import fs from 'node:fs';
 import path from 'node:path';
 import { getCollection } from 'astro:content';
@@ -62,22 +59,14 @@ const GRITTY_DIR = path.resolve(process.cwd(), 'public/images/gritty');
 let files: string[] = [];
 try { files = fs.readdirSync(GRITTY_DIR); } catch { /* no art yet */ }
 
-const wearsBackpack = files.includes('gritty-backpack-1.webp');
-const BASE_FRAMES = wearsBackpack
-  /* one drawing, repeated into the three frame slots: the markup stays the
-     same shape and the boil simply has nothing to cycle */
-  ? [1, 2, 3].map(() => u('/images/gritty/gritty-backpack-1.webp'))
-  : [1, 2, 3].map((n) => u(`/images/gritty/gritty-boil-${n}.webp`));
+const BASE_POSE = u('/images/gritty/gritty-backpack-1.webp');
 
-/* Only moods drawn in the same outfit as the base — otherwise the backpack
-   would blink out for the length of a reaction. */
-const moodRe = wearsBackpack
-  ? /^gritty-backpack-([a-z]+)-[0-9]\.webp$/
-  : /^gritty-([a-z]+)-[0-9]\.webp$/;
+/* Only moods drawn wearing the pack — anything else would blink it out for
+   the length of a reaction. */
 const moodFrames: Record<string, string[]> = {};
 for (const f of files) {
-  const m = f.match(moodRe);
-  if (m && m[1] !== 'boil') (moodFrames[m[1]] ??= []).push(u(`/images/gritty/${f}`));
+  const m = f.match(/^gritty-backpack-([a-z]+)-[0-9]\.webp$/);
+  if (m) (moodFrames[m[1]] ??= []).push(u(`/images/gritty/${f}`));
 }
 for (const k in moodFrames) moodFrames[k].sort();
 
@@ -135,11 +124,8 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
     </div>
 
     <button class="gritty" data-gritty aria-label="Tap Gritty — he wants to talk!" disabled>
-      <img src={BASE_FRAMES[0]} alt={wearsBackpack
-        ? "Gritty the Goat wearing his backpack, hand-drawn by Kim Rekowski"
-        : "Gritty the Goat, hand-drawn by Kim Rekowski"} width="520" height="635" fetchpriority="high" />
-      <img src={BASE_FRAMES[1]} alt="" width="520" height="635" />
-      <img src={BASE_FRAMES[2]} alt="" width="520" height="635" />
+      <img src={BASE_POSE} alt="Gritty the Goat wearing his backpack, hand-drawn by Kim Rekowski"
+           width="640" height="777" fetchpriority="high" />
     </button>
     <p class="tap-hint" data-hint>Tap Gritty to say hello! 👆</p>
   </div>
@@ -333,8 +319,7 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
      base frames, and stretching Gritty for a fifth of a second is the kind
      of wrongness you feel without being able to name it. */
   .gritty img { position: absolute; inset: 0; width: 100%; height: 100%;
-                object-fit: contain; opacity: 0; }
-  .gritty img:first-child { opacity: 1; }
+                object-fit: contain; }
 
   /* When JS will run, he starts tucked behind the front hill and climbs
      out (.arrived). Without JS — or in old browsers — he's simply there. */
@@ -355,15 +340,10 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    /* line boil — Kim's exact linework, re-inked. Stepped opacity is
+    /* One drawing now, so the breath is what keeps him alive. Scale is
        compositor-only, so it can never jank a phone. */
-    .gritty img { animation: boil 0.39s steps(1) infinite; }
-    .gritty img:nth-child(1) { animation-delay: 0s; }
-    .gritty img:nth-child(2) { animation-delay: -0.13s; }
-    .gritty img:nth-child(3) { animation-delay: -0.26s; }
     .gritty { animation: breathe 3.7s ease-in-out infinite; }
   }
-  @keyframes boil { 0%, 33.32% { opacity: 1; } 33.33%, 100% { opacity: 0; } }
   @keyframes breathe { 0%, 100% { scale: 1 1; } 50% { scale: 1 1.014; } }
 
   /* moods, acted out in motion (his emote replaces breathing while it runs) */
@@ -435,7 +415,7 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
 
     const gritty = section.querySelector<HTMLButtonElement>('[data-gritty]')!;
     const frames = Array.from(gritty.querySelectorAll('img'));
-    const baseSrcs = frames.map((f) => f.src);
+    const baseSrcs = frames.map((f) => f.src); /* one pose, kept for restore */
     const say = section.querySelector<HTMLElement>('[data-say]')!;
     const nameplate = section.querySelector<HTMLElement>('[data-nameplate]')!;
     const chipBox = section.querySelector<HTMLElement>('[data-chips]')!;
