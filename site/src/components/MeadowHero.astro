@@ -74,17 +74,16 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
        width="400" height="300" />
 
   <div class="hills" aria-hidden="true">
-    <div class="ground"></div>
-    <img class="band far" src={u("/images/scenery/hills-far.webp")} alt=""
-         width="4800" height="384" />
+    <img class="meadow-layer far" src={u("/images/scenery/meadow-far.webp")} alt=""
+         width="4800" height="800" />
     <div class="school">
       <img src={u("/images/scenery/erin-school.webp")} alt="" width="560" height="354" />
       <span class="school-sign">Erin School</span>
     </div>
     <img class="tree" src={u("/images/scenery/tree.webp")} alt=""
          width="420" height="573" loading="lazy" />
-    <img class="band near" src={u("/images/scenery/hills-near.webp")} alt=""
-         width="4800" height="271" />
+    <img class="meadow-layer near" src={u("/images/scenery/meadow-near.webp")} alt=""
+         width="4800" height="560" />
     <img class="bushes" src={u("/images/scenery/bushes.webp")} alt=""
          width="460" height="292" loading="lazy" />
     <div class="grass-border"></div>
@@ -154,31 +153,19 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
 
   .hills { position: absolute; inset: 0; pointer-events: none; }
 
-  /* Solid ground under everything: each band is transparent above its own
-     ridge, and on wide screens the sky gradient used to show through those
-     gaps as grey strips. The colours are sampled from the bands' own
-     painted fill (#bde98b → #8ddb4e → #6dbf4d), so band and ground meet
-     without a seam. */
-  .ground {
-    position: absolute; z-index: 0; left: 0; right: 0; bottom: 0; height: 236px;
-    background: linear-gradient(180deg,
-      #bde98b 0%, #a4e26b 34%, #8ddb4e 62%, #6dbf4d 100%);
+  /* Each meadow layer is a full-depth painting: ridge and brushwork at
+     the top dissolving into its own flat green, solid to the bottom of
+     the hero. Nothing hands off to CSS colour mid-scene, so there is no
+     seam to see at any width. min-height + bottom-anchored cover keeps
+     the whole ridge in frame: when the natural height is short, cover
+     scales by height and crops the mirrored wings, never the drawing. */
+  .meadow-layer {
+    position: absolute; left: -2%; width: 104%; bottom: 0;
+    max-width: none; height: auto; display: block;
+    object-fit: cover; object-position: 50% 100%;
   }
-
-  /* The bands are open-bottomed landforms — only their ridge is drawn — so
-     they stack and bleed off both sides without ever reading as ribbons. */
-  /* The band sources are mirror-tiled to 4800px so cover is always
-     height-dominated: the full ridge shows at true aspect at any width,
-     and the crop trims the mirrored wings, never the drawing's height.
-     (Top-anchored cover looked right on paper and shipped floating ridge
-     fragments on real desktops — width-dominated scaling showed only the
-     transparent sky above the ridge.) */
-  .band {
-    position: absolute; left: -3%; width: 106%; display: block;
-    max-width: none; object-fit: cover; object-position: 50% 50%;
-  }
-  .band.far { z-index: 1; bottom: 96px; height: 210px; }
-  .band.near { z-index: 3; bottom: 6px; height: 152px; }
+  .meadow-layer.far { z-index: 1; min-height: 300px; }
+  .meadow-layer.near { z-index: 3; min-height: 175px; }
 
   /* Erin School and the tree flank the meadow — school on the left, tree
      on the right — standing on the far ground with the near band closing
