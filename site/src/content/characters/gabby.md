@@ -1,7 +1,6 @@
 ---
 name: Gabby the Goat
 order: 3
-portrait: /images/characters/gabby.webp
 role: The friendship expert
 ---
 "Hi! I'm Gabby! Friends are the best — and being a good friend takes

@@ -35,10 +35,14 @@ const BASE = argOf('--base', null); // URL prefix for the thumbnails
 /* Files loaded by pattern rather than by name — the only two places a path
    is assembled at runtime. Keep this in step with MeadowHero.astro. */
 const DYNAMIC = [
+  { test: /^gritty\/gritty-backpack-1\.webp$/,
+    why: 'The meadow hero — Gritty\'s standing pose. While this file exists he wears his backpack, the line boil rests, and moods act through motion.' },
   { test: /^gritty\/gritty-boil-\d\.webp$/,
-    why: 'The meadow hero — the three-frame line boil, always on screen.' },
+    why: 'The meadow hero\'s line boil — on screen only when no backpack pose is present.' },
+  { test: /^gritty\/gritty-backpack-(happy|laugh|surprised|proud|thinking)-\d\.webp$/,
+    why: 'The meadow hero — Gritty wears this face, backpack and all, when a reply has that mood.' },
   { test: /^gritty\/gritty-(happy|laugh|surprised|proud|thinking)-\d\.webp$/,
-    why: 'The meadow hero — Gritty wears this face when a reply has that mood.' },
+    why: 'Gritty\'s expression drawings — used by the hero when he is not wearing the backpack, and the source of his face elsewhere.' },
 ];
 
 /* ── every image, and every source file that might name one ── */

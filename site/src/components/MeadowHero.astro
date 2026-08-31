@@ -9,7 +9,17 @@
    drop the re-inked frames into public/images/gritty/ as
    gritty-<mood>-1.webp / -2 / -3 and that mood's reactions start using her
    drawing automatically. Until then, moods act through motion alone —
-   never through generated art. */
+   never through generated art.
+
+   The backpack: Kim wants Gritty wearing it in the meadow, and her
+   backpack drawing is a single pose. Two things follow, both automatic.
+   The three-frame line boil has nothing to cycle, so it rests. And her
+   four expression drawings have no backpack on them, so swapping to one
+   mid-reaction would make the pack blink out — while the backpack is the
+   base, moods act through motion alone, exactly as they did before any
+   expression art existed. Drop in gritty-backpack-<mood>-1.webp and that
+   mood starts using her art again; delete gritty-backpack-1.webp and the
+   boil and the plain expressions both come straight back. */
 import fs from 'node:fs';
 import path from 'node:path';
 import { getCollection } from 'astro:content';
@@ -48,15 +58,28 @@ const cast = Object.fromEntries(characters.map((c) => [c.id, {
 
 /* Gritty's base pose ships with the site; extra moods appear the moment
    their frames exist. cwd is site/ for both `npm run dev` and CI builds. */
-const BASE_FRAMES = [1, 2, 3].map((n) => u(`/images/gritty/gritty-boil-${n}.webp`));
+const GRITTY_DIR = path.resolve(process.cwd(), 'public/images/gritty');
+let files: string[] = [];
+try { files = fs.readdirSync(GRITTY_DIR); } catch { /* no art yet */ }
+
+const wearsBackpack = files.includes('gritty-backpack-1.webp');
+const BASE_FRAMES = wearsBackpack
+  /* one drawing, repeated into the three frame slots: the markup stays the
+     same shape and the boil simply has nothing to cycle */
+  ? [1, 2, 3].map(() => u('/images/gritty/gritty-backpack-1.webp'))
+  : [1, 2, 3].map((n) => u(`/images/gritty/gritty-boil-${n}.webp`));
+
+/* Only moods drawn in the same outfit as the base — otherwise the backpack
+   would blink out for the length of a reaction. */
+const moodRe = wearsBackpack
+  ? /^gritty-backpack-([a-z]+)-[0-9]\.webp$/
+  : /^gritty-([a-z]+)-[0-9]\.webp$/;
 const moodFrames: Record<string, string[]> = {};
-try {
-  for (const f of fs.readdirSync(path.resolve(process.cwd(), 'public/images/gritty'))) {
-    const m = f.match(/^gritty-([a-z]+)-[0-9]\.webp$/);
-    if (m && m[1] !== 'boil') (moodFrames[m[1]] ??= []).push(u(`/images/gritty/${f}`));
-  }
-  for (const k in moodFrames) moodFrames[k].sort();
-} catch { /* no expression art yet — motion carries the moods */ }
+for (const f of files) {
+  const m = f.match(moodRe);
+  if (m && m[1] !== 'boil') (moodFrames[m[1]] ??= []).push(u(`/images/gritty/${f}`));
+}
+for (const k in moodFrames) moodFrames[k].sort();
 
 const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
   .replace(/</g, '\\u003c');
@@ -112,7 +135,9 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
     </div>
 
     <button class="gritty" data-gritty aria-label="Tap Gritty — he wants to talk!" disabled>
-      <img src={BASE_FRAMES[0]} alt="Gritty the Goat, hand-drawn by Kim Rekowski" width="520" height="635" fetchpriority="high" />
+      <img src={BASE_FRAMES[0]} alt={wearsBackpack
+        ? "Gritty the Goat wearing his backpack, hand-drawn by Kim Rekowski"
+        : "Gritty the Goat, hand-drawn by Kim Rekowski"} width="520" height="635" fetchpriority="high" />
       <img src={BASE_FRAMES[1]} alt="" width="520" height="635" />
       <img src={BASE_FRAMES[2]} alt="" width="520" height="635" />
     </button>
