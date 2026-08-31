@@ -81,18 +81,23 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
        width="400" height="300" />
   <img class="cloud c2" src={u("/images/scenery/cloud-flat.webp")} alt="" aria-hidden="true"
        width="340" height="255" />
+  <img class="cloud c3" src={u("/images/scenery/cloud-flat.webp")} alt="" aria-hidden="true"
+       width="340" height="255" />
+  <img class="cloud c4" src={u("/images/scenery/cloud-puffy.webp")} alt="" aria-hidden="true"
+       width="400" height="300" />
 
   <div class="hills" aria-hidden="true">
+    <div class="ground"></div>
     <img class="band far" src={u("/images/scenery/hills-far.webp")} alt=""
          width="1600" height="384" />
-    <img class="band near" src={u("/images/scenery/hills-near.webp")} alt=""
-         width="1600" height="271" />
-    <img class="tree" src={u("/images/scenery/tree.webp")} alt=""
-         width="420" height="573" loading="lazy" />
     <div class="school">
       <img src={u("/images/scenery/erin-school.webp")} alt="" width="560" height="354" />
       <span class="school-sign">Erin School</span>
     </div>
+    <img class="tree" src={u("/images/scenery/tree.webp")} alt=""
+         width="420" height="573" loading="lazy" />
+    <img class="band near" src={u("/images/scenery/hills-near.webp")} alt=""
+         width="1600" height="271" />
     <img class="bushes" src={u("/images/scenery/bushes.webp")} alt=""
          width="460" height="292" loading="lazy" />
     <div class="grass-border"></div>
@@ -146,39 +151,49 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
     position: absolute; top: 8px; right: 5%; z-index: 0;
     width: clamp(88px, 11vw, 150px); height: auto;
   }
+
+  /* Clouds drift mid-sky — below the headline, above the ridge line — and
+     all travel the same way, because wind blows in one direction. Negative
+     delays scatter them across the width from the first paint. */
   .cloud { position: absolute; height: auto; z-index: 0; }
-  .c1 { top: 26px; left: 9%; width: clamp(110px, 14vw, 190px);
-        animation: drift 95s linear infinite; }
-  .c2 { top: 128px; left: 56%; width: clamp(88px, 10vw, 145px);
-        animation: drift 130s linear infinite reverse; }
-  @keyframes drift { from { translate: -10vw 0; } to { translate: 110vw 0; } }
+  .c1 { top: 152px; left: 4%; width: clamp(104px, 12vw, 176px);
+        animation: drift 110s linear -12s infinite; }
+  .c2 { top: 205px; left: 38%; width: clamp(84px, 9vw, 136px); opacity: 0.95;
+        animation: drift 140s linear -66s infinite; }
+  .c3 { top: 136px; left: 64%; width: clamp(72px, 8vw, 120px); opacity: 0.9;
+        animation: drift 95s linear -35s infinite; }
+  .c4 { top: 218px; left: 84%; width: clamp(64px, 7vw, 108px); opacity: 0.8;
+        animation: drift 165s linear -120s infinite; }
+  @keyframes drift { from { translate: -12vw 0; } to { translate: 112vw 0; } }
 
   .hills { position: absolute; inset: 0; pointer-events: none; }
+
+  /* Solid ground under everything: each band is transparent above its own
+     ridge, and on wide screens the sky gradient used to show through those
+     gaps as grey strips. The colours are sampled from the bands' own
+     painted fill (#bde98b → #8ddb4e → #6dbf4d), so band and ground meet
+     without a seam. */
+  .ground {
+    position: absolute; z-index: 0; left: 0; right: 0; bottom: 0; height: 236px;
+    background: linear-gradient(180deg,
+      #bde98b 0%, #a4e26b 34%, #8ddb4e 62%, #6dbf4d 100%);
+  }
 
   /* The bands are open-bottomed landforms — only their ridge is drawn — so
      they stack and bleed off both sides without ever reading as ribbons. */
   .band {
     position: absolute; left: -3%; width: 106%; display: block;
-    /* max-width:none beats the global img rule, which would otherwise cap
-       these at 100% and leave bare sky down the right-hand edge. */
     max-width: none; object-fit: fill;
   }
   .band.far { z-index: 1; bottom: 96px; height: 210px; }
   .band.near { z-index: 3; bottom: 6px; height: 152px; }
 
-  /* The tree and the school stand on the far ground with the near band
-     closing in front of their bases — the oldest trick in scenery. */
-  .tree {
-    position: absolute; z-index: 2; left: 4%; bottom: 146px;
-    width: clamp(70px, 9vw, 126px); height: auto;
-  }
-
-  /* Erin School stands between the two bands, so the near ground closes in
-     front of it. The sign is live text, not baked into the drawing: it
-     scales with the building through container units. */
+  /* Erin School and the tree flank the meadow — school on the left, tree
+     on the right — standing on the far ground with the near band closing
+     over their bases: the oldest trick in scenery. */
   .school {
-    position: absolute; z-index: 2; right: 6%; bottom: 148px;
-    width: clamp(120px, 17vw, 232px);
+    position: absolute; z-index: 2; left: 3.5%; bottom: 118px;
+    width: clamp(150px, 24vw, 336px);
     container-type: inline-size;
   }
   .school img { width: 100%; height: auto; display: block; }
@@ -193,18 +208,44 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
     color: #fff; white-space: nowrap;
   }
 
+  .tree {
+    position: absolute; z-index: 2; right: 3%; bottom: 128px;
+    width: clamp(96px, 14vw, 216px); height: auto;
+    transform-origin: 50% 100%;
+  }
+
   .bushes {
-    position: absolute; z-index: 4; right: 24%; bottom: 58px;
+    position: absolute; z-index: 4; right: 26%; bottom: 56px;
     width: clamp(58px, 7vw, 104px); height: auto;
+    transform-origin: 50% 100%;
   }
 
   /* The grass border is the frontmost detail, ahead of Gritty himself, so
      he stands *in* the meadow rather than on it. It repeats at its own
      aspect ratio — a stretched daisy is an oval. */
   .grass-border {
-    position: absolute; z-index: 7; left: 0; right: 0; bottom: -4px;
+    position: absolute; z-index: 7; left: -1%; right: -1%; bottom: -4px;
     height: 82px;
     background: url("/images/scenery/grass-border.webp") repeat-x bottom center / auto 82px;
+    transform-origin: 50% 100%;
+  }
+
+  /* ── the meadow breathes: all compositor-only, all optional ── */
+  @media (prefers-reduced-motion: no-preference) {
+    .sun { animation: sun-glow 6s ease-in-out infinite; }
+    .tree { animation: tree-sway 9s ease-in-out infinite; }
+    .bushes { animation: tree-sway 11s ease-in-out -4s infinite; }
+    .grass-border { animation: grass-lean 7s ease-in-out infinite; }
+  }
+  @keyframes sun-glow {
+    0%, 100% { scale: 1; } 50% { scale: 1.035; }
+  }
+  @keyframes tree-sway {
+    0%, 100% { rotate: -0.7deg; } 50% { rotate: 0.7deg; }
+  }
+  /* blades lean rather than slide — a skew from the roots reads as wind */
+  @keyframes grass-lean {
+    0%, 100% { transform: skewX(-0.8deg); } 50% { transform: skewX(0.8deg); }
   }
 
   /* ── the words ── */
@@ -231,7 +272,11 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
     margin-top: 14px; padding-inline: 16px;
   }
 
-  .say { display: grid; justify-items: center; gap: 6px; min-height: 96px; }
+  /* min-height reserves room so the chips don't jump when the bubble text
+     changes; align-content keeps the bubble itself content-sized instead
+     of stretching into that reserve. */
+  .say { display: grid; justify-items: center; align-content: start;
+         gap: 6px; min-height: 96px; }
   .nameplate {
     font-family: var(--gg-display); font-weight: 600;
     font-size: var(--gg-text-small); color: var(--gg-blue-deep);
@@ -327,12 +372,16 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
     .gritty:not(.arrived) { translate: 0 130%; }
   }
 
+  /* The hint is the page's one call to action, and it sits on the busiest
+     pixels in the hero — so it gets a solid card, a real border, and a
+     shadow, same voice as the reply chips. */
   .tap-hint {
     position: relative; z-index: 8;
     font-family: var(--gg-display); font-weight: 600;
-    font-size: var(--gg-text-small); color: var(--gg-blue-deep);
-    background: rgba(255, 255, 255, 0.7);
-    padding: 0.3em 1.1em; border-radius: 999px;
+    font-size: 1rem; color: var(--gg-blue-deep);
+    background: var(--gg-card); border: 2.5px solid var(--gg-blue);
+    padding: 0.5em 1.4em; border-radius: 999px;
+    box-shadow: var(--gg-shadow);
     transition: opacity 300ms ease;
   }
   @media (scripting: none) {
@@ -378,9 +427,41 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
     70% { rotate: 2deg; }
   }
 
+  /* Side by side on desktop: the bubble speaks from his left, its thought
+     dots drift toward him instead of down, and with the words out of his
+     column Gritty gets to be the size a hero deserves. */
+  @media (min-width: 760px) {
+    .stage {
+      grid-template-columns: minmax(0, 46ch) auto;
+      justify-content: center; align-items: center;
+      column-gap: 40px; margin-top: 4px;
+    }
+    .visitor, .say, .chips { grid-column: 1; justify-self: end; }
+    .say { justify-items: end; }
+    .chips { justify-content: flex-end; }
+    .bubble { text-align: left; }
+    .gritty { grid-column: 2; grid-row: 1 / 4; width: min(280px, 26vw); }
+    .tap-hint { grid-column: 2; grid-row: 4; justify-self: center; translate: 0 30px; }
+    /* the thought dots walk toward Gritty */
+    .bubble::before {
+      left: auto; right: -21px; bottom: 18px; margin-left: 0;
+      width: 14px; height: 11px;
+    }
+    .bubble::after {
+      left: auto; right: -33px; bottom: 8px; margin-left: 0;
+    }
+  }
+
   @media (max-width: 600px) {
     .meadow { padding-bottom: 78px; }
     .bubble { font-size: 1.15rem; }
+    /* the headline wraps to two full-width lines here, so the sun ducks
+       into the corner instead of sitting behind the words */
+    .sun { width: 64px; top: 4px; right: 3%; }
+    /* school and tree shrink and tuck so Gritty keeps the stage */
+    .school { width: clamp(104px, 28vw, 140px); left: 2%; bottom: 104px; }
+    .tree { width: clamp(70px, 19vw, 104px); right: 2%; bottom: 116px; }
+    .bushes { display: none; } /* three set pieces is enough on a phone */
   }
 </style>
 
