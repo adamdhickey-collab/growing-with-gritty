@@ -20,7 +20,7 @@ npm run build    # → dist/
 - **Pages** — home, `/meet-gritty`, `/books` + four book pages, `/about`,
   `/grown-ups`, and Gritty's World: `/grit-zone` (scenario quiz, the Power
   of YET, the private "how did YOU have grit today?" check-in),
-  `/mistake-maker`, `/calm-corner` (feeling picker, strategy cards,
+  `/mistake-maker`, `/calming-corner` (feeling picker, strategy cards,
   Breathe with Gritty).
 - **The meadow hero** (`src/components/MeadowHero.astro`, from style tile
   V3 "Alive") — Gritty climbs out of the grass, kids tap him to chat and

@@ -298,7 +298,7 @@ content:
           word — it means your brain is still growing!"
 
   - name: calm-strategies
-    label: Calm Corner strategies
+    label: Calming Corner strategies
     type: collection
     path: src/content/calm-strategies
     view:

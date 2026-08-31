@@ -53,7 +53,7 @@ an entry adds it to the game on the site, about two minutes after you save:
 - **Power of YET sentences** — just the "I can't…" part. The site adds the
   big gold YET! **Gritty's idea** is the one thing he suggests trying after
   the YET lands.
-- **Calm Corner strategies** — a name, an emoji, and the steps (one per
+- **Calming Corner strategies** — a name, an emoji, and the steps (one per
   line).
 
 The entries in there now are starters to show how each form works — edit

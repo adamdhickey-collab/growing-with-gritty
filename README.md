@@ -33,7 +33,7 @@ Every push to `main` redeploys all four:
 
 - **Phase 1 built**: design system, home, Meet Gritty, four book pages,
   About, Grown-Up Grit Guide, Pages CMS config, KIM-GUIDE.
-- **Phase 2 built**: Gritty's World — Grit Zone, Mistake Maker, Calm Corner —
+- **Phase 2 built**: Gritty's World — Grit Zone, Mistake Maker, Calming Corner —
   plus the meadow hero, where Gritty talks back.
 - **Not yet connected**: Cloudflare Pages + domain + Pages CMS (PLAN.md §10).
 - **Open decision**: the final web address. `polkadotbackpack.com` is already

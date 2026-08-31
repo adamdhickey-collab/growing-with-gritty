@@ -42,7 +42,7 @@ Two jobs, in order:
 Kim's doc (via its ChatGPT brainstorm, which she endorsed) proposes twelve
 sections. We build them in phases (§7) so the site ships early and never
 feels half-finished — the doc itself suggests homepage, Grit Zone, Mistake
-Maker, Calm Corner, and Books as the strong foundation.
+Maker, Calming Corner, and Books as the strong foundation.
 
 ## 3. What Kim asked for (requirements from the doc)
 
@@ -105,7 +105,7 @@ edits in the exact same forms she uses for books:
 | A **mistake** (Gritty's funny oops + the lesson) | The Mistake Maker button |
 | A **YET sentence** ("I can't tie my shoes…") | The Power of YET flip |
 | A **kindness challenge** (one mission) | Kindness Corner's daily challenge |
-| A **calm strategy** (name, emoji, steps) | Calm Corner's strategy picker |
+| A **calm strategy** (name, emoji, steps) | Calming Corner's strategy picker |
 | A **grit story** (first name, age, state, sentence) | The Grit Wall |
 
 So "add a new challenge to the website" is Kim filling in a four-field form —
@@ -144,7 +144,7 @@ build.
 
 Navigation stays simple and visual (per the doc):
 **🏠 Home · 🐐 Meet Gritty · 📚 Books · 💪 Grit Zone · 🧠 Mistake Maker ·
-🧘 Calm Corner · 👨‍👩‍👧 Grown-Ups**
+🧘 Calming Corner · 👨‍👩‍👧 Grown-Ups**
 (Power of YET lives inside Grit Zone; Kindness Corner and Be YOU join the nav
 when they ship in Phase 3 — seven top-level items is already the ceiling for
 a six-year-old.)
@@ -169,7 +169,7 @@ a six-year-old.)
   (signature feature: kid clicks the big YET button, the sentence transforms).
 - **The Mistake Maker** — "Oops! I made a mistake!" button → funny mistake →
   "Turn my OOPS into I LEARNED!"
-- **Calm Corner** — feeling picker → strategy picker → **Breathe with
+- **Calming Corner** — feeling picker → strategy picker → **Breathe with
   Gritty** (pure-CSS breathing animation, `prefers-reduced-motion` honored).
 - **"How did YOU have grit today?"** — the private on-device version: checklist
   ("Today I… kept trying / asked for help / …"), Gritty celebrates, saves

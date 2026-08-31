@@ -25,6 +25,6 @@ a positive mindset.
 Kim hopes her stories inspire every child to believe in themselves, embrace
 challenges, and remember:
 
-**"I have grit! I don't quit!"**
+> "I have grit! I don't quit!"
 
 Keep growing. Keep learning. Keep trying.
