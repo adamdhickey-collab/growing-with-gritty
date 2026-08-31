@@ -91,12 +91,15 @@ const entries = await Promise.all(images.map(async (rel) => {
 const folders = [...new Set(entries.map((e) => e.folder))].sort();
 const LABELS = {
   gritty: 'Gritty', characters: 'Characters', books: 'Book covers',
+  scenes: 'Scenes', spreads: 'Book spreads',
   photos: 'Photos', '(loose)': 'Loose files',
 };
 const NOTES = {
   gritty: 'His animation frames. The three boil frames are always on screen; each expression plays when a reply carries that mood.',
   characters: 'Portraits. A character shows a "coming soon" circle until one lands here.',
   books: 'One cover per book, named to match the book\'s file.',
+  scenes: 'Kim\'s scene art — Gritty mid-activity, meant for the section buttons (Read, Play, Make, Calm Corner) and the hero.',
+  spreads: 'Interior spreads for each book\'s "look inside", named <book>-spread-<n> in reading order.',
   photos: 'Kim, and the photographs on the About page.',
 };
 
