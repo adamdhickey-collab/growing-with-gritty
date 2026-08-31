@@ -1,9 +1,10 @@
 ---
 /* The meadow hero — style tile V3 "Alive", grown into the real site.
    Gritty (Kim's drawing) climbs out of the meadow grass; kids tap him to
-   chat, answer with reply chips, and his friends wander up the path to
-   visit. Every conversation is CMS content
-   (the meadow-chats collection) — the shell here is built once.
+   chat and answer with reply chips. Every conversation is CMS content
+   (the meadow-chats collection) — the shell here is built once. Per Kim's
+   2026 doc the hero is Gritty's alone: chats by other speakers stay in
+   the CMS for their own pages, but nobody else appears here.
 
    Expression art: when Kim draws a mood (laughing, surprised, thinking…),
    drop the re-inked frames into public/images/gritty/ as
@@ -26,9 +27,9 @@ interface Props { heading: string; bubble: string; sayings?: string[] }
 const { heading, bubble, sayings = [] } = Astro.props;
 
 const chats = (await getCollection('meadow-chats'))
+  .filter((c) => c.data.speaker === 'gritty')
   .sort((a, b) => a.data.order - b.data.order)
   .map(({ data: d }) => ({
-    speaker: d.speaker,
     opener: d.opener,
     replies: [
       { say: d.replyA, react: d.reactionA, mood: d.moodA ?? 'happy' },
@@ -38,20 +39,6 @@ const chats = (await getCollection('meadow-chats'))
         : []),
     ],
   }));
-
-/* Friends' visitor cards: name, role, and portrait once Kim uploads one —
-   the same slot the character pages use. Never stand-in art. */
-const TONES: Record<string, string> = {
-  gritty: 'blue', gabby: 'gold', 'grandpa-goat': 'blue',
-  'grandma-goat': 'green', gibby: 'sky',
-};
-const characters = await getCollection('characters');
-const cast = Object.fromEntries(characters.map((c) => [c.id, {
-  name: c.data.name,
-  role: c.data.role ?? '',
-  portrait: c.data.portrait ? u(c.data.portrait) : null,
-  tone: TONES[c.id] ?? 'green',
-}]));
 
 /* Gritty's base pose ships with the site; extra moods appear the moment
    their frames exist. cwd is site/ for both `npm run dev` and CI builds. */
@@ -70,7 +57,7 @@ for (const f of files) {
 }
 for (const k in moodFrames) moodFrames[k].sort();
 
-const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
+const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
   .replace(/</g, '\\u003c');
 ---
 
@@ -109,16 +96,7 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
   </div>
 
   <div class="stage">
-    <div class="visitor" data-visitor hidden>
-      <span class="visitor-disc" data-visitor-disc aria-hidden="true">🌼</span>
-      <p class="visitor-name">
-        <b data-visitor-name></b>
-        <span class="visitor-role" data-visitor-role></span>
-      </p>
-    </div>
-
     <div class="say">
-      <p class="nameplate" data-nameplate hidden>Gritty</p>
       <p class="bubble" data-say role="status">"{bubble.replace(/^"|"$/g, '')}"</p>
     </div>
 
@@ -132,7 +110,16 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
       <img src={BASE_POSE} alt="Gritty the Goat wearing his backpack, hand-drawn by Kim Rekowski"
            width="640" height="777" fetchpriority="high" />
     </button>
-    <p class="tap-hint" data-hint>Tap Gritty to say hello! 👆</p>
+    <p class="tap-hint" data-hint>
+      <span data-hint-text>Tap Gritty to say hello!</span>
+      <svg class="hint-arrow" viewBox="0 0 110 70" aria-hidden="true">
+        {/* drawn twice: ink underneath, gold on top — a crayon arrow with
+            an outline, pointing at the goat */}
+        <path class="shaft-ink" d="M97,9 C89,33 64,49 34,51" />
+        <path class="shaft-gold" d="M97,9 C89,33 64,49 34,51" />
+        <polygon class="head" points="12,55 40,38 38,66" />
+      </svg>
+    </p>
   </div>
 
   <script type="application/json" data-meadow-data is:inline set:html={payload} />
@@ -156,13 +143,13 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
      all travel the same way, because wind blows in one direction. Negative
      delays scatter them across the width from the first paint. */
   .cloud { position: absolute; height: auto; z-index: 0; }
-  .c1 { top: 152px; left: 4%; width: clamp(104px, 12vw, 176px);
+  .c1 { top: 148px; left: 5%; width: clamp(104px, 12vw, 176px);
         animation: drift 110s linear -12s infinite; }
-  .c2 { top: 205px; left: 38%; width: clamp(84px, 9vw, 136px); opacity: 0.95;
-        animation: drift 140s linear -66s infinite; }
-  .c3 { top: 136px; left: 64%; width: clamp(72px, 8vw, 120px); opacity: 0.9;
+  .c2 { top: 236px; left: 18%; width: clamp(84px, 9vw, 136px); opacity: 0.95;
+        animation: drift 140s linear -100s infinite; }
+  .c3 { top: 210px; left: 58%; width: clamp(72px, 8vw, 120px); opacity: 0.9;
         animation: drift 95s linear -35s infinite; }
-  .c4 { top: 218px; left: 84%; width: clamp(64px, 7vw, 108px); opacity: 0.8;
+  .c4 { top: 168px; left: 78%; width: clamp(64px, 7vw, 108px); opacity: 0.8;
         animation: drift 165s linear -120s infinite; }
   @keyframes drift { from { translate: -12vw 0; } to { translate: 112vw 0; } }
 
@@ -181,9 +168,12 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
 
   /* The bands are open-bottomed landforms — only their ridge is drawn — so
      they stack and bleed off both sides without ever reading as ribbons. */
+  /* cover + top anchor: the ridge stays at true aspect at every width and
+     the crop happens in the flat fill, whose colour the ground continues —
+     fill was stretching the brushwork into long smears on wide screens */
   .band {
     position: absolute; left: -3%; width: 106%; display: block;
-    max-width: none; object-fit: fill;
+    max-width: none; object-fit: cover; object-position: 50% 0;
   }
   .band.far { z-index: 1; bottom: 96px; height: 210px; }
   .band.near { z-index: 3; bottom: 6px; height: 152px; }
@@ -192,8 +182,8 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
      on the right — standing on the far ground with the near band closing
      over their bases: the oldest trick in scenery. */
   .school {
-    position: absolute; z-index: 2; left: 3.5%; bottom: 118px;
-    width: clamp(150px, 24vw, 336px);
+    position: absolute; z-index: 2; left: 3%; bottom: 112px;
+    width: clamp(170px, 26vw, 400px);
     container-type: inline-size;
   }
   .school img { width: 100%; height: auto; display: block; }
@@ -248,21 +238,20 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
     0%, 100% { transform: skewX(-0.8deg); } 50% { transform: skewX(0.8deg); }
   }
 
-  /* ── the words ── */
+  /* ── the words: the title carries the hero, the motto whispers ── */
   .hero-copy {
     position: relative; z-index: 5; text-align: center;
-    padding-inline: 24px; display: grid; gap: 12px; justify-items: center;
+    padding: 26px 24px 34px; display: grid; gap: 10px; justify-items: center;
   }
   .hero-copy h1 {
     color: var(--gg-blue-deep);
-    font-size: clamp(2.1rem, 5.2vw, 3.4rem); line-height: 1.05;
+    font-size: clamp(2.3rem, 6vw, 4rem); line-height: 1.04;
     text-shadow: 0 2px 0 rgba(255, 255, 255, 0.5);
   }
   .motto {
-    background: var(--gg-green); color: #fff;
-    font-family: var(--gg-display); font-weight: 600; font-size: 1.05rem;
-    padding: 0.45em 1.3em; border-radius: 4px 18px 4px 18px;
-    rotate: -1.5deg; box-shadow: var(--gg-shadow);
+    font-family: var(--gg-display); font-weight: 600;
+    font-size: clamp(0.95rem, 1.6vw, 1.15rem); letter-spacing: 0.06em;
+    color: var(--gg-green-ink);
   }
 
   /* ── the stage ── */
@@ -277,12 +266,6 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
      of stretching into that reserve. */
   .say { display: grid; justify-items: center; align-content: start;
          gap: 6px; min-height: 96px; }
-  .nameplate {
-    font-family: var(--gg-display); font-weight: 600;
-    font-size: var(--gg-text-small); color: var(--gg-blue-deep);
-    background: rgba(255, 255, 255, 0.7);
-    padding: 0.2em 1em; border-radius: 999px;
-  }
   .bubble {
     position: relative; background: #fff; border: 3px solid var(--gg-ink);
     border-radius: 26px 30px 28px 26px / 28px 26px 30px 28px;
@@ -302,40 +285,6 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
   .bubble.enter { animation: bpop 420ms var(--gg-ease-back); }
   @keyframes bpop { from { opacity: 0; scale: 0.86 0.94; } to { opacity: 1; scale: 1 1; } }
 
-  /* friend bubbles borrow the visitor's tone so each voice looks its own */
-  .bubble.tone-gold { border-color: var(--gg-gold-ink); }
-  .bubble.tone-green { border-color: var(--gg-green-ink); }
-  .bubble.tone-sky { border-color: var(--gg-blue); }
-  .bubble.tone-gold::before, .bubble.tone-gold::after { border-color: var(--gg-gold-ink); }
-  .bubble.tone-green::before, .bubble.tone-green::after { border-color: var(--gg-green-ink); }
-  .bubble.tone-sky::before, .bubble.tone-sky::after { border-color: var(--gg-blue); }
-
-  /* ── the visitor (a friend up the path) ── */
-  .visitor {
-    display: flex; align-items: center; gap: 10px;
-    background: rgba(255, 255, 255, 0.82);
-    border-radius: 999px; padding: 6px 18px 6px 6px;
-    box-shadow: var(--gg-shadow);
-    translate: -28vw 0; opacity: 0;
-    transition: translate 700ms var(--gg-ease-bouncy), opacity 300ms ease;
-  }
-  .visitor.here { translate: 0 0; opacity: 1; }
-  .visitor-disc {
-    display: grid; place-items: center; overflow: hidden;
-    width: 44px; height: 44px; border-radius: 50%;
-    background: color-mix(in srgb, var(--gg-sky) 55%, #fff);
-    font-size: 1.4rem;
-  }
-  .visitor-disc img { width: 100%; height: 100%; object-fit: cover; }
-  .visitor-name {
-    display: grid; line-height: 1.25;
-    font-family: var(--gg-display); font-weight: 600; color: var(--gg-blue-deep);
-  }
-  .visitor-role {
-    font-family: var(--gg-body); font-weight: 600;
-    font-size: var(--gg-text-small); color: var(--gg-ink-soft);
-  }
-
   /* ── the reply chips: what YOU say back ── */
   .chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
   .chip {
@@ -351,12 +300,19 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
 
   /* ── Gritty ── */
   .gritty {
-    position: relative; width: min(184px, 38vw); aspect-ratio: 520 / 635;
-    margin-bottom: -34px;
+    position: relative; width: min(184px, 38vw); aspect-ratio: 640 / 777;
+    margin-bottom: -46px;
     border: none; background: none; padding: 0; cursor: pointer;
-    filter: drop-shadow(0 12px 9px rgba(46, 60, 40, 0.28));
     transform-origin: 50% 97%; /* hooves stay planted */
     transition: translate 900ms var(--gg-ease-bouncy);
+  }
+  /* a pool of shade under his hooves, not a floating silhouette — this is
+     what actually puts him ON the ground */
+  .gritty::after {
+    content: ''; position: absolute; z-index: -1;
+    left: 8%; right: 8%; bottom: -2px; height: 30px;
+    background: radial-gradient(50% 50% at 50% 50%,
+      rgba(46, 60, 40, 0.35) 0%, rgba(46, 60, 40, 0.18) 55%, transparent 75%);
   }
   .gritty:disabled { cursor: default; }
   .gritty:focus-visible { outline: 3px solid var(--gg-gold); outline-offset: 6px; border-radius: 18px; }
@@ -372,17 +328,28 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
     .gritty:not(.arrived) { translate: 0 130%; }
   }
 
-  /* The hint is the page's one call to action, and it sits on the busiest
-     pixels in the hero — so it gets a solid card, a real border, and a
-     shadow, same voice as the reply chips. */
+  /* The hint is the page's one call to action: hand-lettered words and a
+     big gold crayon arrow aimed straight at the goat. */
   .tap-hint {
     position: relative; z-index: 8;
+    display: grid; justify-items: center; gap: 0;
     font-family: var(--gg-display); font-weight: 600;
-    font-size: 1rem; color: var(--gg-blue-deep);
-    background: var(--gg-card); border: 2.5px solid var(--gg-blue);
-    padding: 0.5em 1.4em; border-radius: 999px;
-    box-shadow: var(--gg-shadow);
+    font-size: 1.15rem; color: var(--gg-blue-deep);
+    text-shadow: 0 0 6px var(--gg-paper), 0 0 12px var(--gg-paper),
+                 0 2px 0 rgba(255, 255, 255, 0.8);
+    rotate: -3deg;
     transition: opacity 300ms ease;
+  }
+  .hint-arrow { width: 92px; height: auto; margin-top: -2px; }
+  .hint-arrow .shaft-ink {
+    fill: none; stroke: var(--gg-ink); stroke-width: 13; stroke-linecap: round;
+  }
+  .hint-arrow .shaft-gold {
+    fill: none; stroke: var(--gg-gold); stroke-width: 7.5; stroke-linecap: round;
+  }
+  .hint-arrow .head {
+    fill: var(--gg-gold); stroke: var(--gg-ink);
+    stroke-width: 4; stroke-linejoin: round;
   }
   @media (scripting: none) {
     .tap-hint { display: none; } /* no JS, nothing to tap */
@@ -436,12 +403,18 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
       justify-content: center; align-items: center;
       column-gap: 40px; margin-top: 4px;
     }
-    .visitor, .say, .chips { grid-column: 1; justify-self: end; }
+    .say, .chips { grid-column: 1; justify-self: end; }
     .say { justify-items: end; }
     .chips { justify-content: flex-end; }
     .bubble { text-align: left; }
     .gritty { grid-column: 2; grid-row: 1 / 4; width: min(280px, 26vw); }
-    .tap-hint { grid-column: 2; grid-row: 4; justify-self: center; translate: 0 30px; }
+    /* the hint shares his cell and floats up beside his head, the arrow
+       diving toward him */
+    .tap-hint {
+      grid-column: 2; grid-row: 1 / 4;
+      align-self: start; justify-self: end;
+      translate: 34% -30px;
+    }
     /* the thought dots walk toward Gritty */
     .bubble::before {
       left: auto; right: -21px; bottom: 18px; margin-left: 0;
@@ -455,11 +428,23 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
   @media (max-width: 600px) {
     .meadow { padding-bottom: 78px; }
     .bubble { font-size: 1.15rem; }
+    /* the hint takes the row between the bubble and Gritty, its arrow
+       diving down at him */
+    .say { grid-row: 1; }
+    .chips { grid-row: 2; }
+    .tap-hint {
+      grid-row: 3; justify-self: end;
+      margin-right: 4%; margin-bottom: -40px;
+      font-size: 0.95rem;
+    }
+    .gritty { grid-row: 4; }
+    .tap-hint .hint-arrow { width: 62px; }
+    .c2 { top: 300px; }
     /* the headline wraps to two full-width lines here, so the sun ducks
        into the corner instead of sitting behind the words */
     .sun { width: 64px; top: 4px; right: 3%; }
     /* school and tree shrink and tuck so Gritty keeps the stage */
-    .school { width: clamp(104px, 28vw, 140px); left: 2%; bottom: 104px; }
+    .school { width: clamp(200px, 56vw, 270px); left: -3%; bottom: 96px; }
     .tree { width: clamp(70px, 19vw, 104px); right: 2%; bottom: 116px; }
     .bushes { display: none; } /* three set pieces is enough on a phone */
   }
@@ -481,10 +466,8 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
     const data = JSON.parse(
       section.querySelector('[data-meadow-data]')!.textContent!,
     ) as {
-      chats: { speaker: string; opener: string;
+      chats: { opener: string;
                replies: { say: string; react: string; mood: string }[] }[];
-      cast: Record<string, { name: string; role: string;
-                             portrait: string | null; tone: string }>;
       moods: Record<string, string[]>;
       sayings: string[];
     };
@@ -498,36 +481,25 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
     const frames = Array.from(gritty.querySelectorAll('img'));
     const baseSrcs = frames.map((f) => f.src); /* one pose, kept for restore */
     const say = section.querySelector<HTMLElement>('[data-say]')!;
-    const nameplate = section.querySelector<HTMLElement>('[data-nameplate]')!;
     const chipBox = section.querySelector<HTMLElement>('[data-chips]')!;
     const chips = Array.from(chipBox.querySelectorAll<HTMLButtonElement>('[data-chip]'));
     const hint = section.querySelector<HTMLElement>('[data-hint]')!;
-    const visitor = section.querySelector<HTMLElement>('[data-visitor]')!;
-    const visitorDisc = section.querySelector<HTMLElement>('[data-visitor-disc]')!;
-    const visitorName = section.querySelector<HTMLElement>('[data-visitor-name]')!;
-    const visitorRole = section.querySelector<HTMLElement>('[data-visitor-role]')!;
+    const hintText = section.querySelector<HTMLElement>('[data-hint-text]')!;
     const calm = matchMedia('(prefers-reduced-motion: reduce)');
 
-    const grittyChats = data.chats.filter((c) => c.speaker === 'gritty');
-    const friendChats = data.chats.filter((c) => c.speaker !== 'gritty');
-    let gi = 0; // next Gritty chat
-    let fi = 0; // next friend visit
+    let gi = 0; // next chat
     let current: (typeof data.chats)[0] | null = null;
-    let friendHere = false;
-    let friendTimer = 0;
-    const TONE_CLASSES = ['tone-gold', 'tone-green', 'tone-sky'];
 
     /* he climbs out of the meadow */
     gritty.disabled = false;
     setTimeout(() => gritty.classList.add('arrived'), 350);
 
-    function speak(text: string, opts: { cheer?: boolean; tone?: string } = {}) {
+    function speak(text: string, opts: { cheer?: boolean } = {}) {
       say.textContent = `"${text.replace(/^"|"$/g, '')}"`;
-      say.classList.remove('enter', 'cheer', ...TONE_CLASSES);
+      say.classList.remove('enter', 'cheer');
       void say.offsetWidth;
       say.classList.add('enter');
       if (opts.cheer) say.classList.add('cheer');
-      else if (opts.tone && opts.tone !== 'blue') say.classList.add(`tone-${opts.tone}`);
     }
 
     /* ——— Kim's sayings, taking turns while nobody has tapped him ———
@@ -600,52 +572,16 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
     function startChat(chat: (typeof data.chats)[0]) {
       stopIdle(); /* a real conversation outranks the waiting sayings */
       current = chat;
-      const who = data.cast[chat.speaker];
-      nameplate.hidden = false;
-      nameplate.textContent = who?.name ?? 'Gritty';
       hint.style.opacity = '0';
-      speak(chat.opener, { tone: friendHere ? who?.tone : undefined });
+      speak(chat.opener);
       showChips(chat.replies);
-    }
-
-    function friendArrives() {
-      const chat = friendChats[fi % friendChats.length];
-      fi += 1;
-      friendHere = true;
-      const who = data.cast[chat.speaker];
-      visitorName.textContent = who?.name ?? '';
-      visitorRole.textContent = who?.role ?? '';
-      visitorDisc.textContent = '🌼';
-      if (who?.portrait) {
-        const img = document.createElement('img');
-        img.src = who.portrait;
-        img.alt = '';
-        /* inline because runtime-made elements miss Astro's scoped styles */
-        img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-        visitorDisc.replaceChildren(img);
-      }
-      visitor.hidden = false;
-      /* reflow, not rAF — rAF stalls in background tabs and the panel
-         would run its whole visit invisible */
-      void visitor.offsetWidth;
-      visitor.classList.add('here');
-      emote('surprised'); /* someone's coming up the path! */
-      setTimeout(() => startChat(chat), 650);
-    }
-
-    function friendLeaves() {
-      friendHere = false;
-      visitor.classList.remove('here');
-      setTimeout(() => { visitor.hidden = true; }, 400);
     }
 
     gritty.addEventListener('click', () => {
       /* mid-question, a tap is just a giggle — the chips are the next step */
       if (!chipBox.hidden) { emote('laugh'); return; }
-      clearTimeout(friendTimer);
-      if (friendHere) friendLeaves();
       emote('happy');
-      startChat(grittyChats[gi % grittyChats.length]);
+      startChat(data.chats[gi % data.chats.length]);
       gi += 1;
     });
 
@@ -656,23 +592,12 @@ const payload = JSON.stringify({ chats, cast, moods: moodFrames, sayings })
         chipBox.hidden = true;
         say.textContent = '…';
         setTimeout(() => { /* a beat of thought makes the answer feel real */
-          const who = current ? data.cast[current.speaker] : undefined;
-          speak(reply.react, {
-            cheer: reply.mood === 'proud',
-            tone: friendHere ? who?.tone : undefined,
-          });
+          speak(reply.react, { cheer: reply.mood === 'proud' });
           emote(reply.mood);
           if (reply.mood === 'proud') sparks();
           gritty.focus({ preventScroll: true });
-          hint.textContent = friendChats.length
-            ? 'Tap Gritty to keep talking!'
-            : 'Tap Gritty again!';
+          hintText.textContent = 'Tap Gritty again!';
           hint.style.opacity = '1';
-          /* after a chat wraps up, a friend wanders over to visit */
-          if (!friendHere && friendChats.length) {
-            clearTimeout(friendTimer);
-            friendTimer = window.setTimeout(friendArrives, 2800);
-          }
         }, 420);
       });
     });
