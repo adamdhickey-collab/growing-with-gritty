@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { u } from '../lib/url';
 import { buyLabel } from '../lib/buy';
+import IconCart from './IconCart.astro';
 
 interface Props { book: CollectionEntry<'books'>; headingLevel?: 2 | 3 }
 const { book, headingLevel = 3 } = Astro.props;
@@ -20,7 +21,7 @@ const { title, order, cover, ages, tagline, buyLink } = book.data;
     {buyLink && (
       <a class="btn btn-gold buy" href={buyLink} target="_blank" rel="noopener"
          aria-label={`${buyLabel(buyLink)}: ${title} (opens in a new tab)`}>
-        🛒 {buyLabel(buyLink)}
+        <IconCart />{buyLabel(buyLink)}
       </a>
     )}
   </div>
