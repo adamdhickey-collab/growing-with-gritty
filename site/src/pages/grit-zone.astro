@@ -38,8 +38,14 @@ const ROW_GAP = 150;
 const TURN_R = ROW_GAP / 2;
 const X_MIN = 170;
 const X_MAX = 630;
-const TOP_ROW_Y = 320;   /* air above for the summit */
+/* The backdrop is a pixel drawing (public/images/grit-zone/trail-bg.png,
+   made from ChatGPT's crayon scene by scripts/pixelate.mjs). It sets how
+   much sky sits above the top switchback, and its snow cap is where the
+   flag goes. A 16th scenario grows the scene taller than the drawing; the
+   drawing then scales to height and loses a sliver off each side. */
+const BG = { w: 160, h: 202, peakX: 0.512, peakY: 0.188 };
 const BOTTOM_AIR = 120;  /* room below for the trailhead */
+const TOP_ROW_Y = Math.max(320, Math.round((W * BG.h) / BG.w) - (rows - 1) * ROW_GAP - BOTTOM_AIR);
 const H = TOP_ROW_Y + (rows - 1) * ROW_GAP + BOTTOM_AIR;
 const rowY = (r: number) => H - BOTTOM_AIR - r * ROW_GAP;
 const slotX = (k: number) => X_MIN + (k * (X_MAX - X_MIN)) / (PER_ROW - 1);
@@ -51,9 +57,15 @@ const stops = scenarios.map((s, i) => {
   return { id: s.id, x, y: rowY(r) };
 });
 
-/* the flag on the peak */
-const SX = 360;
-const SY = 190;
+/* the flag on the peak: wherever the drawing's snow cap lands once it is
+   scaled to cover the scene (xMidYMin slice, mirrored in the markup) */
+const bgScale = Math.max(W / BG.w, H / BG.h);
+const SX = Math.round((W - BG.w * bgScale) / 2 + BG.peakX * BG.w * bgScale);
+const SY = Math.round(BG.peakY * BG.h * bgScale);
+/* the flag sprite: its pole is planted 38% in from the left, 85% down */
+const FLAG = 120;
+const flagX = Math.round(SX - 0.385 * FLAG);
+const flagY = Math.round(SY + 6 - 0.85 * FLAG);
 
 /* The path: a switchback trail — straight rows joined by half-circle turns,
    then a final climb curve to the flag. Drawn once, walked many times. */
@@ -98,13 +110,13 @@ const summitPt = pct(SX, SY);
         </Bubble>
       </div>
 
-      {/* Kim's trailhead painting. The arrow sign in the scene is blank on
-          purpose — the site prints the words on it, same as the Erin School
-          sign in the hero, so a rename never needs new art. */}
+      {/* The trailhead, as a pixel drawing. The arrow sign in the scene is
+          blank on purpose — the site prints the words on it, same as the
+          Erin School sign in the hero, so a rename never needs new art. */}
       <div class="trailhead">
-        <img src={u("/images/scenery/grit-trailhead.webp")}
+        <img src={u("/images/grit-zone/trailhead.png")}
              alt="Gritty the Goat, backpack on, standing at a trail sign where a winding path climbs to a flag on the mountaintop."
-             width="1400" height="933" />
+             width="256" height="171" />
         <span class="trailhead-sign" aria-hidden="true">Grit Trail</span>
       </div>
     </div>
@@ -162,45 +174,27 @@ const summitPt = pct(SX, SY);
         </div>
 
         <div class="trail" data-trail data-sx={summitPt.x} data-sy={summitPt.y} hidden>
-          <div class="trail-scene" style={`aspect-ratio: ${W} / ${H};`}>
+          <div class="trail-scene"
+               style={`aspect-ratio: ${W} / ${H};`
+                 + ['ahead', 'current', 'done']
+                   .map((st) => ` --stop-${st}: url('${u(`/images/grit-zone/stop-${st}.png`)}');`)
+                   .join('')}>
             <svg class="trail-art" viewBox={`0 0 ${W} ${H}`} aria-hidden="true"
                  preserveAspectRatio="xMidYMid meet">
               <defs>
-                <linearGradient id="gz-sky" x1="0" y1="0" x2="0" y2="1">
-                  <stop class="sky-top" offset="0" />
-                  <stop class="sky-low" offset="1" />
-                </linearGradient>
+                <clipPath id="gz-frame"><rect x="0" y="0" width={W} height={H} rx="22" /></clipPath>
               </defs>
-              <rect class="sky" x="0" y="0" width={W} height={H} fill="url(#gz-sky)" rx="22" />
-              <circle class="sun-core" cx={W - 116} cy="112" r="56" />
-              <circle class="sun" cx={W - 116} cy="112" r="42" />
-              <g class="cloud">
-                <ellipse cx="130" cy="120" rx="58" ry="24" />
-                <ellipse cx="172" cy="104" rx="40" ry="20" />
-              </g>
-              <g class="cloud c2">
-                <ellipse cx="540" cy="82" rx="48" ry="20" />
-                <ellipse cx="500" cy="70" rx="30" ry="15" />
-              </g>
-              {/* the range: shoulder hills left and right keep the upper
-                  switchbacks on green, the main peak carries the flag */}
-              <path class="hill-back" d={`M -40 ${H} Q 20 ${rowY(rows - 2) + 60} 85 ${rowY(rows - 2) + 20} Q 150 ${rowY(rows - 2) - 90} 220 ${rowY(rows - 2) + 30} Q 300 ${H - 170} 440 ${H} Z`} />
-              <path class="hill-back" d={`M 250 ${H} Q 440 ${H - 190} 525 ${rowY(rows - 1) + 70} Q 615 ${rowY(rows - 1) - 100} 705 ${rowY(rows - 1) + 50} Q 770 ${H - 170} ${W + 40} ${H} Z`} />
-              <path class="mountain" d={`M -40 ${H + 40} C ${W * 0.14} ${H - 280} ${SX - 200} ${SY + 170} ${SX - 10} ${SY - 60} C ${SX + 160} ${SY + 130} ${W * 0.82} ${H - 260} ${W + 40} ${H + 40} Z`} />
-              <path class="snow" d={`M ${SX - 68} ${SY + 26} C ${SX - 40} ${SY - 18} ${SX - 24} ${SY - 52} ${SX - 10} ${SY - 60} C ${SX + 4} ${SY - 44} ${SX + 34} ${SY - 16} ${SX + 62} ${SY + 30} C ${SX + 30} ${SY + 52} ${SX - 34} ${SY + 50} ${SX - 68} ${SY + 26} Z`} />
-              <path class="meadow" d={`M -40 ${H - 130} C 200 ${H - 172} 560 ${H - 96} ${W + 40} ${H - 150} L ${W + 40} ${H} L -40 ${H} Z`} />
+              {/* the whole landscape is one drawing; only the trail is code,
+                  so the stops always sit on it */}
+              <image class="backdrop" href={u('/images/grit-zone/trail-bg.png')}
+                     x="0" y="0" width={W} height={H}
+                     preserveAspectRatio="xMidYMin slice" clip-path="url(#gz-frame)" />
               {/* the trail: a cream path with gold stitches */}
               <path class="trail-under" d={trailD} />
               <path class="trail-stitch" d={trailD} />
               {/* the summit flag */}
-              <g class="flag">
-                <line x1={SX} y1={SY + 8} x2={SX} y2={SY - 58} />
-                <path d={`M ${SX} ${SY - 58} L ${SX + 52} ${SY - 44} L ${SX} ${SY - 30} Z`} />
-              </g>
-              {/* a few daisies in the front grass */}
-              <g class="daisy" transform={`translate(96 ${H - 60})`}><circle r="9" /><circle class="mid" r="3.6" /></g>
-              <g class="daisy" transform={`translate(710 ${H - 74})`}><circle r="8" /><circle class="mid" r="3.2" /></g>
-              <g class="daisy" transform={`translate(410 ${H - 42})`}><circle r="7" /><circle class="mid" r="3" /></g>
+              <image class="flag" href={u('/images/grit-zone/flag.png')}
+                     x={flagX} y={flagY} width={FLAG} height={FLAG} />
             </svg>
 
             {/* The stops are real buttons overlaying the drawing, so little
@@ -210,14 +204,13 @@ const summitPt = pct(SX, SY);
                       data-x={s.x} data-y={s.y}
                       style={`left: ${s.x}%; top: ${s.y}%;`} disabled>
                 <span class="stop-num" aria-hidden="true">{i + 1}</span>
-                <span class="stop-star" aria-hidden="true"><Icon name="badge-star" size="1.7rem" /></span>
               </button>
             ))}
 
             {/* Gritty walks the map — progress you can watch, not count */}
             <div class="walker" data-walker aria-hidden="true">
-              <img src={u('/images/nav/meet-gritty.webp')} alt=""
-                   width="52" height="52" />
+              <img src={u('/images/grit-zone/walker.png')} alt=""
+                   width="64" height="64" />
             </div>
           </div>
 
@@ -245,7 +238,7 @@ const summitPt = pct(SX, SY);
               {s.data.hint && (
                 <div class="ask">
                   <button type="button" class="ask-btn" data-ask>
-                    <img src={u('/images/nav/meet-gritty.webp')} alt=""
+                    <img src={u('/images/grit-zone/walker.png')} alt=""
                          width="34" height="34" loading="lazy" />
                     Ask Gritty for an idea
                   </button>
@@ -713,6 +706,7 @@ const summitPt = pct(SX, SY);
   .trailhead img {
     display: block; width: 100%; height: auto;
     border-radius: var(--gg-radius); box-shadow: var(--gg-shadow);
+    image-rendering: pixelated;
   }
   .trailhead-sign {
     position: absolute; left: 38.5%; top: 65.8%; translate: -50% -50%;
@@ -762,68 +756,61 @@ const summitPt = pct(SX, SY);
     box-shadow: var(--gg-shadow);
   }
   .trail-art { display: block; width: 100%; height: auto; }
-  .sky-top { stop-color: var(--gg-sky-high); }
-  .sky-low { stop-color: var(--gg-sky-low); }
-  .sun { fill: var(--gg-sun); }
-  .sun-core { fill: var(--gg-sun-core); opacity: 0.55; }
-  .cloud ellipse { fill: #fff; opacity: 0.92; }
-  .hill-back { fill: var(--gg-hill-back); }
-  .mountain { fill: var(--gg-hill-mid); }
-  .snow { fill: var(--gg-paper); opacity: 0.9; }
-  .meadow { fill: var(--gg-meadow); }
+  /* The retro look is the sprites' tiny native size times pixelated
+     upscaling — every picture in the game scales this way, and the trail
+     strokes give up their antialiasing to match. */
+  .trail-art image, .trail-scene img, .stop::before, .trailhead img, .ask-btn img {
+    image-rendering: pixelated;
+  }
   .trail-under {
     fill: none; stroke: var(--gg-paper); stroke-width: 24;
     stroke-linecap: round; stroke-linejoin: round; opacity: 0.92;
+    shape-rendering: crispEdges;
   }
   .trail-stitch {
     fill: none; stroke: var(--gg-gold-ink); stroke-width: 4.5;
     stroke-linecap: round; stroke-linejoin: round;
     stroke-dasharray: 1 26; opacity: 0.5;
+    shape-rendering: crispEdges;
   }
-  .flag line { stroke: var(--gg-ink); stroke-width: 5; stroke-linecap: round; }
-  .flag path { fill: var(--gg-gold); stroke: var(--gg-ink); stroke-width: 3; stroke-linejoin: round; }
-  .daisy circle { fill: #fff; }
-  .daisy .mid { fill: var(--gg-sun); }
 
-  /* the stops: pebbles ahead, a glow where Gritty waits, stars that stay */
+  /* the stops: pebbles ahead, a glow where Gritty waits, stars that stay.
+     Each state is a sprite on ::before (public/images/grit-zone/stop-*.png)
+     at twice its native size; the button on top keeps the number and the
+     words. */
   .stop {
     position: absolute; translate: -50% -50%;
     display: grid; place-items: center;
-    width: 30px; height: 30px; padding: 0;
-    background: color-mix(in srgb, var(--gg-paper) 88%, var(--gg-ink));
-    border: 2px solid color-mix(in srgb, var(--gg-ink) 22%, transparent);
-    border-radius: 50%;
+    width: 32px; height: 32px; padding: 0;
+    background: none; border: none; border-radius: 50%;
+    isolation: isolate; /* keeps the ::before sprite behind the number, not behind the map */
     font-family: var(--gg-display); font-weight: 600;
-    color: var(--gg-ink-soft); font-size: 0.78rem;
-    transition: width 0.25s var(--gg-ease-back), height 0.25s var(--gg-ease-back),
-                border-color 0.25s ease, background 0.25s ease;
+    color: var(--gg-ink); font-size: 0.8rem;
+    transition: width 0.25s var(--gg-ease-back), height 0.25s var(--gg-ease-back);
   }
+  .stop::before {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: var(--stop-ahead) center / 100% 100% no-repeat;
+  }
+  .stop .stop-num { position: relative; }
   .stop:disabled { cursor: default; }
-  .stop .stop-star { display: none; line-height: 0; }
-  .stop.done {
-    width: 46px; height: 46px; cursor: pointer;
-    background: #FFFDF4; border: 2.5px solid var(--gg-gold);
-  }
+  .stop.done { width: 48px; height: 48px; cursor: pointer; }
+  .stop.done::before { background-image: var(--stop-done); }
   .stop.done .stop-num { display: none; }
-  .stop.done .stop-star { display: grid; place-items: center; }
   .stop.done:hover { scale: 1.12; }
   .stop.current {
-    width: 58px; height: 58px; cursor: pointer;
-    background: var(--gg-card); border: 3px solid var(--gg-gold);
-    color: var(--gg-blue); font-size: 1.2rem; z-index: 2;
+    width: 64px; height: 64px; cursor: pointer;
+    color: var(--gg-blue); font-size: 1.3rem; z-index: 2;
   }
-  .stop.current::after {
-    content: ''; position: absolute; inset: -7px; border-radius: 50%;
-    border: 3px solid var(--gg-gold);
-  }
+  .stop.current::before { background-image: var(--stop-current); }
   @media (prefers-reduced-motion: no-preference) {
-    .stop.current::after { animation: stop-pulse 1.6s ease-in-out infinite; }
+    .stop.current::before { animation: stop-pulse 1.6s ease-in-out infinite; }
   }
   @keyframes stop-pulse {
-    0%, 100% { scale: 1; opacity: 0.9; }
-    50% { scale: 1.22; opacity: 0.25; }
+    0%, 100% { scale: 1; }
+    50% { scale: 1.14; }
   }
-  .stop.just .stop-star { animation: star-in 650ms var(--gg-ease-bouncy); }
+  .stop.just::before { animation: star-in 650ms var(--gg-ease-bouncy); }
   @keyframes star-in { from { scale: 0; rotate: -40deg; } to { scale: 1; rotate: 0deg; } }
 
   /* Gritty on the map: he stands just above the stop he's thinking about */
@@ -833,9 +820,8 @@ const summitPt = pct(SX, SY);
     transition: left 900ms var(--gg-ease-bouncy), top 900ms var(--gg-ease-bouncy);
   }
   .walker img {
-    display: block; width: 52px; height: 52px; border-radius: 50%;
-    background: var(--gg-sky); border: 3px solid #fff;
-    box-shadow: var(--gg-shadow);
+    display: block; width: 64px; height: 64px; border-radius: 50%;
+    border: 3px solid #fff; box-shadow: var(--gg-shadow);
   }
   .walker.hop { animation: walker-hop 640ms var(--gg-ease-back); }
   @keyframes walker-hop {
