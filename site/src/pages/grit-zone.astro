@@ -91,7 +91,7 @@ const pct = (x: number, y: number) => ({
   x: ((x / W) * 100).toFixed(2),
   y: ((y / H) * 100).toFixed(2),
 });
-const stopPts = stops.map((s) => ({ id: s.id, ...pct(s.x, s.y) }));
+const stopPts = stops.map((s, i) => ({ id: s.id, row: Math.floor(i / PER_ROW), ...pct(s.x, s.y) }));
 const summitPt = pct(SX, SY);
 ---
 
@@ -182,15 +182,17 @@ const summitPt = pct(SX, SY);
             <svg class="trail-art" viewBox={`0 0 ${W} ${H}`} aria-hidden="true"
                  preserveAspectRatio="xMidYMid meet">
               <defs>
-                <clipPath id="gz-frame"><rect x="0" y="0" width={W} height={H} rx="22" /></clipPath>
+                <clipPath id="gz-frame"><rect x="0" y="0" width={W} height={H} rx="10" /></clipPath>
               </defs>
               {/* the whole landscape is one drawing; only the trail is code,
                   so the stops always sit on it */}
               <image class="backdrop" href={u('/images/grit-zone/trail-bg.webp')}
                      x="0" y="0" width={W} height={H}
                      preserveAspectRatio="xMidYMin slice" clip-path="url(#gz-frame)" />
-              {/* the trail: a cream path with gold stitches */}
+              {/* the trail: an inked edge, a sandy tread, and a run of
+                  gold stepping-stones — an overworld path, drawn as tiles */}
               <path class="trail-under" d={trailD} />
+              <path class="trail-mid" d={trailD} />
               <path class="trail-stitch" d={trailD} />
               {/* the summit flag */}
               <image class="flag" href={u('/images/grit-zone/flag.webp')}
@@ -202,7 +204,7 @@ const summitPt = pct(SX, SY);
             {stopPts.map((s, i) => (
               <button type="button" class="stop" data-stop data-id={s.id}
                       data-x={s.x} data-y={s.y}
-                      style={`left: ${s.x}%; top: ${s.y}%;`} disabled>
+                      style={`left: ${s.x}%; top: ${s.y}%; --row: ${s.row};`} disabled>
                 <span class="stop-num" aria-hidden="true">{i + 1}</span>
               </button>
             ))}
@@ -765,50 +767,83 @@ const summitPt = pct(SX, SY);
   .panel-head { max-width: 720px; margin: 0 auto 22px; text-align: center; }
   .panel-head .note { margin-inline: auto; }
 
-  /* — the trail map — */
-  .trail { display: grid; justify-items: center; gap: 18px; }
+  /* — the trail map: a 16-bit overworld —
+     Hard ink frame, a chunky offset shadow, no blur anywhere: the map is
+     a game screen, not a card. Same tokens as the rest of the site, just
+     pushed the way a SNES map pushes them — ink outlines, a gold path,
+     paper number tiles. The art underneath is a drop-in: the pixel set
+     (PIXEL-PROMPTS.md) lands under the same file names. */
+  .trail { display: grid; justify-items: center; gap: 22px; }
   .trail-scene {
     position: relative; width: min(100%, 620px);
-    border-radius: var(--gg-radius);
-    box-shadow: var(--gg-shadow);
+    border: 4px solid var(--gg-ink);
+    border-radius: var(--gg-radius-small);
+    background: var(--gg-blue-deep);
+    box-shadow: 8px 8px 0 var(--gg-blue-deep);
   }
   .trail-art { display: block; width: 100%; height: auto; }
+  /* the path is three strokes on one line: ink edge, sandy tread, and
+     gold stepping-stones that march uphill (the map's idle shimmer) */
   .trail-under {
-    fill: none; stroke: var(--gg-paper); stroke-width: 24;
-    stroke-linecap: round; stroke-linejoin: round; opacity: 0.92;
+    fill: none; stroke: var(--gg-gold-ink); stroke-width: 30;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+  .trail-mid {
+    fill: none; stroke: var(--gg-sun-core); stroke-width: 20;
+    stroke-linecap: round; stroke-linejoin: round;
   }
   .trail-stitch {
-    fill: none; stroke: var(--gg-gold-ink); stroke-width: 4.5;
-    stroke-linecap: round; stroke-linejoin: round;
-    stroke-dasharray: 1 26; opacity: 0.5;
+    fill: none; stroke: var(--gg-gold); stroke-width: 8;
+    stroke-linecap: butt; stroke-linejoin: round;
+    stroke-dasharray: 8 16;
   }
+  @media (prefers-reduced-motion: no-preference) {
+    .trail-stitch { animation: trail-march 1.6s linear infinite; }
+  }
+  @keyframes trail-march { to { stroke-dashoffset: -24; } }
 
   /* the stops: pebbles ahead, a glow where Gritty waits, stars that stay.
      Each state is a drawing on ::before (public/images/grit-zone/stop-*.webp);
-     the button on top keeps the number and the words. */
+     the button on top keeps the number and the words. --row counts
+     switchbacks from the bottom, so the stops and their numbers grow as
+     the trail climbs: the summit is the big one, and it looks it. */
   .stop {
+    --row: 0;
+    --size: calc(34px + var(--row) * 4px);
     position: absolute; translate: -50% -50%;
     display: grid; place-items: center;
-    width: 32px; height: 32px; padding: 0;
+    width: var(--size); height: var(--size); padding: 0;
     background: none; border: none; border-radius: 50%;
     isolation: isolate; /* keeps the ::before sprite behind the number, not behind the map */
-    font-family: var(--gg-display); font-weight: 600;
-    color: var(--gg-ink); font-size: 0.8rem;
+    font-family: var(--gg-display); font-weight: 700;
+    color: var(--gg-ink); font-size: calc(0.82rem + var(--row) * 0.12rem);
     transition: width 0.25s var(--gg-ease-back), height 0.25s var(--gg-ease-back);
   }
   .stop::before {
     content: ''; position: absolute; inset: 0; z-index: -1;
     background: var(--stop-ahead) center / 100% 100% no-repeat;
   }
-  .stop .stop-num { position: relative; }
+  /* the number is a level tile: paper, an ink edge, a hard shadow */
+  .stop .stop-num {
+    position: relative; line-height: 1;
+    min-width: 1.6em; padding: 0.16em 0.3em 0.1em; text-align: center;
+    background: var(--gg-card); color: var(--gg-ink);
+    border: 2px solid var(--gg-ink); border-radius: 5px;
+    box-shadow: 2px 2px 0 var(--gg-ink);
+  }
   .stop:disabled { cursor: default; }
-  .stop.done { width: 48px; height: 48px; cursor: pointer; }
+  .stop.done { --size: calc(48px + var(--row) * 4px); cursor: pointer; }
   .stop.done::before { background-image: var(--stop-done); }
   .stop.done .stop-num { display: none; }
   .stop.done:hover { scale: 1.12; }
   .stop.current {
-    width: 64px; height: 64px; cursor: pointer;
-    color: var(--gg-blue); font-size: 1.3rem; z-index: 2;
+    --size: calc(64px + var(--row) * 5px);
+    cursor: pointer; z-index: 2;
+    font-size: calc(1.2rem + var(--row) * 0.12rem);
+  }
+  /* the glowing stop's tile goes gold — ink on gold, ≈6:1 */
+  .stop.current .stop-num {
+    background: var(--gg-gold); box-shadow: 3px 3px 0 var(--gg-ink);
   }
   .stop.current::before { background-image: var(--stop-current); }
   @media (prefers-reduced-motion: no-preference) {
@@ -827,9 +862,11 @@ const summitPt = pct(SX, SY);
     translate: -50% -128%;
     transition: left 900ms var(--gg-ease-bouncy), top 900ms var(--gg-ease-bouncy);
   }
+  /* a portrait tile, not a bubble: ink frame, sky behind, hard shadow */
   .walker img {
-    display: block; width: 64px; height: 64px; border-radius: 50%;
-    border: 3px solid #fff; box-shadow: var(--gg-shadow);
+    display: block; width: 64px; height: 64px;
+    border-radius: var(--gg-radius-small); background: var(--gg-sky);
+    border: 3px solid var(--gg-ink); box-shadow: 4px 4px 0 var(--gg-ink);
   }
   .walker.hop { animation: walker-hop 640ms var(--gg-ease-back); }
   @keyframes walker-hop {
@@ -843,7 +880,14 @@ const summitPt = pct(SX, SY);
     .walker img { animation: walker-breathe 3.7s ease-in-out infinite; }
   }
   @keyframes walker-breathe { 0%, 100% { scale: 1 1; } 50% { scale: 1 1.04; } }
-  .trail-play { font-size: 1.15rem; }
+  /* the START button: square-cornered, inked, and it presses down */
+  .trail-play {
+    font-size: 1.15rem;
+    border: 3px solid var(--gg-ink); border-radius: var(--gg-radius-small);
+    box-shadow: 5px 5px 0 var(--gg-ink);
+  }
+  .trail-play:hover { box-shadow: 5px 7px 0 var(--gg-ink); }
+  .trail-play:active { box-shadow: 1px 1px 0 var(--gg-ink); }
 
   /* — the challenge stage — */
   .quiz { display: grid; gap: 16px; max-width: 720px; margin-inline: auto; }

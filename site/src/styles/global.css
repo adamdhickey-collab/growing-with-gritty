@@ -83,11 +83,17 @@ main > .band-deep:last-child { margin-bottom: 0; }
 .btn-gold:hover { background: #C79430; color: var(--gg-ink); }
 
 /* The icon set is full-colour art: a grey cart or a blue arrow sinks into
-   gold while the label beside it stays crisp. Inside a gold button an icon
-   stops being a picture and behaves like the text — same ink, same weight
-   of presence. Blue buttons are dark enough that the colour still reads,
-   so they keep it. */
-.btn-gold svg { filter: brightness(0); }
+   gold while the label beside it stays crisp. Inking the icon (brightness 0)
+   was tried and turned the filled glyphs — the play button, the cart — into
+   black blobs. Instead the icon sits on a small white coin, so it keeps its
+   colour and still lifts off the gold. Blue buttons are dark enough that
+   the colour reads on its own, so they stay bare. */
+.btn-gold svg {
+  box-sizing: content-box;
+  padding: 0.12em;
+  background: var(--gg-card);
+  border-radius: 50%;
+}
 .btn-ghost { background: transparent; color: var(--gg-blue); border: 2.5px solid var(--gg-blue); }
 .btn-ghost:hover { background: color-mix(in srgb, var(--gg-sky) 45%, transparent); color: var(--gg-blue-deep); }
 
