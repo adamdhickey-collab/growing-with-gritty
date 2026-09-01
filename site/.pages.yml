@@ -479,9 +479,6 @@ content:
       - name: heroText
         label: Welcome paragraph
         type: text
-      - name: reminder
-        label: Gritty's reminder (gold bubble near the bottom)
-        type: string
 
   - name: about
     label: About the Author

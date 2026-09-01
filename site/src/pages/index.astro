@@ -1,7 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import Bubble from '../components/Bubble.astro';
 import BookCard from '../components/BookCard.astro';
 import MeadowHero from '../components/MeadowHero.astro';
 import home from '../data/homepage.json';
@@ -104,12 +103,6 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
       <a class="btn btn-primary" href={u("/grown-ups")}>Visit the guide</a>
     </div>
   </section>
-
-  <section class="band" aria-label="A reminder from Gritty">
-    <div class="wrap reminder">
-      <Bubble variant="cheer" tail={false}>{home.reminder}</Bubble>
-    </div>
-  </section>
 </Base>
 
 <style>
@@ -203,5 +196,4 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
   .grown-cta > div { flex: 1; min-width: 260px; display: grid; gap: 10px; }
   .grown-cta .btn { flex: none; }
 
-  .reminder { display: flex; justify-content: center; }
 </style>
