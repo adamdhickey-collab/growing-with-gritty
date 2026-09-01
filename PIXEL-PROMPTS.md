@@ -1,11 +1,11 @@
 # The Grit Trail, drawn as a 16-bit game — ChatGPT prompts
 
-> **Status: prompts written 1 Sep 2026, art not yet generated.** The trail
-> code already wears the retro look (ink frame, tiled path, level-number
-> tiles that grow up the mountain); the crayon art still sits underneath.
-> Every asset below lands under the **same file name** it replaces, so the
-> swap is a drop-in. Once the art is in, ping Claude to re-measure the two
-> "where things are" constants (summit peak, sign board) — see §5.
+> **Status: all eight landed, 1 Sep 2026.** ChatGPT returned the set in one
+> round; every file replaced its crayon predecessor under the same name
+> (`site/public/images/grit-zone/` and `scenes/gritty-climbing.webp`), and
+> the summit-peak, flag-pole, and sign-board constants in
+> `site/src/pages/grit-zone.astro` were re-measured off the new pixels.
+> Kept for the record and for any redo.
 
 The crayon set stays in the repo history; the pixel-filter look was tried
 on 1 Sep and rejected because a filter over crayon art blurs into mush. This

@@ -38,12 +38,14 @@ const ROW_GAP = 150;
 const TURN_R = ROW_GAP / 2;
 const X_MIN = 170;
 const X_MAX = 630;
-/* The backdrop is one crayon drawing (public/images/grit-zone/trail-bg.webp,
-   the meadow band cropped off so the stops sit on mountain). It sets how
-   much sky sits above the top switchback, and its snow cap is where the
-   flag goes. A 16th scenario grows the scene taller than the drawing; the
-   drawing then scales to height and loses a sliver off each side. */
-const BG = { w: 1024, h: 1290, peakX: 0.524, peakY: 0.184 };
+/* The backdrop is one pixel-art drawing (public/images/grit-zone/trail-bg.webp,
+   the 1024×1536 original cropped top-anchored to 1024×1290 so the stops sit
+   on mountain). It sets how much sky sits above the top switchback, and its
+   snow cap is where the flag goes — peakX/peakY were measured off the
+   drawing's topmost snow pixel. A 16th scenario grows the scene taller than
+   the drawing; the drawing then scales to height and loses a sliver off
+   each side. */
+const BG = { w: 1024, h: 1290, peakX: 0.568, peakY: 0.128 };
 const BOTTOM_AIR = 120;  /* room below for the trailhead */
 const TOP_ROW_Y = Math.max(320, Math.round((W * BG.h) / BG.w) - (rows - 1) * ROW_GAP - BOTTOM_AIR);
 const H = TOP_ROW_Y + (rows - 1) * ROW_GAP + BOTTOM_AIR;
@@ -62,10 +64,11 @@ const stops = scenarios.map((s, i) => {
 const bgScale = Math.max(W / BG.w, H / BG.h);
 const SX = Math.round((W - BG.w * bgScale) / 2 + BG.peakX * BG.w * bgScale);
 const SY = Math.round(BG.peakY * BG.h * bgScale);
-/* the flag sprite: its pole is planted 38% in from the left, 85% down */
+/* the flag sprite: its pole stands 25% in from the left, and the grass
+   tuft at its foot ends 96% down — that tuft sits on the snow */
 const FLAG = 120;
-const flagX = Math.round(SX - 0.385 * FLAG);
-const flagY = Math.round(SY + 6 - 0.85 * FLAG);
+const flagX = Math.round(SX - 0.25 * FLAG);
+const flagY = Math.round(SY + 10 - 0.96 * FLAG);
 
 /* The path: a switchback trail — straight rows joined by half-circle turns,
    then a final climb curve to the flag. Drawn once, walked many times. */
@@ -726,10 +729,12 @@ const summitPt = pct(SX, SY);
     border-radius: var(--gg-radius); box-shadow: var(--gg-shadow);
   }
   .trailhead-sign {
-    position: absolute; left: 38.5%; top: 65.8%; translate: -50% -50%;
-    rotate: -3deg; /* the painted board tips up toward the trail */
+    /* the board's pixels span 31–47% across and 63–70% down; the words sit
+       on its plank part, just left of the arrow head */
+    position: absolute; left: 38%; top: 66.5%; translate: -50% -50%;
+    rotate: -2deg; /* the drawn board tips up toward the trail */
     font-family: var(--gg-display); font-weight: 600;
-    font-size: 3.1cqw; line-height: 1; letter-spacing: 0.02em;
+    font-size: 2.7cqw; line-height: 1; letter-spacing: 0.02em;
     color: #fff; white-space: nowrap;
   }
 
