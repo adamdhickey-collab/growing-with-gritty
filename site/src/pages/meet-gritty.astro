@@ -24,19 +24,19 @@ const gritIs: { icon: string; label: string }[] = [
 >
   <section class="band">
     <div class="wrap intro-grid">
+      <div class="intro-copy">
+        <h1>Hi! I'm Gritty!</h1>
+        <Bubble side="right">
+          "I don't always get things right the first time. But that's okay!
+          I keep trying, learn from my mistakes, and never give up."
+        </Bubble>
+      </div>
       <img
         class="intro-art"
         src={u("/images/characters/gritty-standing.webp")}
         alt="Gritty the Goat, hand-drawn by Kim Rekowski"
         width="878" height="1097"
       />
-      <div class="intro-copy">
-        <h1>Hi! I'm Gritty!</h1>
-        <Bubble>
-          "I don't always get things right the first time. But that's okay!
-          I keep trying, learn from my mistakes, and never give up."
-        </Bubble>
-      </div>
     </div>
   </section>
 
@@ -86,11 +86,24 @@ const gritIs: { icon: string; label: string }[] = [
 </Base>
 
 <style>
+  /* The words come first and Gritty stands to their right, so the bubble's
+     tail rises toward his mouth (his face is on the left of the drawing). */
   .intro-grid {
-    display: grid; grid-template-columns: minmax(220px, 320px) 1fr;
-    gap: 24px 48px; align-items: center;
+    display: grid; grid-template-columns: auto minmax(220px, 320px);
+    gap: 24px 48px; align-items: center; justify-content: start;
   }
+  .intro-art { width: 100%; max-width: 320px; height: auto; }
   .intro-copy { display: grid; gap: 20px; justify-items: start; }
+  /* Phones: the drawing sits above the words instead of squeezing them into
+     a sliver beside it, and the bubble drops its tail, since there's no
+     longer a goat to its left. Same breakpoint as About. */
+  @media (max-width: 820px) {
+    .intro-grid { grid-template-columns: 1fr; justify-items: center; gap: 20px; }
+    .intro-art { max-width: 240px; order: -1; }
+    .intro-copy { justify-items: center; text-align: center; }
+    .intro-copy :global(.bubble)::before,
+    .intro-copy :global(.bubble)::after { display: none; }
+  }
 
   .note { color: var(--gg-ink-soft); margin-top: 6px; }
   .grit-grid {
@@ -112,11 +125,29 @@ const gritIs: { icon: string; label: string }[] = [
   }
   /* Like the homepage's doors: the art is square and sits flush at the top,
      the words get the padding. A card still on a cutout portrait keeps its
-     old frame until its scene lands. */
-  .char-card { padding: 0 0 24px; display: grid; gap: 8px; justify-items: start; overflow: hidden; }
+     old frame until its scene lands.
+
+     The cards share one set of rows (subgrid): art, name, role, greeting,
+     note. The tallest role in the row sets the role row for everyone, so
+     every name sits on the same line across the row, every role starts
+     level, and every quote opens level — a two-line role no longer shoves
+     its own quote down while the neighbour's stays put. Before this the
+     card's stretched rows also shared the leftover height out equally, so
+     the shorter a card's words, the further its name drifted from its
+     picture. Rows now pack to the top and the spacing is fixed margins:
+     20 under the art, 6 between name and role, 14 before the quote. */
+  .char-card {
+    padding: 0 0 24px; overflow: hidden;
+    display: grid; grid-row: span 5; grid-template-rows: subgrid;
+    row-gap: 0; align-content: start; justify-items: start;
+  }
   .char-card > * { padding-inline: 20px; }
+  .char-card > .scene, .char-card > .portrait { grid-row: 1; }
+  .char-card > h3 { grid-row: 2; margin-top: 20px; }
+  .char-card > .role { grid-row: 3; margin-top: 6px; }
+  .char-card > .hello { grid-row: 4; margin-top: 14px; }
+  .char-card > .soon { grid-row: 5; margin-top: 12px; }
   .char-card > .portrait, .char-card > .portrait.coming { margin-top: 24px; }
-  .char-card h3 { margin-top: 16px; }
   .char-card > .scene {
     padding: 0; width: 100%; height: auto; aspect-ratio: 1 / 1;
     object-fit: cover; display: block; background: var(--gg-sky);
@@ -132,7 +163,19 @@ const gritIs: { icon: string; label: string }[] = [
     border-radius: 50%;
     background: color-mix(in srgb, var(--gg-sky) 30%, #fff);
   }
-  .role { font-size: 0.88rem; font-weight: 800; color: var(--gg-green-ink); }
-  .hello { font-family: var(--gg-hand); font-size: 1.3rem; line-height: 1.35; color: var(--gg-ink); }
+  .role {
+    font-size: 0.88rem; font-weight: 800; line-height: 1.35;
+    color: var(--gg-green-ink); text-wrap: pretty;
+  }
+  .hello {
+    font-family: var(--gg-hand); font-size: 1.3rem; line-height: 1.35;
+    color: var(--gg-ink); text-wrap: pretty;
+    /* the opening quote mark hangs in the margin so the words themselves
+       line up with the name and role above */
+    hanging-punctuation: first;
+  }
+  @supports not (hanging-punctuation: first) {
+    .hello > :first-child { text-indent: -0.3em; }
+  }
   .soon { font-size: 0.85rem; color: var(--gg-ink-soft); }
 </style>
