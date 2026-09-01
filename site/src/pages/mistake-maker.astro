@@ -52,12 +52,12 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
         </button>
         <div class="stage" data-stage hidden>
           <p class="oops-line"><Icon name="feeling-silly-oops"
-            /><span data-stage-oops role="status"></span></p>
+            /><span data-stage-oops></span></p>
           <button type="button" class="btn btn-gold big-btn" data-turn>
             <Icon name="action-try-again" /> Turn my OOPS into I LEARNED!
           </button>
           <p class="learned-line" hidden data-stage-learned-line><Icon name="action-idea" /> <span
-            data-stage-learned role="status"></span></p>
+            data-stage-learned></span></p>
           <button type="button" class="btn btn-ghost" data-again hidden>
             <Icon name="feeling-silly-oops" /> Another mistake, please!
           </button>
@@ -89,6 +89,8 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
 </Base>
 
 <script>
+  import { announce } from '../lib/announce';
+
   const staticList = document.querySelector<HTMLElement>('[data-mistake-static]');
   const machine = document.querySelector<HTMLElement>('[data-machine]');
   if (staticList && machine) {
@@ -116,6 +118,9 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
         learnedLine.hidden = true;
         againBtn.hidden = true;
         turnBtn.hidden = false;
+        /* the stage was hidden a moment ago, so a live role on the line
+           itself would stay silent — the page's announcer says it instead */
+        announce(`Oops! ${entries[i].oops}`);
       };
 
       makeBtn.addEventListener('click', () => {
@@ -129,6 +134,7 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
         learnedEl.textContent = `I learned: ${entries[i].learned}`;
         learnedLine.hidden = false;
         againBtn.hidden = false;
+        announce(`I learned: ${entries[i].learned}`);
         againBtn.focus();
       });
 

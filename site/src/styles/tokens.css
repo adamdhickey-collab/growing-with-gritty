@@ -53,6 +53,12 @@
   /* touch — little fingers and grandparents' too */
   --gg-tap: 48px;
 
+  /* focus — the ring every keyboard user follows. Gold reaches only ≈2:1
+     on paper and white, and WCAG 1.4.11 wants 3:1 for a focus indicator,
+     so the ring is deep Gritty Blue (≈9:1). Dark grounds (the footer)
+     re-set this to white. */
+  --gg-focus: var(--gg-blue-deep);
+
   /* motion — springs sampled from a damped harmonic oscillator at authoring
      time; cubic-bezier mathematically cannot bounce more than once. */
   --gg-ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);

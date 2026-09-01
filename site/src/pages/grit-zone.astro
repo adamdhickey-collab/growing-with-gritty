@@ -249,15 +249,18 @@ const summitPt = pct(SX, SY);
                          width="34" height="34" loading="lazy" />
                     Ask Gritty for an idea
                   </button>
-                  <p class="ask-said" data-ask-said role="status" hidden>
+                  <p class="ask-said" data-ask-said hidden>
                     "{s.data.hint}"
                   </p>
                 </div>
               )}
-              <p class="nudge" data-nudge role="status" hidden>
+              {/* Shown-and-hidden things carry no live role: a region that
+                  appears with its words already in it goes unannounced.
+                  The script speaks them through the page's announcer. */}
+              <p class="nudge" data-nudge hidden>
                 Hmm — would that help Gritty keep going? Try another one!
               </p>
-              <div class="cheer" data-cheer role="status" hidden>
+              <div class="cheer" data-cheer hidden>
                 <p class="cheer-title"><Icon name="badge-star" /> Gritty's Grit Choice!</p>
                 <p class="cheer-motto">"I have grit! I don't quit!"</p>
                 {s.data.cheer && <p class="cheer-why">{s.data.cheer}</p>}
@@ -306,7 +309,7 @@ const summitPt = pct(SX, SY);
               <span data-yet-sentence></span>
               <b class="yet-gold yet-word" data-yet-word hidden>YET!</b>
             </p>
-            <p class="yet-cheer" data-yet-cheer role="status" hidden>
+            <p class="yet-cheer" data-yet-cheer hidden>
               YET is a magic word — it means your brain is still growing!
               <Icon name="action-brain-grows" />
             </p>
@@ -343,11 +346,11 @@ const summitPt = pct(SX, SY);
             </li>
           ))}
         </ul>
-        <p class="checkin-cheer" data-checkin-cheer role="status" hidden>
+        <p class="checkin-cheer" data-checkin-cheer hidden>
           <Icon name="action-celebrate" /> WOW! You showed grit today!
         </p>
         <p class="streak" hidden data-streak-line><Icon
-          name="action-mountain-streak" /> <span data-streak role="status"></span></p>
+          name="action-mountain-streak" /> <span data-streak></span></p>
         <p class="privacy">This stays right here on your device — only you can
         see it. Nothing is ever sent anywhere.</p>
       </section>
@@ -380,13 +383,20 @@ const summitPt = pct(SX, SY);
      understated, and reduced motion as replacement — the star still
      appears, it just doesn't fly.
      ———————————————————————————————————————————————— */
+  import { announce } from '../lib/announce';
+
   const calm = matchMedia('(prefers-reduced-motion: reduce)');
+  /* the OS setting, or the site's own "Pause animations" switch */
+  const isCalm = () => calm.matches || document.documentElement.dataset.motion === 'calm';
+  /* what a shown element says, as one line for the announcer */
+  const words = (el: Element) => (el.textContent ?? '').replace(/\s+/g, ' ').trim();
 
   /* gold sparks — celebration only, and never under reduced motion */
   function burst(el: Element, count = 12) {
-    if (calm.matches) return;
+    if (isCalm()) return;
     const r = el.getBoundingClientRect();
     const box = document.createElement('div');
+    box.setAttribute('aria-hidden', 'true');
     box.style.cssText =
       `position:fixed;left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px;` +
       'z-index:150;pointer-events:none;';
@@ -512,6 +522,7 @@ const summitPt = pct(SX, SY);
       ask?.addEventListener('click', () => {
         askSaid!.hidden = false;
         ask.hidden = true;
+        announce(`Gritty says: ${words(askSaid!)}`);
       });
 
       card.querySelectorAll<HTMLButtonElement>('.choice').forEach((btn) => {
@@ -527,11 +538,13 @@ const summitPt = pct(SX, SY);
               cheer.hidden = false;
               back.hidden = false;
               burst(btn.querySelector('b')!);
+              announce(words(cheer));
             }, 100);
           } else {
             btn.classList.add('tried');
             replay(btn, 'shake');
             nudge.hidden = false;
+            announce(words(nudge));
             /* Sesame's scaffold: after a miss, the hint offers itself */
             if (ask && !ask.hidden) ask.classList.add('beckon');
           }
@@ -623,6 +636,7 @@ const summitPt = pct(SX, SY);
           if (tip) tipEl.textContent = `Gritty says: "${tip}"`;
           pressBtn.hidden = true;
           nextBtn.hidden = false;
+          announce(`${sentences[i].text} YET! ${words(cheerEl)}${tip ? ` Gritty says: ${tip}` : ''}`);
           nextBtn.focus();
         }, 110);
       });
@@ -662,9 +676,11 @@ const summitPt = pct(SX, SY);
       boxes.forEach((b) => { b.checked = state.checked.includes(b.dataset.check); });
     }
 
-    const refresh = () => {
+    const refresh = (spoken = false) => {
       const checked = boxes.filter((b) => b.checked).map((b) => b.dataset.check);
+      const first = cheer.hidden && checked.length > 0;
       cheer.hidden = checked.length === 0;
+      if (spoken && first) announce(words(cheer));
       if (checked.length > 0 && state.lastDate !== today) {
         state.days = (state.days ?? 0) + 1;
         state.lastDate = today;
@@ -679,7 +695,7 @@ const summitPt = pct(SX, SY);
 
     boxes.forEach((b) => b.addEventListener('change', () => {
       if (b.checked) burst(b.closest('.check-chip')!.querySelector('.coin')!, 8);
-      refresh();
+      refresh(true);
     }));
     refresh();
   }
@@ -741,8 +757,10 @@ const summitPt = pct(SX, SY);
   .gz-tab .ico { display: grid; place-items: center; line-height: 0; }
   .gz-tab:hover { translate: 0 -3px; border-color: var(--gg-blue); }
   .gz-tab:active { scale: 0.96; }
+  /* the chosen game: a gold-ink frame (≈5:1 on the cream — light gold
+     reaches only ≈2:1, and the lift alone is too quiet to be the state) */
   .gz-tab[aria-selected='true'] {
-    border-color: var(--gg-gold); background: #FFFDF4;
+    border-color: var(--gg-gold-ink); background: #FFFDF4;
     translate: 0 -3px; box-shadow: var(--gg-shadow-lift);
   }
   .gz-panel { outline: none; }
@@ -863,6 +881,7 @@ const summitPt = pct(SX, SY);
   .scenario { padding: 26px 28px 28px; display: grid; gap: 16px; }
   .flee {
     justify-self: start; padding: 6px 10px; margin: -6px 0 -4px -10px;
+    min-height: var(--gg-tap); display: inline-flex; align-items: center; gap: 0.4em;
     background: none; border: none; cursor: pointer;
     font-family: var(--gg-display); font-weight: 600; font-size: 0.92rem;
     color: var(--gg-ink-soft); border-radius: 999px;
@@ -874,7 +893,7 @@ const summitPt = pct(SX, SY);
   .q-num {
     flex: none; width: 34px; height: 34px; border-radius: 50%;
     display: inline-grid; place-items: center; align-self: center;
-    background: var(--gg-sky); color: var(--gg-blue);
+    background: var(--gg-sky); color: var(--gg-blue-deep); /* ≈6.6:1 on sky */
     font-size: 1rem; font-weight: 700;
   }
   .choices { display: grid; gap: 10px; }
@@ -895,7 +914,9 @@ const summitPt = pct(SX, SY);
     transition: scale 0.2s var(--gg-ease-back);
   }
   .choice:hover b { scale: 1.12; }
-  .choice.tried { opacity: 0.45; border-style: dashed; }
+  /* a tried answer steps back but stays readable (≈4.9:1 at 0.7; at 0.45
+     it fell to 2.5:1) — the dashed edge does the rest of the telling */
+  .choice.tried { opacity: 0.7; border-style: dashed; }
   .choice.shake { animation: choice-no 380ms ease; }
   @keyframes choice-no {
     0%, 100% { translate: 0 0; }
@@ -904,7 +925,7 @@ const summitPt = pct(SX, SY);
     75% { translate: -3px 0; }
   }
   .choice.is-grit { border-color: var(--gg-gold); background: #FFFDF4; }
-  .choice.is-grit b { background: var(--gg-gold); animation: badge-spin 600ms var(--gg-ease-bouncy); }
+  .choice.is-grit b { background: var(--gg-gold); color: var(--gg-ink); animation: badge-spin 600ms var(--gg-ease-bouncy); }
   @keyframes badge-spin { from { scale: 0.4; rotate: -120deg; } to { scale: 1; rotate: 0deg; } }
   .solved .choice { cursor: default; }
   .solved .choice:hover { transform: none; }
@@ -1031,7 +1052,7 @@ const summitPt = pct(SX, SY);
   /* a real arcade button: it has depth, and pressing it presses it */
   .yet-press {
     width: 104px; height: 104px; border-radius: 50%;
-    background: var(--gg-gold); color: #fff;
+    background: var(--gg-gold); color: var(--gg-ink); /* white on gold is ≈2.2:1 */
     border: 3px solid color-mix(in srgb, var(--gg-gold-ink) 55%, var(--gg-gold));
     box-shadow: 0 9px 0 var(--gg-gold-ink), 0 16px 22px -10px rgba(138, 100, 20, 0.55);
     font-family: var(--gg-display); font-weight: 700; font-size: 1.5rem;
@@ -1058,6 +1079,7 @@ const summitPt = pct(SX, SY);
     margin: -1px; overflow: hidden; clip-path: inset(50%);
   }
   .coin {
+    position: relative;
     width: 96px; height: 96px; border-radius: 50%;
     display: grid; place-items: center;
     background: var(--gg-card); border: 3px solid rgba(44, 95, 138, 0.25);
@@ -1081,8 +1103,17 @@ const summitPt = pct(SX, SY);
     45% { scale: 1.12 0.9; }
     100% { scale: 1 1; }
   }
+  /* an earned badge wears a check — the state in a mark, not only in a
+     colour, so it reads for colour-blind kids and in high-contrast mode */
+  .check-chip:has(input:checked) .coin::after {
+    content: '✓'; position: absolute; right: -4px; bottom: -4px;
+    width: 30px; height: 30px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--gg-gold-ink); color: #fff; border: 2px solid #fff;
+    font-family: var(--gg-body); font-weight: 800; font-size: 1.05rem; line-height: 1;
+  }
   .check-chip:has(input:checked) .coin-label { color: var(--gg-gold-ink); }
-  .check-chip:has(input:focus-visible) .coin { outline: 3px solid var(--gg-gold); outline-offset: 3px; }
+  .check-chip:has(input:focus-visible) .coin { outline: 3px solid var(--gg-focus); outline-offset: 3px; }
   .checkin-cheer {
     font-family: var(--gg-hand); font-size: 1.5rem; color: var(--gg-gold-ink);
     text-align: center; margin-top: 18px;

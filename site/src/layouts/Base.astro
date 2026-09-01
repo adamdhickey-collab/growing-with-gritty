@@ -47,6 +47,13 @@ const tiles = import.meta.env.PUBLIC_TILES_URL;
 
     <link rel="preload" href={fredokaUrl} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={nunitoUrl} as="font" type="font/woff2" crossorigin />
+    {/* The "Pause animations" choice (MotionToggle.astro), restored before
+        the first paint so a paused meadow never twitches on the way in. */}
+    <script is:inline>
+      try {
+        if (localStorage.getItem('gg-motion') === 'calm') document.documentElement.dataset.motion = 'calm';
+      } catch (e) { /* storage blocked — the page simply starts in motion */ }
+    </script>
     {tiles && <style is:global>
       /* version switcher — identical to the one on the style tiles */
       .tile-switch { position: sticky; top: 0; z-index: 300; display: flex; flex-wrap: wrap;
@@ -74,6 +81,9 @@ const tiles = import.meta.env.PUBLIC_TILES_URL;
   </head>
   <body>
     <a class="visually-hidden" href="#main">Skip to content</a>
+    {/* The one live region every game announces through — see
+        src/lib/announce.ts for why it lives here and not on each cheer. */}
+    <div class="visually-hidden" role="status" aria-live="polite" data-announcer></div>
     {/* Review-build only: the same switcher the style tiles carry, so the
         three design directions and the real site all link together. Absent
         from the production build. */}

@@ -1,5 +1,6 @@
 ---
 import { u } from '../lib/url';
+import MotionToggle from './MotionToggle.astro';
 const year = new Date().getFullYear();
 ---
 
@@ -16,6 +17,9 @@ const year = new Date().getFullYear();
       <a href={u("/grown-ups")}>Grown-Ups</a>
       <a href={u("/about")}>About Kim</a>
     </nav>
+    {/* On every page, so motion can be paused from wherever it is noticed —
+        the meadow carries a second, closer copy of the same switch. */}
+    <MotionToggle />
     <p class="legal">
       © {year} Kim Rekowski · All character art by Kim Rekowski ·
       This site collects no personal information — activities happen right on
@@ -30,6 +34,8 @@ const year = new Date().getFullYear();
        see main > :last-child in global.css */
     background: var(--gg-blue);
     color: #fff;
+    /* deep blue on blue is invisible (≈1.5:1); the ring goes white here */
+    --gg-focus: #fff;
   }
   .inner { padding-block: 44px 36px; display: grid; gap: 14px; justify-items: center; text-align: center; }
   .motto { font-family: var(--gg-hand); font-size: 1.7rem; color: #fff; }

@@ -11,8 +11,12 @@ const { title, order, cover, ages, tagline, buyLink } = book.data;
 ---
 
 <article class="book-card card">
-  <a href={u(`/books/${book.id}`)} class="cover-link">
-    <img src={u(cover)} alt={`${title} book cover`} width="322" height="322" loading="lazy" />
+  {/* The cover and the title go to the same page. The title link is the
+      one screen readers and the Tab key meet; the cover is a bigger target
+      for a finger, taken out of the accessibility tree so the card isn't
+      two identical stops in a row. */}
+  <a href={u(`/books/${book.id}`)} class="cover-link" tabindex="-1" aria-hidden="true">
+    <img src={u(cover)} alt="" width="322" height="322" loading="lazy" />
   </a>
   <div class="meta">
     <H class="title"><a href={u(`/books/${book.id}`)}>{title}</a></H>

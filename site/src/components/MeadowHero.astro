@@ -22,6 +22,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { getCollection } from 'astro:content';
 import { u } from '../lib/url';
+import MotionToggle from './MotionToggle.astro';
 
 interface Props { heading: string; bubble: string; sayings?: string[] }
 const { heading, bubble, sayings = [] } = Astro.props;
@@ -89,6 +90,10 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     <div class="grass-border"
          style={`--grass-art: url('${u("/images/scenery/grass-border.webp")}')`}></div>
   </div>
+
+  {/* The meadow is the one place on the site where things move by
+      themselves, so the pause switch sits right here in the sky. */}
+  <div class="meadow-tools"><MotionToggle /></div>
 
   <div class="hero-copy">
     <h1>{heading}</h1>
@@ -232,6 +237,15 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     0%, 100% { transform: skewX(-2.1deg); } 50% { transform: skewX(2.1deg); }
   }
 
+  .meadow-tools {
+    position: relative; z-index: 9;
+    display: flex; justify-content: flex-end;
+    padding-inline: 16px; margin-bottom: -8px;
+  }
+  /* wide enough that the title never wraps under it, the switch shares
+     the title's row and the title keeps its place */
+  @media (min-width: 900px) { .meadow-tools { margin-bottom: -38px; } }
+
   /* ── the words: the title carries the hero, the motto whispers ── */
   .hero-copy {
     position: relative; z-index: 5; text-align: center;
@@ -276,6 +290,9 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
 
   /* ── the reply chips: what YOU say back ── */
   .chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  /* an author display beats the UA's [hidden] — without this the chips a
+     kid just chose from stayed on screen under Gritty's answer */
+  .chips[hidden] { display: none; }
   .chip {
     min-height: var(--gg-tap); padding: 0.5em 1.2em;
     background: #fff; color: var(--gg-blue);
@@ -475,6 +492,8 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     const hint = section.querySelector<HTMLElement>('[data-hint]')!;
     const hintText = section.querySelector<HTMLElement>('[data-hint-text]')!;
     const calm = matchMedia('(prefers-reduced-motion: reduce)');
+    /* the OS setting, or the site's own "Pause animations" switch */
+    const isCalm = () => calm.matches || document.documentElement.dataset.motion === 'calm';
 
     let gi = 0; // next chat
     let current: (typeof data.chats)[0] | null = null;
@@ -502,7 +521,8 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
       say.setAttribute('aria-live', 'polite');
     }
     function startIdle() {
-      if (data.sayings.length < 2 || idleTimer) return;
+      /* text that changes by itself is motion too: paused, it holds still */
+      if (data.sayings.length < 2 || idleTimer || isCalm()) return;
       say.setAttribute('aria-live', 'off');
       idleTimer = window.setInterval(() => {
         si = (si + 1) % data.sayings.length;
@@ -512,6 +532,11 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     /* the bubble ships with sayings[0], so the rotation picks up from there */
     si = Math.max(0, data.sayings.indexOf(say.textContent!.replace(/^"|"$/g, '')));
     startIdle();
+    /* the pause switch (and the OS setting) stop and restart the rotation —
+       but never barge in on a conversation that has already started */
+    const onMotion = () => { if (isCalm()) stopIdle(); else if (!current) startIdle(); };
+    document.addEventListener('gg:motion', onMotion);
+    calm.addEventListener('change', onMotion);
 
     function emote(mood: string) {
       gritty.classList.remove('e-happy', 'e-proud', 'e-laugh', 'e-surprised', 'e-thinking');
@@ -526,9 +551,10 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
 
     /* gold sparks — celebration only, and never under reduced motion */
     function sparks() {
-      if (calm.matches) return;
+      if (isCalm()) return;
       const r = gritty.getBoundingClientRect();
       const box = document.createElement('div');
+      box.setAttribute('aria-hidden', 'true');
       box.style.cssText =
         `position:fixed;left:${r.left + r.width / 2}px;top:${r.top + r.height / 3}px;` +
         'z-index:150;pointer-events:none;';

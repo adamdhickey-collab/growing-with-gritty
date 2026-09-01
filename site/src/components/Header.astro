@@ -126,7 +126,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
               transition: rotate 0.18s var(--gg-ease-back), scale 0.18s var(--gg-ease-back); }
   nav a:hover { background: color-mix(in srgb, var(--gg-sky) 45%, transparent); translate: 0 -2px; }
   nav a:hover img { rotate: -5deg; scale: 1.12; }
-  nav a:focus-visible { outline: 3px solid var(--gg-gold); outline-offset: 2px; }
+  nav a:focus-visible { outline: 3px solid var(--gg-focus); outline-offset: 2px; }
   nav a[aria-current='page'] {
     background: var(--gg-blue); color: #fff;
   }

@@ -1,0 +1,57 @@
+---
+/* "Pause animations" — the on-page way to hold everything that moves by
+   itself: the drifting clouds, the swaying tree, Gritty's breathing, the
+   rotating sayings. WCAG 2.2.2 asks for a control like this wherever
+   motion runs longer than five seconds, and it matters most for exactly
+   this audience: kids who can't settle with things moving, grandparents
+   with vestibular trouble, and nobody in either group who knows the OS
+   has a reduced-motion setting.
+
+   It sets data-motion="calm" on <html>, which global.css treats exactly
+   like prefers-reduced-motion, and remembers the choice in localStorage
+   so it holds across pages (Base.astro re-applies it before first paint).
+   Media-player pattern: the label says what pressing it will do. */
+import Icon from './Icon.astro';
+
+interface Props { class?: string }
+const { class: cls } = Astro.props;
+---
+
+<button type="button" class:list={['motion-toggle', cls]} data-motion-toggle>
+  <span class="when-moving"><Icon name="ui-pause" /> Pause animations</span>
+  <span class="when-still"><Icon name="ui-play" /> Play animations</span>
+</button>
+
+<style>
+  .motion-toggle {
+    display: inline-flex; align-items: center;
+    min-height: var(--gg-tap); padding: 0.4em 1.1em;
+    background: var(--gg-card); color: var(--gg-blue);
+    border: 2.5px solid var(--gg-blue); border-radius: 999px;
+    font-family: var(--gg-display); font-weight: 600; font-size: var(--gg-text-small);
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .motion-toggle:hover { background: color-mix(in srgb, var(--gg-sky) 40%, #fff); }
+  .when-moving, .when-still { display: inline-flex; align-items: center; gap: 0.45em; }
+  :global(html[data-motion='calm']) .when-moving { display: none; }
+  :global(html:not([data-motion='calm'])) .when-still { display: none; }
+</style>
+
+<script>
+  const KEY = 'gg-motion';
+  const root = document.documentElement;
+  const isCalm = () => root.dataset.motion === 'calm';
+
+  document.querySelectorAll<HTMLButtonElement>('[data-motion-toggle]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const calm = !isCalm();
+      if (calm) root.dataset.motion = 'calm';
+      else delete root.dataset.motion;
+      try { localStorage.setItem(KEY, calm ? 'calm' : 'moving'); }
+      catch { /* private window — it still holds for this page */ }
+      /* the meadow listens: its rotating sayings stop and start with this */
+      document.dispatchEvent(new CustomEvent('gg:motion', { detail: { calm } }));
+    });
+  });
+</script>

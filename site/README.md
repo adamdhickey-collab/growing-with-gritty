@@ -38,6 +38,13 @@ npm run build    # → dist/
 - **Interactivity** — vanilla JS per page, progressively enhanced: without
   JavaScript every game renders as a readable list. Game state (the grit
   check-in) lives in `localStorage` only, wrapped in try/catch.
+- **Accessibility plumbing** — `Base.astro` carries one polite live region
+  and every game announces through `src/lib/announce.ts` (never put
+  `role="status"` on something you show and hide — it won't be read). The
+  focus ring is `--gg-focus`; dark grounds re-set it. `MotionToggle.astro`
+  ("Pause animations", in the meadow and the footer) sets
+  `data-motion="calm"` on `<html>`, which `global.css` treats exactly like
+  `prefers-reduced-motion` — check both (`isCalm()`) before any JS motion.
 - **CMS config** — `.pages.yml`, field descriptions written for Kim.
   Never rename a schema field without updating `.pages.yml` and
   `KIM-GUIDE.md` in the same change.

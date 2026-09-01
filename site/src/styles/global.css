@@ -30,7 +30,7 @@ p { max-width: 65ch; }
 a { color: var(--gg-blue); text-decoration-thickness: 2px; text-underline-offset: 3px; }
 a:hover { color: var(--gg-blue-deep); }
 
-:focus-visible { outline: 3px solid var(--gg-gold); outline-offset: 3px; border-radius: 4px; }
+:focus-visible { outline: 3px solid var(--gg-focus); outline-offset: 3px; border-radius: 4px; }
 
 /* layout */
 .wrap { max-width: 1120px; margin: 0 auto; padding-inline: 24px; }
@@ -76,15 +76,18 @@ main > .band-deep:last-child { margin-bottom: 0; }
 .btn:active { transform: translateY(1px) scale(0.98); }
 .btn-primary { background: var(--gg-blue); color: #fff; box-shadow: 0 8px 16px -8px rgba(31, 70, 102, 0.7); }
 .btn-primary:hover { background: var(--gg-blue-deep); color: #fff; }
-.btn-gold { background: var(--gg-gold); color: #fff; box-shadow: 0 8px 16px -8px rgba(138, 100, 20, 0.6); }
-.btn-gold:hover { background: #C79430; color: #fff; }
+/* Gold is a light ground: white lettering on it reaches only ≈2.2:1, so
+   the gold button is lettered in ink (≈6:1, and ≈4.8:1 on the darker
+   hover gold) — AA for the small button type on every state. */
+.btn-gold { background: var(--gg-gold); color: var(--gg-ink); box-shadow: 0 8px 16px -8px rgba(138, 100, 20, 0.6); }
+.btn-gold:hover { background: #C79430; color: var(--gg-ink); }
 
-/* Gold is a light ground, and the icon set is full-colour art: a grey cart
-   or a blue arrow sinks into it while the white label beside it stays
-   crisp. Inside a gold button an icon stops being a picture and behaves
-   like the text — same white, same weight of presence. Blue buttons are
-   dark enough that the colour still reads, so they keep it. */
-.btn-gold svg { filter: brightness(0) invert(1); }
+/* The icon set is full-colour art: a grey cart or a blue arrow sinks into
+   gold while the label beside it stays crisp. Inside a gold button an icon
+   stops being a picture and behaves like the text — same ink, same weight
+   of presence. Blue buttons are dark enough that the colour still reads,
+   so they keep it. */
+.btn-gold svg { filter: brightness(0); }
 .btn-ghost { background: transparent; color: var(--gg-blue); border: 2.5px solid var(--gg-blue); }
 .btn-ghost:hover { background: color-mix(in srgb, var(--gg-sky) 45%, transparent); color: var(--gg-blue-deep); }
 
@@ -115,7 +118,11 @@ main > .band-deep:last-child { margin-bottom: 0; }
   font-family: var(--gg-display);
 }
 
-/* one global kill switch for all motion */
+/* one global kill switch for all motion — thrown by the OS setting, or by
+   the site's own "Pause animations" button (MotionToggle.astro), which sets
+   data-motion="calm" on <html>. WCAG 2.2.2 wants a pause control on the
+   page itself for anything that moves for more than five seconds, and a
+   six-year-old has never heard of the OS setting. Same rules, twice. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -123,4 +130,12 @@ main > .band-deep:last-child { margin-bottom: 0; }
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+html[data-motion='calm'] *,
+html[data-motion='calm'] *::before,
+html[data-motion='calm'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }
