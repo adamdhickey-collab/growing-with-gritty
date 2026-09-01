@@ -68,7 +68,9 @@ const gritIs: { icon: string; label: string }[] = [
             {c.data.portrait ? (
               <img class="portrait" src={u(c.data.portrait)} alt={`${c.data.name}, hand-drawn by Kim Rekowski`} width="320" height="416" loading="lazy" />
             ) : (
-              <div class="portrait coming" aria-hidden="true">🐐</div>
+              <div class="portrait coming" aria-hidden="true">
+                <Icon name="character-coming" size="5rem" />
+              </div>
             )}
             <h3>{c.data.name}</h3>
             {c.data.role && <p class="role">{c.data.role}</p>}

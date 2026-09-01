@@ -17,7 +17,7 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
   <section class="band">
     <div class="wrap intro">
       <p class="eyebrow">Gritty's World</p>
-      <h1>The Mistake Maker 🧠</h1>
+      <h1>The Mistake Maker <Icon name="action-brain-grows" size="1.1em" /></h1>
       <Bubble tail={false}>
         "Everyone makes mistakes — even me! Mistakes don't mean I'm bad at
         something. Mistakes help my brain learn!"
@@ -48,13 +48,13 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
 
       <div class="machine card" data-machine hidden>
         <button type="button" class="btn btn-primary big-btn" data-make>
-          😜 Oops! I made a mistake!
+          <Icon name="feeling-silly-oops" /> Oops! I made a mistake!
         </button>
         <div class="stage" data-stage hidden>
           <p class="oops-line"><Icon name="feeling-silly-oops"
             /><span data-stage-oops role="status"></span></p>
           <button type="button" class="btn btn-gold big-btn" data-turn>
-            🔄 Turn my OOPS into I LEARNED!
+            <Icon name="action-try-again" /> Turn my OOPS into I LEARNED!
           </button>
           <p class="learned-line" hidden data-stage-learned-line><Icon name="action-idea" /> <span
             data-stage-learned role="status"></span></p>
@@ -83,7 +83,7 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
   <section class="band">
     <div class="wrap next-up card">
       <p>Sometimes a mistake brings a big feeling with it. That's okay too.</p>
-      <a class="btn btn-primary" href={u('/calming-corner')}>🧘 Visit the Calming Corner</a>
+      <a class="btn btn-primary" href={u('/calming-corner')}><Icon name="action-calm-break" /> Visit the Calming Corner</a>
     </div>
   </section>
 </Base>

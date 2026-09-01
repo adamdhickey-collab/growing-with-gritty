@@ -99,7 +99,7 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
                 <a class="char-chip" href={u("/meet-gritty")}>
                   {c.data.portrait
                     ? <img src={u(c.data.portrait)} alt="" width="56" height="72" loading="lazy" />
-                    : <span class="chip-emoji" aria-hidden="true">🐐</span>}
+                    : <span class="chip-emoji" aria-hidden="true"><Icon name="character-coming" size="2.2rem" /></span>}
                   {c.data.name}
                 </a>
               </li>
@@ -113,7 +113,10 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
       <section class="band">
         <div class="wrap challenge">
           <h2 class="visually-hidden">Grit challenge</h2>
-          <p class="eyebrow">🐐 Grit challenge — talk about it together</p>
+          <p class="eyebrow gritty-eyebrow">
+            <img src={u("/images/gritty/gritty-face.webp")} alt="" width="160" height="160" />
+            Grit challenge — talk about it together
+          </p>
           <Bubble tail={false}>{challenge}</Bubble>
         </div>
       </section>
@@ -122,6 +125,11 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
 </Base>
 
 <style>
+  /* Gritty's own face fronting the grit challenge — his art, not an icon */
+  .gritty-eyebrow { display: flex; align-items: center; gap: 0.45em; }
+  /* the scan's paper edge disappears once it's a round badge */
+  .gritty-eyebrow img { width: 1.9em; height: 1.9em; border-radius: 50%; }
+
   .head-grid {
     display: grid; grid-template-columns: minmax(220px, 340px) 1fr;
     gap: 32px 56px; align-items: start;
