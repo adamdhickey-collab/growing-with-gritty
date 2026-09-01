@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
 import { u } from '../lib/url';
 import { buyLabel } from '../lib/buy';
 
@@ -11,15 +12,15 @@ const buyableBooks = (await getCollection('books'))
   .filter((b) => b.data.buyLink)
   .sort((a, b) => a.data.order - b.data.order);
 
-const kindLabels: Record<string, string> = {
-  'coloring-page': '🖍️ Coloring page',
-  'discussion-cards': '💬 Discussion cards',
-  'calm-down-cards': '🧘 Calm-down cards',
-  'poster': '🌟 Poster',
-  'journal': '📓 Grit journal',
-  'certificate': '🏆 Certificate',
-  'book-guide': '📚 Book guide',
-  'classroom-activity': '🏫 Classroom activity',
+const kindLabels: Record<string, { icon?: string; emoji?: string; label: string }> = {
+  'coloring-page': { icon: 'printable-coloring-page', label: 'Coloring page' },
+  'discussion-cards': { icon: 'printable-discussion-cards', label: 'Discussion cards' },
+  'calm-down-cards': { icon: 'action-calm-break', label: 'Calm-down cards' },
+  'poster': { icon: 'badge-star-burst', label: 'Poster' },
+  'journal': { icon: 'printable-journal', label: 'Grit journal' },
+  'certificate': { icon: 'printable-certificate', label: 'Certificate' },
+  'book-guide': { icon: 'printable-book-guide', label: 'Book guide' },
+  'classroom-activity': { icon: 'printable-classroom', label: 'Classroom activity' },
 };
 
 const groups = [
@@ -49,7 +50,7 @@ const groups = [
   {groups.length === 0 ? (
     <section class="band">
       <div class="wrap empty card">
-        <span class="big" aria-hidden="true">🖍️</span>
+        <span class="big" aria-hidden="true"><Icon name="printable-coloring-page" size="3.4rem" /></span>
         <h2>The first printables are on their way!</h2>
         <p>Kim is getting her coloring pages, discussion cards, and posters
         ready right now. Check back soon — or
@@ -67,7 +68,11 @@ const groups = [
               <li class="dl card">
                 {p.data.thumb && <img src={u(p.data.thumb)} alt="" width="280" height="200" loading="lazy" />}
                 <h3>{p.data.title}</h3>
-                <p class="kind">{kindLabels[p.data.kind] ?? p.data.kind}</p>
+                <p class="kind">
+                  {kindLabels[p.data.kind]?.icon && <Icon name={kindLabels[p.data.kind].icon!} />}
+                  {kindLabels[p.data.kind]?.emoji}
+                  {kindLabels[p.data.kind]?.label ?? p.data.kind}
+                </p>
                 <a class="btn btn-primary" href={u(p.data.download)}>⬇️ Download PDF</a>
               </li>
             ))}
@@ -94,7 +99,7 @@ const groups = [
     <section class="band" aria-labelledby="own-h">
       <div class="wrap own card">
         <div class="own-copy">
-          <p class="eyebrow">📚 Bring Gritty home</p>
+          <p class="eyebrow"><Icon name="printable-book-guide" /> Bring Gritty home</p>
           <h2 id="own-h">The books behind the guide</h2>
           <p>Every printable and conversation starter here grows out of one of
           Kim's four books. Tap a cover to get your copy on Amazon — or
@@ -132,7 +137,10 @@ const groups = [
   }
   .dl { padding: 20px; display: grid; gap: 10px; justify-items: start; }
   .dl img { border-radius: var(--gg-radius-small); }
-  .kind { font-size: 0.88rem; font-weight: 800; color: var(--gg-green-ink); }
+  .kind {
+    font-size: 0.88rem; font-weight: 800; color: var(--gg-green-ink);
+    display: flex; align-items: center; gap: 0.4em;
+  }
 
   /* — bring Gritty home — */
   .own { padding: 36px 40px; display: grid; gap: 24px; }

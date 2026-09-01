@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Bubble from '../components/Bubble.astro';
 import Stamp from '../components/Stamp.astro';
+import Icon from '../components/Icon.astro';
 import { u } from '../lib/url';
 
 const mistakes = (await getCollection('mistakes')).sort((a, b) => a.data.order - b.data.order);
@@ -39,7 +40,7 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
             data-oops={m.data.oops}
             data-learned={m.data.learned ?? FALLBACK_LEARNED}
           >
-            <p class="oops-line">😜 {m.data.oops}</p>
+            <p class="oops-line"><Icon name="feeling-silly-oops" /> {m.data.oops}</p>
             <p class="learned-line">💡 {m.data.learned ?? FALLBACK_LEARNED}</p>
           </article>
         ))}
@@ -50,13 +51,15 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
           😜 Oops! I made a mistake!
         </button>
         <div class="stage" data-stage hidden>
-          <p class="oops-line" data-stage-oops role="status"></p>
+          <p class="oops-line"><Icon name="feeling-silly-oops"
+            /><span data-stage-oops role="status"></span></p>
           <button type="button" class="btn btn-gold big-btn" data-turn>
             🔄 Turn my OOPS into I LEARNED!
           </button>
-          <p class="learned-line" data-stage-learned role="status" hidden></p>
+          <p class="learned-line" hidden data-stage-learned-line>💡 <span
+            data-stage-learned role="status"></span></p>
           <button type="button" class="btn btn-ghost" data-again hidden>
-            😜 Another mistake, please!
+            <Icon name="feeling-silly-oops" /> Another mistake, please!
           </button>
         </div>
       </div>
@@ -69,10 +72,10 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
       <p class="note">When a mistake happens, a goat with grit can always
       pick one of these.</p>
       <div class="moves">
-        <Stamp emoji="🔄" label="Try Again" tone="blue" tilt={-3} />
+        <Stamp icon="action-try-again" label="Try Again" tone="blue" tilt={-3} />
         <Stamp emoji="💡" label="Learn From It" tone="gold" tilt={2} />
-        <Stamp emoji="🤝" label="Ask for Help" tone="green" tilt={-2} />
-        <Stamp emoji="🧘" label="Take a Break" tone="blue" tilt={3} />
+        <Stamp icon="action-ask-for-help" label="Ask for Help" tone="green" tilt={-2} />
+        <Stamp icon="action-calm-break" label="Take a Break" tone="blue" tilt={3} />
       </div>
     </div>
   </section>
@@ -99,6 +102,7 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
       const makeBtn = machine.querySelector<HTMLElement>('[data-make]')!;
       const stage = machine.querySelector<HTMLElement>('[data-stage]')!;
       const oopsEl = machine.querySelector<HTMLElement>('[data-stage-oops]')!;
+      const learnedLine = machine.querySelector<HTMLElement>('[data-stage-learned-line]')!;
       const turnBtn = machine.querySelector<HTMLElement>('[data-turn]')!;
       const learnedEl = machine.querySelector<HTMLElement>('[data-stage-learned]')!;
       const againBtn = machine.querySelector<HTMLElement>('[data-again]')!;
@@ -108,8 +112,8 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
 
       const showOops = () => {
         stage.hidden = false;
-        oopsEl.textContent = `😜 ${entries[i].oops}`;
-        learnedEl.hidden = true;
+        oopsEl.textContent = entries[i].oops;
+        learnedLine.hidden = true;
         againBtn.hidden = true;
         turnBtn.hidden = false;
       };
@@ -122,8 +126,8 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
 
       turnBtn.addEventListener('click', () => {
         turnBtn.hidden = true;
-        learnedEl.textContent = `💡 I learned: ${entries[i].learned}`;
-        learnedEl.hidden = false;
+        learnedEl.textContent = `I learned: ${entries[i].learned}`;
+        learnedLine.hidden = false;
         againBtn.hidden = false;
         againBtn.focus();
       });
@@ -149,7 +153,11 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
     margin-top: 24px; padding: 40px 32px; width: min(100%, 680px);
     display: grid; gap: 20px; justify-items: center; text-align: center;
   }
+  /* A class's display beats [hidden]'s, so every element this page hides
+     has to say so itself — otherwise the no-JS list, the stage, and the
+     "Another mistake" button all sit on screen from the first paint. */
   .stage { display: grid; gap: 18px; justify-items: center; }
+  .stage[hidden], .mistake-list[hidden], .machine [hidden] { display: none; }
   .big-btn { font-size: 1.2rem; }
 
   .oops-line {

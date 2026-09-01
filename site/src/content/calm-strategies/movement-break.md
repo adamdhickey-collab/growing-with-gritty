@@ -1,6 +1,7 @@
 ---
 order: 6
 name: Take a movement break
+icon: calm-movement
 emoji: 🚶
 steps: |-
   March in place and count to twenty.

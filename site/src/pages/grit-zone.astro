@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Bubble from '../components/Bubble.astro';
+import Icon from '../components/Icon.astro';
 import { u } from '../lib/url';
 
 const scenarios = (await getCollection('scenarios')).sort((a, b) => a.data.order - b.data.order);
@@ -10,15 +11,15 @@ const yets = (await getCollection('yet-sentences')).sort((a, b) => a.data.order 
 /* The private "How did YOU have grit today?" checklist. Fixed list, not CMS:
    it mirrors the "what is grit" vocabulary used across the site. The label
    strings are also the localStorage keys — changing one orphans saved days. */
-const checkin = [
-  { emoji: '🔁', label: 'Kept trying' },
-  { emoji: '✨', label: 'Tried something new' },
+const checkin: { icon?: string; emoji?: string; label: string }[] = [
+  { icon: 'action-try-again', label: 'Kept trying' },
+  { icon: 'action-something-new', label: 'Tried something new' },
   { emoji: '💡', label: 'Learned from a mistake' },
-  { emoji: '🤝', label: 'Asked for help' },
-  { emoji: '🫶', label: 'Helped someone' },
-  { emoji: '🧘', label: 'Took a calming break' },
+  { icon: 'action-ask-for-help', label: 'Asked for help' },
+  { icon: 'heart-hands-helped', label: 'Helped someone' },
+  { icon: 'action-calm-break', label: 'Took a calming break' },
   { emoji: '💛', label: 'Was kind' },
-  { emoji: '⭐', label: 'Believed in myself' },
+  { icon: 'badge-star', label: 'Believed in myself' },
 ];
 
 /* ——— The Grit Trail: board-game geometry ———
@@ -135,12 +136,12 @@ const summitPt = pct(SX, SY);
       <div class="gz-tabs" role="tablist" aria-label="Pick a game">
         <button class="gz-tab" role="tab" id="tab-trail" aria-controls="panel-trail"
                 aria-selected="true" data-tab>
-          <span class="ico" aria-hidden="true">⛰️</span>
+          <span class="ico" aria-hidden="true"><Icon name="action-mountain-streak" size="2.3rem" /></span>
           <span>The Grit Trail</span>
         </button>
         <button class="gz-tab" role="tab" id="tab-yet" aria-controls="panel-yet"
                 aria-selected="false" tabindex="-1" data-tab>
-          <span class="ico" aria-hidden="true">✨</span>
+          <span class="ico" aria-hidden="true"><Icon name="action-something-new" size="2.3rem" /></span>
           <span>Power of YET</span>
         </button>
         <button class="gz-tab" role="tab" id="tab-day" aria-controls="panel-day"
@@ -209,13 +210,13 @@ const summitPt = pct(SX, SY);
                       data-x={s.x} data-y={s.y}
                       style={`left: ${s.x}%; top: ${s.y}%;`} disabled>
                 <span class="stop-num" aria-hidden="true">{i + 1}</span>
-                <span class="stop-star" aria-hidden="true">⭐</span>
+                <span class="stop-star" aria-hidden="true"><Icon name="badge-star" size="1.25rem" /></span>
               </button>
             ))}
 
             {/* Gritty walks the map — progress you can watch, not count */}
             <div class="walker" data-walker aria-hidden="true">
-              <img src={u('/images/gritty/gritty-face.webp')} alt=""
+              <img src={u('/images/nav/meet-gritty.webp')} alt=""
                    width="52" height="52" />
             </div>
           </div>
@@ -244,7 +245,7 @@ const summitPt = pct(SX, SY);
               {s.data.hint && (
                 <div class="ask">
                   <button type="button" class="ask-btn" data-ask>
-                    <img src={u('/images/gritty/gritty-face.webp')} alt=""
+                    <img src={u('/images/nav/meet-gritty.webp')} alt=""
                          width="34" height="34" loading="lazy" />
                     Ask Gritty for an idea
                   </button>
@@ -257,7 +258,7 @@ const summitPt = pct(SX, SY);
                 Hmm — would that help Gritty keep going? Try another one!
               </p>
               <div class="cheer" data-cheer role="status" hidden>
-                <p class="cheer-title">⭐ Gritty's Grit Choice!</p>
+                <p class="cheer-title"><Icon name="badge-star" /> Gritty's Grit Choice!</p>
                 <p class="cheer-motto">"I have grit! I don't quit!"</p>
                 {s.data.cheer && <p class="cheer-why">{s.data.cheer}</p>}
                 <p class="cheer-what">Grit means we keep trying, learn from
@@ -271,7 +272,7 @@ const summitPt = pct(SX, SY);
         </div>
 
         <div class="finale card" data-finale tabindex="-1" hidden>
-          <span class="finale-emoji" aria-hidden="true">🌟</span>
+          <span class="finale-emoji" aria-hidden="true"><Icon name="badge-star-burst" size="3rem" /></span>
           <h3>You climbed the whole trail!</h3>
           <p>You helped Gritty {scenarios.length} times. You know what grit
           looks like: trying again, taking a breath, asking for help, and
@@ -312,7 +313,7 @@ const summitPt = pct(SX, SY);
           <p class="yet-tip" data-yet-tip hidden></p>
           <div class="yet-buttons">
             <button type="button" class="yet-press" data-yet-press>YET!</button>
-            <button type="button" class="btn btn-ghost" data-yet-next hidden>Another one ➡️</button>
+            <button type="button" class="btn btn-ghost" data-yet-next hidden>Another one <Icon name="ui-next-arrow" /></button>
           </div>
         </div>
       </section>
@@ -326,13 +327,15 @@ const summitPt = pct(SX, SY);
           hear it!</p>
         </div>
         <ul class="checkin" role="list" data-checkin>
-          {checkin.map(({ emoji, label }) => (
+          {checkin.map(({ icon, emoji, label }) => (
             <li>
               <label class="check-chip">
                 <input type="checkbox" data-check={label}
                        aria-label={`Today I ${label.toLowerCase()}`} />
                 <span class="coin">
-                  <span class="chip-emoji" aria-hidden="true">{emoji}</span>
+                  <span class="chip-emoji" aria-hidden="true">
+                    {icon ? <Icon name={icon} size="2.8rem" /> : emoji}
+                  </span>
                 </span>
                 <span class="coin-label" aria-hidden="true">{label}</span>
               </label>
@@ -342,7 +345,8 @@ const summitPt = pct(SX, SY);
         <p class="checkin-cheer" data-checkin-cheer role="status" hidden>
           🎉 WOW! You showed grit today!
         </p>
-        <p class="streak" data-streak role="status" hidden></p>
+        <p class="streak" hidden data-streak-line><Icon
+          name="action-mountain-streak" /> <span data-streak role="status"></span></p>
         <p class="privacy">This stays right here on your device — only you can
         see it. Nothing is ever sent anywhere.</p>
       </section>
@@ -638,6 +642,7 @@ const summitPt = pct(SX, SY);
     const boxes = [...checkinList.querySelectorAll<HTMLInputElement>('input')];
     const cheer = document.querySelector<HTMLElement>('[data-checkin-cheer]')!;
     const streakEl = document.querySelector<HTMLElement>('[data-streak]')!;
+    const streakLine = document.querySelector<HTMLElement>('[data-streak-line]')!;
     const KEY = 'gg-grit-checkin';
     const today = new Date().toLocaleDateString('en-CA'); /* YYYY-MM-DD, local */
 
@@ -666,8 +671,8 @@ const summitPt = pct(SX, SY);
       state.checked = checked;
       write(state);
       if ((state.days ?? 0) >= 2) {
-        streakEl.hidden = false;
-        streakEl.textContent = `⛰️ You've shown grit on ${state.days} different days. Amazing!`;
+        streakLine.hidden = false;
+        streakEl.textContent = `You've shown grit on ${state.days} different days. Amazing!`;
       }
     };
 

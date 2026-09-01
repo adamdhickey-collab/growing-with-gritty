@@ -314,10 +314,28 @@ content:
         type: string
         required: true
         description: 'Like "Take 5 slow breaths".'
+      - name: icon
+        label: Icon
+        type: select
+        description: >-
+          One of Kim's drawn icons. Leave blank to use the emoji below
+          instead.
+        options:
+          values:
+            - calm-five-senses
+            - calm-flower-candle
+            - calm-movement
+            - calm-water
+            - action-calm-break
+            - action-try-again
+            - action-ask-for-help
+            - badge-star
       - name: emoji
         label: Emoji
         type: string
-        description: One emoji for the card, like 🌬️.
+        description: >-
+          One emoji for the card, like 🌬️. Only used when no icon is picked
+          above.
       - name: steps
         label: The steps
         type: text

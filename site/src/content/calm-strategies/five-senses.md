@@ -1,6 +1,7 @@
 ---
 order: 3
 name: 5-4-3-2-1 senses
+icon: calm-five-senses
 emoji: 🖐️
 steps: |-
   Look around and find 5 things you can see.

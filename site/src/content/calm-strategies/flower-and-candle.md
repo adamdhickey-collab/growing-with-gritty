@@ -1,6 +1,7 @@
 ---
 order: 2
 name: Smell the flower, blow out the candle
+icon: calm-flower-candle
 emoji: 🌸
 steps: |-
   Hold up one finger. Pretend it's a flower.

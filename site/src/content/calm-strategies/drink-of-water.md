@@ -1,6 +1,7 @@
 ---
 order: 5
 name: Take a drink of water
+icon: calm-water
 emoji: 💧
 steps: |-
   Get a cup of cool water.

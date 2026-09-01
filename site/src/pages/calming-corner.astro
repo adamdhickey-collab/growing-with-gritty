@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Bubble from '../components/Bubble.astro';
+import Icon from '../components/Icon.astro';
 import { u } from '../lib/url';
 
 const strategies = (await getCollection('calm-strategies')).sort((a, b) => a.data.order - b.data.order);
@@ -9,12 +10,12 @@ const strategies = (await getCollection('calm-strategies')).sort((a, b) => a.dat
 /* The feeling picker is fixed vocabulary (from Kim's doc), not CMS content —
    each answer is Gritty naming the feeling as okay before offering calm. */
 const feelings = [
-  { emoji: '😡', label: 'Angry', response: "It's okay to feel angry. Anger means something felt unfair. Let's help your body cool down." },
-  { emoji: '😢', label: 'Sad', response: "It's okay to feel sad. Even goats have rainy days. Let's be extra gentle with ourselves." },
-  { emoji: '😟', label: 'Worried', response: "It's okay to feel worried. Worries get smaller after a slow breath. Want to try one together?" },
-  { emoji: '😩', label: 'Frustrated', response: "It's okay to feel frustrated. That means you're doing something HARD — and hard things take grit." },
-  { emoji: '😴', label: 'Tired', response: "It's okay to feel tired. Bodies and brains need rest to grow. Let's find a slow, quiet calm-down." },
-  { emoji: '😬', label: 'Nervous', response: "It's okay to feel nervous. Nervous and excited are almost the same wiggle! A slow breath helps both." },
+  { icon: 'feeling-angry', label: 'Angry', response: "It's okay to feel angry. Anger means something felt unfair. Let's help your body cool down." },
+  { icon: 'feeling-sad', label: 'Sad', response: "It's okay to feel sad. Even goats have rainy days. Let's be extra gentle with ourselves." },
+  { icon: 'feeling-worried', label: 'Worried', response: "It's okay to feel worried. Worries get smaller after a slow breath. Want to try one together?" },
+  { icon: 'feeling-frustrated', label: 'Frustrated', response: "It's okay to feel frustrated. That means you're doing something HARD — and hard things take grit." },
+  { icon: 'feeling-tired', label: 'Tired', response: "It's okay to feel tired. Bodies and brains need rest to grow. Let's find a slow, quiet calm-down." },
+  { icon: 'feeling-nervous', label: 'Nervous', response: "It's okay to feel nervous. Nervous and excited are almost the same wiggle! A slow breath helps both." },
 ];
 ---
 
@@ -25,7 +26,7 @@ const feelings = [
   <section class="band">
     <div class="wrap intro">
       <p class="eyebrow">Gritty's World</p>
-      <h1>The Calming Corner 🧘</h1>
+      <h1>The Calming Corner <Icon name="action-calm-break" /></h1>
       <Bubble tail={false}>
         "Big feelings happen to everyone. Let's help your body feel calm."
       </Bubble>
@@ -44,7 +45,7 @@ const feelings = [
             data-response={f.response}
             aria-pressed="false"
           >
-            <span class="feel-emoji" aria-hidden="true">{f.emoji}</span>
+            <Icon name={f.icon} size="2.6rem" />
             <span>{f.label}</span>
           </button>
         ))}
@@ -68,7 +69,9 @@ const feelings = [
         {strategies.map((s) => (
           <details class="strategy card">
             <summary>
-              <span class="strat-emoji" aria-hidden="true">{s.data.emoji ?? '🌿'}</span>
+              {s.data.icon
+                ? <Icon name={s.data.icon} size="2.1rem" />
+                : <span class="strat-emoji" aria-hidden="true">{s.data.emoji ?? '🌿'}</span>}
               <span class="strat-name">{s.data.name}</span>
               <span class="strat-chevron" aria-hidden="true">▾</span>
             </summary>
@@ -184,7 +187,6 @@ const feelings = [
   .feeling[aria-pressed='true'] {
     border-color: var(--gg-blue); background: color-mix(in srgb, var(--gg-sky) 45%, #fff);
   }
-  .feel-emoji { font-size: 1.9rem; }
 
   /* — strategies — */
   .strategies {

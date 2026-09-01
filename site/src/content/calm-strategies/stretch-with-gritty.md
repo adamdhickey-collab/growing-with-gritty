@@ -1,6 +1,7 @@
 ---
 order: 4
 name: Stretch with Gritty
+icon: action-calm-break
 emoji: 🧘
 steps: |-
   Reach your arms up as high as a treehouse.

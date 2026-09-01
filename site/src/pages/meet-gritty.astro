@@ -2,18 +2,19 @@
 import { getCollection, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Bubble from '../components/Bubble.astro';
+import Icon from '../components/Icon.astro';
 import { u } from '../lib/url';
 
 const characters = (await getCollection('characters')).sort((a, b) => a.data.order - b.data.order);
 const rendered = await Promise.all(characters.map(async (c) => ({ c, Content: (await render(c)).Content })));
 
-const gritIs = [
-  { emoji: '🧩', label: 'Trying something hard' },
-  { emoji: '🧗', label: 'Keeping going' },
+const gritIs: { icon?: string; emoji?: string; label: string }[] = [
+  { icon: 'action-hard-thing', label: 'Trying something hard' },
+  { icon: 'action-keep-going', label: 'Keeping going' },
   { emoji: '💡', label: 'Trying a new idea' },
-  { emoji: '🤝', label: 'Asking for help' },
-  { emoji: '🔄', label: 'Trying again' },
-  { emoji: '❤️', label: 'Believing in yourself' },
+  { icon: 'action-ask-for-help', label: 'Asking for help' },
+  { icon: 'action-try-again', label: 'Trying again' },
+  { icon: 'heart-believe', label: 'Believing in yourself' },
 ];
 ---
 
@@ -45,9 +46,11 @@ const gritIs = [
       <h2>What is grit?</h2>
       <p class="note">Grit can look like a lot of things. All of these count!</p>
       <ul class="grit-grid" role="list">
-        {gritIs.map(({ emoji, label }) => (
+        {gritIs.map(({ icon, emoji, label }) => (
           <li class="grit-item card">
-            <span class="grit-emoji" aria-hidden="true">{emoji}</span>
+            <span class="grit-emoji" aria-hidden="true">
+              {icon ? <Icon name={icon} size="2.7rem" /> : emoji}
+            </span>
             <span>{label}</span>
           </li>
         ))}

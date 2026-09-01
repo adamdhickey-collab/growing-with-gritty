@@ -1,0 +1,44 @@
+---
+/* A drawn icon from public/images/icons — Kim's marker-doodle set, the
+ * replacement for the system emoji the site used to render inline.
+ *
+ * Decorative by design: the word beside it always carries the meaning, so
+ * the image stays alt="" and aria-hidden, same contract as Stamp's disc.
+ * Sized in em (like IconCart) so it scales with whatever text it sits next
+ * to, instead of needing a pixel size at every call site.
+ *
+ * The art is ink-on-transparent, so it needs a light ground — paper, a card,
+ * a ghost button. On a solid blue or gold button the outline goes muddy, and
+ * those spots still use emoji. ICONS.md §4 tracks what is still to draw.
+ */
+import { u } from '../lib/url';
+
+interface Props {
+  name: string;
+  /* any CSS length; em keeps it tied to the surrounding type */
+  size?: string;
+  class?: string;
+}
+const { name, size = '1.15em', class: cls } = Astro.props;
+---
+
+<img
+  class:list={['gg-icon', cls]}
+  src={u(`/images/icons/${name}.webp`)}
+  alt=""
+  aria-hidden="true"
+  width="256"
+  height="256"
+  loading="lazy"
+  decoding="async"
+  style={`--icon-size:${size}`}
+/>
+
+<style>
+  .gg-icon {
+    width: var(--icon-size, 1.15em);
+    height: var(--icon-size, 1.15em);
+    flex: none; /* its own flex item, so a button's gap actually separates it */
+    object-fit: contain;
+  }
+</style>
