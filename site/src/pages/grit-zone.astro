@@ -21,65 +21,58 @@ const checkin = [
   { emoji: '⭐', label: 'Believed in myself' },
 ];
 
-/* ——— The Grit Trail: board-game geometry ———
-   The scenarios stop being a stack of cards and become stops on a path up
-   the mountain (the same mountain the streak line and ⛰️ icon already use).
-   One challenge on screen at a time; the map is the progress display, so
-   there is no "3 of 15" counter anywhere (V3-CRAFT: the map shows the
-   journey, numbers read as a contract). Geometry is computed from however
-   many scenarios Kim has written — she can add a 16th and the trail simply
-   grows another switchback. */
-const PER_ROW = 4;
-const N = scenarios.length;
-const rows = Math.ceil(N / PER_ROW);
-const W = 800;
-const ROW_GAP = 150;
-const TURN_R = ROW_GAP / 2;
-const X_MIN = 170;
-const X_MAX = 630;
-const TOP_ROW_Y = 320;   /* air above for the summit */
-const BOTTOM_AIR = 120;  /* room below for the trailhead */
-const H = TOP_ROW_Y + (rows - 1) * ROW_GAP + BOTTOM_AIR;
-const rowY = (r: number) => H - BOTTOM_AIR - r * ROW_GAP;
-const slotX = (k: number) => X_MIN + (k * (X_MAX - X_MIN)) / (PER_ROW - 1);
+/* ——— The Grit Trail: the board is Kim's trailhead painting ———
+   The scenarios stop being a stack of cards and become stops on the trail
+   in the painting — the same scene that welcomes kids at the top of the
+   page. One challenge on screen at a time; the map is the progress
+   display, so there is no "3 of 15" counter anywhere (V3-CRAFT: the map
+   shows the journey, numbers read as a contract). The painted path's
+   centerline is traced below in pixels of the 1536 × 1024 painting;
+   however many scenarios Kim writes get spaced evenly along it — a 16th
+   just draws the pebbles a little closer together. */
+const IMG_W = 1536;
+const IMG_H = 1024;
+const TRAIL_PTS: [number, number][] = [
+  [882, 952], [890, 900], [990, 830], [1105, 765], [1010, 700],
+  [860, 645], [770, 600], [845, 550], [975, 510], [1035, 475],
+  [955, 435], [895, 405], [912, 360], [935, 315], [918, 270],
+  [938, 225], [930, 195],
+];
 
-const stops = scenarios.map((s, i) => {
-  const r = Math.floor(i / PER_ROW);
-  const k = i % PER_ROW;
-  const x = r % 2 === 0 ? slotX(k) : slotX(PER_ROW - 1 - k);
-  return { id: s.id, x, y: rowY(r) };
-});
-
-/* the flag on the peak */
-const SX = 360;
-const SY = 190;
-
-/* The path: a switchback trail — straight rows joined by half-circle turns,
-   then a final climb curve to the flag. Drawn once, walked many times. */
-let trailD = `M 64 ${H - 26} Q 90 ${rowY(0) + 26} ${X_MIN - 6} ${rowY(0)}`;
-for (let r = 0; r < rows; r++) {
-  const yr = rowY(r);
-  const goingRight = r % 2 === 0;
-  if (r < rows - 1) {
-    const turnX = goingRight ? X_MAX + 12 : X_MIN - 12;
-    trailD += ` L ${turnX} ${yr}`
-      + ` A ${TURN_R} ${TURN_R} 0 0 ${goingRight ? 0 : 1} ${turnX} ${yr - ROW_GAP}`;
-  } else {
-    const end = stops[N - 1];
-    trailD += ` L ${end.x} ${yr}`;
-    trailD += goingRight
-      ? ` C ${end.x + 110} ${yr - 30} ${SX + 150} ${SY + 60} ${SX} ${SY + 6}`
-      : ` C ${end.x - 110} ${yr - 30} ${SX - 150} ${SY + 60} ${SX} ${SY + 6}`;
-  }
+/* walk the traced centerline: cumulative length, then a point at any
+   fraction of the climb */
+const lens: number[] = [0];
+for (let i = 1; i < TRAIL_PTS.length; i++) {
+  const [ax, ay] = TRAIL_PTS[i - 1];
+  const [bx, by] = TRAIL_PTS[i];
+  lens.push(lens[i - 1] + Math.hypot(bx - ax, by - ay));
+}
+const TOTAL = lens[lens.length - 1];
+function pointAt(t: number): [number, number] {
+  const d = t * TOTAL;
+  let i = 1;
+  while (i < lens.length - 1 && lens[i] < d) i++;
+  const f = (d - lens[i - 1]) / (lens[i] - lens[i - 1]);
+  const [ax, ay] = TRAIL_PTS[i - 1];
+  const [bx, by] = TRAIL_PTS[i];
+  return [ax + (bx - ax) * f, ay + (by - ay) * f];
 }
 
-/* percent coordinates so HTML stop buttons overlay the SVG at any width */
+const N = scenarios.length;
+const stops = scenarios.map((s, i) => {
+  const [x, y] = pointAt(N === 1 ? 0 : i / (N - 1));
+  return { id: s.id, x, y };
+});
+
+/* percent coordinates so the HTML stop buttons overlay the painting at
+   any width; the summit is the walker's finale perch on the snow cap,
+   just past the last stop */
 const pct = (x: number, y: number) => ({
-  x: ((x / W) * 100).toFixed(2),
-  y: ((y / H) * 100).toFixed(2),
+  x: ((x / IMG_W) * 100).toFixed(2),
+  y: ((y / IMG_H) * 100).toFixed(2),
 });
 const stopPts = stops.map((s) => ({ id: s.id, ...pct(s.x, s.y) }));
-const summitPt = pct(SX, SY);
+const summitPt = pct(930, 150);
 ---
 
 <Base
@@ -161,48 +154,16 @@ const summitPt = pct(SX, SY);
         </div>
 
         <div class="trail" data-trail data-sx={summitPt.x} data-sy={summitPt.y} hidden>
-          <div class="trail-scene" style={`aspect-ratio: ${W} / ${H};`}>
-            <svg class="trail-art" viewBox={`0 0 ${W} ${H}`} aria-hidden="true"
-                 preserveAspectRatio="xMidYMid meet">
-              <defs>
-                <linearGradient id="gz-sky" x1="0" y1="0" x2="0" y2="1">
-                  <stop class="sky-top" offset="0" />
-                  <stop class="sky-low" offset="1" />
-                </linearGradient>
-              </defs>
-              <rect class="sky" x="0" y="0" width={W} height={H} fill="url(#gz-sky)" rx="22" />
-              <circle class="sun-core" cx={W - 116} cy="112" r="56" />
-              <circle class="sun" cx={W - 116} cy="112" r="42" />
-              <g class="cloud">
-                <ellipse cx="130" cy="120" rx="58" ry="24" />
-                <ellipse cx="172" cy="104" rx="40" ry="20" />
-              </g>
-              <g class="cloud c2">
-                <ellipse cx="540" cy="82" rx="48" ry="20" />
-                <ellipse cx="500" cy="70" rx="30" ry="15" />
-              </g>
-              {/* the range: shoulder hills left and right keep the upper
-                  switchbacks on green, the main peak carries the flag */}
-              <path class="hill-back" d={`M -40 ${H} Q 20 ${rowY(rows - 2) + 60} 85 ${rowY(rows - 2) + 20} Q 150 ${rowY(rows - 2) - 90} 220 ${rowY(rows - 2) + 30} Q 300 ${H - 170} 440 ${H} Z`} />
-              <path class="hill-back" d={`M 250 ${H} Q 440 ${H - 190} 525 ${rowY(rows - 1) + 70} Q 615 ${rowY(rows - 1) - 100} 705 ${rowY(rows - 1) + 50} Q 770 ${H - 170} ${W + 40} ${H} Z`} />
-              <path class="mountain" d={`M -40 ${H + 40} C ${W * 0.14} ${H - 280} ${SX - 200} ${SY + 170} ${SX - 10} ${SY - 60} C ${SX + 160} ${SY + 130} ${W * 0.82} ${H - 260} ${W + 40} ${H + 40} Z`} />
-              <path class="snow" d={`M ${SX - 68} ${SY + 26} C ${SX - 40} ${SY - 18} ${SX - 24} ${SY - 52} ${SX - 10} ${SY - 60} C ${SX + 4} ${SY - 44} ${SX + 34} ${SY - 16} ${SX + 62} ${SY + 30} C ${SX + 30} ${SY + 52} ${SX - 34} ${SY + 50} ${SX - 68} ${SY + 26} Z`} />
-              <path class="meadow" d={`M -40 ${H - 130} C 200 ${H - 172} 560 ${H - 96} ${W + 40} ${H - 150} L ${W + 40} ${H} L -40 ${H} Z`} />
-              {/* the trail: a cream path with gold stitches */}
-              <path class="trail-under" d={trailD} />
-              <path class="trail-stitch" d={trailD} />
-              {/* the summit flag */}
-              <g class="flag">
-                <line x1={SX} y1={SY + 8} x2={SX} y2={SY - 58} />
-                <path d={`M ${SX} ${SY - 58} L ${SX + 52} ${SY - 44} L ${SX} ${SY - 30} Z`} />
-              </g>
-              {/* a few daisies in the front grass */}
-              <g class="daisy" transform={`translate(96 ${H - 60})`}><circle r="9" /><circle class="mid" r="3.6" /></g>
-              <g class="daisy" transform={`translate(710 ${H - 74})`}><circle r="8" /><circle class="mid" r="3.2" /></g>
-              <g class="daisy" transform={`translate(410 ${H - 42})`}><circle r="7" /><circle class="mid" r="3" /></g>
-            </svg>
+          {/* Kim's painting is the board. The crop wrapper lets narrow
+              screens zoom in on the mountain: the scene keeps its full 3:2
+              geometry (so the stops' percentages stay true) and simply
+              overflows the sides. */}
+          <div class="trail-crop">
+          <div class="trail-scene">
+            <img class="trail-art" src={u("/images/scenery/grit-trailhead.webp")}
+                 alt="" width="1400" height="933" />
 
-            {/* The stops are real buttons overlaying the drawing, so little
+            {/* The stops are real buttons overlaying the painting, so little
                 fingers get true 48px targets and screen readers get words. */}
             {stopPts.map((s, i) => (
               <button type="button" class="stop" data-stop data-id={s.id}
@@ -218,6 +179,7 @@ const summitPt = pct(SX, SY);
               <img src={u('/images/gritty/gritty-face.webp')} alt=""
                    width="52" height="52" />
             </div>
+          </div>
           </div>
 
           <button type="button" class="btn btn-gold trail-play" data-play>
@@ -750,34 +712,22 @@ const summitPt = pct(SX, SY);
 
   /* — the trail map — */
   .trail { display: grid; justify-items: center; gap: 18px; }
-  .trail-scene {
-    position: relative; width: min(100%, 620px);
+  /* The board is the painting. The crop wrapper is the window: full 3:2 on
+     wide screens; on narrow ones the scene grows past the sides so the
+     mountain — where the trail lives (x 25%–80% of the painting) — fills
+     the window at a size fingers can still hit. Stops keep percentages of
+     the full painting either way. */
+  .trail-crop {
+    width: min(100%, 620px); overflow: hidden;
     border-radius: var(--gg-radius);
     box-shadow: var(--gg-shadow);
   }
+  .trail-scene { position: relative; }
   .trail-art { display: block; width: 100%; height: auto; }
-  .sky-top { stop-color: var(--gg-sky-high); }
-  .sky-low { stop-color: var(--gg-sky-low); }
-  .sun { fill: var(--gg-sun); }
-  .sun-core { fill: var(--gg-sun-core); opacity: 0.55; }
-  .cloud ellipse { fill: #fff; opacity: 0.92; }
-  .hill-back { fill: var(--gg-hill-back); }
-  .mountain { fill: var(--gg-hill-mid); }
-  .snow { fill: var(--gg-paper); opacity: 0.9; }
-  .meadow { fill: var(--gg-meadow); }
-  .trail-under {
-    fill: none; stroke: var(--gg-paper); stroke-width: 24;
-    stroke-linecap: round; stroke-linejoin: round; opacity: 0.92;
+  @media (max-width: 560px) {
+    .trail-crop { aspect-ratio: 33 / 40; }
+    .trail-scene { width: 181.8%; margin-left: -45.45%; }
   }
-  .trail-stitch {
-    fill: none; stroke: var(--gg-gold-ink); stroke-width: 4.5;
-    stroke-linecap: round; stroke-linejoin: round;
-    stroke-dasharray: 1 26; opacity: 0.5;
-  }
-  .flag line { stroke: var(--gg-ink); stroke-width: 5; stroke-linecap: round; }
-  .flag path { fill: var(--gg-gold); stroke: var(--gg-ink); stroke-width: 3; stroke-linejoin: round; }
-  .daisy circle { fill: #fff; }
-  .daisy .mid { fill: var(--gg-sun); }
 
   /* the stops: pebbles ahead, a glow where Gritty waits, stars that stay */
   .stop {
