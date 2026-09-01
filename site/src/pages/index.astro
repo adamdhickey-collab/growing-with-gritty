@@ -92,7 +92,7 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
     </div>
   </section>
 
-  <section class="band">
+  <section class="band band-grown">
     <div class="wrap grown-cta card">
       <div>
         <p class="eyebrow">For parents &amp; teachers</p>
@@ -186,6 +186,15 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
   .world-card p { color: var(--gg-ink-soft); }
 
   .world-more { margin-top: 26px; color: var(--gg-ink-soft); }
+
+  /* ── the grown-ups band: the page's third ground. Sky belongs to the
+     books above and gold to the welcome, and another sheet of paper-deep
+     would read as the same tan the whole page already sits on — so this
+     one is a Meadow Green wash, the growing color, mixed light enough
+     that the white card still lifts off it. ── */
+  .band-grown {
+    background: color-mix(in srgb, var(--gg-green) 22%, var(--gg-paper));
+  }
 
   .grown-cta {
     display: flex; flex-wrap: wrap; align-items: center; gap: 20px 40px;
