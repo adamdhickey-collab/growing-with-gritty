@@ -97,18 +97,14 @@ const summitPt = pct(SX, SY);
         </Bubble>
       </div>
 
-      {/* Art spot: Kim's trailhead painting drops in here at exactly this
-          shape (3:2 — a 1536×1024 image fits with no cropping). The sign in
-          the scene stays blank; the site overlays the words, same as the
-          Erin School sign in the hero. The copy button is for the grown-up
-          building the site, so it whispers. */}
-      <div class="art-spot" data-art-spot>
-        <span class="art-emoji" aria-hidden="true">🎨</span>
-        <p class="art-note">Kim's trailhead painting goes here</p>
-        <p class="art-size">shows at 3:2 — generate at 1536 × 1024</p>
-        <button type="button" class="art-copy" data-copy-prompt>
-          Copy the full art prompt
-        </button>
+      {/* Kim's trailhead painting. The arrow sign in the scene is blank on
+          purpose — the site prints the words on it, same as the Erin School
+          sign in the hero, so a rename never needs new art. */}
+      <div class="trailhead">
+        <img src={u("/images/scenery/grit-trailhead.webp")}
+             alt="Gritty the Goat, backpack on, standing at a trail sign where a winding path climbs to a flag on the mountaintop."
+             width="1400" height="933" />
+        <span class="trailhead-sign" aria-hidden="true">Grit Trail</span>
       </div>
     </div>
   </section>
@@ -682,38 +678,6 @@ const summitPt = pct(SX, SY);
     refresh();
   }
 
-  /* ——— the art spot: one click puts the whole prompt on the clipboard ——— */
-  const copyBtn = document.querySelector<HTMLButtonElement>('[data-copy-prompt]');
-  if (copyBtn) {
-    const ART_PROMPT = `Children's picture-book illustration for "Growing with Gritty" (the world of teacher-author-illustrator Kim Rekowski). Style: soft watercolor washes with confident, slightly wobbly black ink outlines and flat colored-pencil / marker fills that show a little grain — warm, friendly, hand-made. No gradients-as-gloss, no 3D, no drop shadows, no photo textures, no vector-flat corporate look.
-
-Scene: at the bottom left, Gritty the Goat stands at the start of a winding dirt trail, looking up at the mountain, happy and determined. Gritty is a small white goat drawn exactly like this: round white face and body, big oval eyes with black pupils, small rounded black nose, gentle smile, long floppy brown ears with pink inner lining, two short candy-striped gold-and-cream horns, shaggy brown beard under the chin, brown hooves, small fluffy white tail — and he wears his little brown backpack. Beside him stands a wooden arrow-shaped trail sign on a post; leave the sign board completely BLANK (the website prints the words on it later).
-
-The dirt trail winds upward in S-curves across a big, friendly, rounded green mountain that fills the middle of the picture, with little daisies and pink flowers along the edges, a few grey pebbles, and a small wooden fence at the bottom. At the very top of the mountain: a small snow cap and a gold flag on a pole. Sky: soft watercolor blue with puffy ink-outlined white clouds, a smiling yellow sun in the upper right, and one or two tiny butterflies.
-
-Palette — use only these: sky blues #A7CBE3 and #BDD7E7, meadow greens #B9CFA4, #97BA80, #6E9A5C, #7FA86B, path tan #B98A55, gold #D9A93F, sun #F2D48A with bright center #F7E1A8, warm cream #FAF6EC, ink outline #2A3238, pink accent #E8A0A8, goat brown #B98A55.
-
-Format: landscape, 1536 × 1024 pixels, full-bleed scene with no border, no frame, no watermark, and no text or letters anywhere in the image (the wooden sign stays blank).`;
-
-    const label = copyBtn.textContent;
-    copyBtn.addEventListener('click', async () => {
-      let ok = true;
-      try { await navigator.clipboard.writeText(ART_PROMPT); }
-      catch {
-        /* older browsers: a briefly-selected textarea does the same job */
-        try {
-          const t = document.createElement('textarea');
-          t.value = ART_PROMPT;
-          document.body.appendChild(t);
-          t.select();
-          ok = document.execCommand('copy');
-          t.remove();
-        } catch { ok = false; }
-      }
-      copyBtn.textContent = ok ? '✓ Copied — paste into ChatGPT' : 'Copy failed — try again';
-      setTimeout(() => { copyBtn.textContent = label; }, 2400);
-    });
-  }
 </script>
 
 <style>
@@ -736,31 +700,21 @@ Format: landscape, 1536 × 1024 pixels, full-bleed scene with no border, no fram
   .yet-machine[hidden], .yet-list[hidden], .yet-word[hidden],
   .ask-btn[hidden], .btn[hidden] { display: none; }
 
-  /* The art spot: sized exactly like the finished painting (3:2), so the
-     day Kim's trailhead scene exists it drops in with zero layout shift. */
-  .art-spot {
-    aspect-ratio: 3 / 2; width: 100%;
-    border: 3px dashed color-mix(in srgb, var(--gg-gold) 65%, transparent);
-    border-radius: var(--gg-radius);
-    background: linear-gradient(180deg,
-      color-mix(in srgb, var(--gg-sky) 55%, #fff) 0%,
-      color-mix(in srgb, var(--gg-sky-low) 70%, #fff) 55%,
-      color-mix(in srgb, var(--gg-hill-back) 60%, var(--gg-paper)) 100%);
-    display: grid; place-content: center; justify-items: center;
-    gap: 6px; padding: 20px; text-align: center;
+  /* The trailhead: Kim's painting at the exact 3:2 the spot always held.
+     The words sit on the blank sign board in percentages of the painting,
+     with cqw type so they hold at every width — the Erin School trick. */
+  .trailhead { position: relative; container-type: inline-size; }
+  .trailhead img {
+    display: block; width: 100%; height: auto;
+    border-radius: var(--gg-radius); box-shadow: var(--gg-shadow);
   }
-  .art-emoji { font-size: 2.1rem; }
-  .art-note { font-family: var(--gg-display); font-weight: 600; color: var(--gg-blue-deep); }
-  .art-size { font-size: var(--gg-text-small); color: var(--gg-ink-soft); }
-  .art-copy {
-    margin-top: 8px; min-height: var(--gg-tap); padding: 8px 18px;
-    background: #fff; color: var(--gg-blue);
-    border: 2.5px solid var(--gg-blue); border-radius: 999px;
-    font-family: var(--gg-display); font-weight: 600; font-size: 0.95rem;
-    cursor: pointer; transition: background 0.15s ease, transform 0.15s ease;
+  .trailhead-sign {
+    position: absolute; left: 38.5%; top: 65.8%; translate: -50% -50%;
+    rotate: -3deg; /* the painted board tips up toward the trail */
+    font-family: var(--gg-display); font-weight: 600;
+    font-size: 3.1cqw; line-height: 1; letter-spacing: 0.02em;
+    color: #fff; white-space: nowrap;
   }
-  .art-copy:hover { background: color-mix(in srgb, var(--gg-sky) 40%, #fff); transform: translateY(-1px); }
-  .art-copy:active { transform: scale(0.97); }
 
   /* — the arcade: three big game buttons, one stage — */
   .arcade { padding-block: 44px 64px; }
