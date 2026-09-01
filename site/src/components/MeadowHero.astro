@@ -109,7 +109,7 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
            width="640" height="777" fetchpriority="high" />
     </button>
     <p class="tap-hint" data-hint>
-      <span data-hint-text>Tap Gritty to say hello!</span>
+      <span data-hint-text>Tap Gritty to say hi!</span>
       <svg class="hint-arrow" viewBox="0 0 110 70" aria-hidden="true">
         {/* drawn twice: ink underneath, gold on top — a crayon arrow with
             an outline, pointing at the goat */}
@@ -322,13 +322,13 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     position: relative; z-index: 8;
     display: grid; justify-items: center; gap: 0;
     font-family: var(--gg-display); font-weight: 600;
-    font-size: 1.15rem; color: var(--gg-blue-deep);
+    font-size: 1rem; color: var(--gg-blue-deep);
     text-shadow: 0 0 6px var(--gg-paper), 0 0 12px var(--gg-paper),
                  0 2px 0 rgba(255, 255, 255, 0.8);
     rotate: -3deg;
     transition: opacity 300ms ease;
   }
-  .hint-arrow { width: 92px; height: auto; margin-top: -2px; }
+  .hint-arrow { width: 76px; height: auto; margin-top: -2px; }
   .hint-arrow .shaft-ink {
     fill: none; stroke: var(--gg-ink); stroke-width: 13; stroke-linecap: round;
   }

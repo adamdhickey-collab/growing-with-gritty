@@ -21,7 +21,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <a class="wordmark" href={u("/")}>
       <img src={u("/icon.png")} alt="" width="58" height="58" />
       <span class="wordmark-text">
-        <span class="site-name">Growing <em>with</em> <span class="tail">Gritty</span></span>
+        <span class="site-name">Growing<em>with</em>Gritty</span>
         <span class="site-motto">Build Grit. Grow Strong. Never Quit!</span>
       </span>
     </a>
@@ -51,19 +51,18 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     color: var(--gg-blue); text-decoration: none; min-height: var(--gg-tap);
   }
   .wordmark img { width: 116px; height: 116px; object-fit: contain; }
-  /* the name reads as one word with the lightest breath between parts,
-     and "Gritty" leans in a touch closer still */
-  .wordmark-text { display: grid; gap: 2px; line-height: 1.1; word-spacing: -0.22em; }
-  .site-name .tail { margin-left: -0.09em; }
+  /* one word, one size, one weight — the colours alone tell the parts */
+  .wordmark-text { display: grid; gap: 2px; line-height: 1.1; }
   .wordmark em {
-    font-style: normal; font-weight: 500; font-size: 0.72em;
+    font-style: normal; font-weight: inherit; font-size: inherit;
     color: var(--gg-green-ink);
   }
   /* the motto rides under the name — the site introduces itself in full */
+  /* dressed exactly like a nav label, so the header speaks one language */
   .site-motto {
     font-family: var(--gg-display); font-weight: 600;
-    font-size: 0.95rem; letter-spacing: 0.04em; word-spacing: 0;
-    color: var(--gg-green-ink);
+    font-size: 0.8rem; line-height: 1.1;
+    color: var(--gg-blue-deep);
   }
 
   nav { display: flex; flex-wrap: wrap; gap: 2px; margin-left: auto; }
@@ -94,7 +93,6 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     .bar { justify-content: center; }
     .wordmark { font-size: 1.45rem; gap: 5px; }
     .wordmark img { width: 84px; height: 84px; }
-    .site-motto { font-size: 0.8rem; }
     nav { margin-left: 0; justify-content: center; }
     nav a { min-width: 68px; font-size: 0.75rem; }
     nav a img { width: 38px; height: 38px; }
