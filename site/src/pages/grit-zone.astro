@@ -8,7 +8,8 @@ const scenarios = (await getCollection('scenarios')).sort((a, b) => a.data.order
 const yets = (await getCollection('yet-sentences')).sort((a, b) => a.data.order - b.data.order);
 
 /* The private "How did YOU have grit today?" checklist. Fixed list, not CMS:
-   it mirrors the "what is grit" vocabulary used across the site. */
+   it mirrors the "what is grit" vocabulary used across the site. The label
+   strings are also the localStorage keys — changing one orphans saved days. */
 const checkin = [
   { emoji: '🔁', label: 'Kept trying' },
   { emoji: '✨', label: 'Tried something new' },
@@ -19,150 +20,336 @@ const checkin = [
   { emoji: '💛', label: 'Was kind' },
   { emoji: '⭐', label: 'Believed in myself' },
 ];
+
+/* ——— The Grit Trail: board-game geometry ———
+   The scenarios stop being a stack of cards and become stops on a path up
+   the mountain (the same mountain the streak line and ⛰️ icon already use).
+   One challenge on screen at a time; the map is the progress display, so
+   there is no "3 of 15" counter anywhere (V3-CRAFT: the map shows the
+   journey, numbers read as a contract). Geometry is computed from however
+   many scenarios Kim has written — she can add a 16th and the trail simply
+   grows another switchback. */
+const PER_ROW = 4;
+const N = scenarios.length;
+const rows = Math.ceil(N / PER_ROW);
+const W = 800;
+const ROW_GAP = 150;
+const TURN_R = ROW_GAP / 2;
+const X_MIN = 170;
+const X_MAX = 630;
+const TOP_ROW_Y = 320;   /* air above for the summit */
+const BOTTOM_AIR = 120;  /* room below for the trailhead */
+const H = TOP_ROW_Y + (rows - 1) * ROW_GAP + BOTTOM_AIR;
+const rowY = (r: number) => H - BOTTOM_AIR - r * ROW_GAP;
+const slotX = (k: number) => X_MIN + (k * (X_MAX - X_MIN)) / (PER_ROW - 1);
+
+const stops = scenarios.map((s, i) => {
+  const r = Math.floor(i / PER_ROW);
+  const k = i % PER_ROW;
+  const x = r % 2 === 0 ? slotX(k) : slotX(PER_ROW - 1 - k);
+  return { id: s.id, x, y: rowY(r) };
+});
+
+/* the flag on the peak */
+const SX = 360;
+const SY = 190;
+
+/* The path: a switchback trail — straight rows joined by half-circle turns,
+   then a final climb curve to the flag. Drawn once, walked many times. */
+let trailD = `M 64 ${H - 26} Q 90 ${rowY(0) + 26} ${X_MIN - 6} ${rowY(0)}`;
+for (let r = 0; r < rows; r++) {
+  const yr = rowY(r);
+  const goingRight = r % 2 === 0;
+  if (r < rows - 1) {
+    const turnX = goingRight ? X_MAX + 12 : X_MIN - 12;
+    trailD += ` L ${turnX} ${yr}`
+      + ` A ${TURN_R} ${TURN_R} 0 0 ${goingRight ? 0 : 1} ${turnX} ${yr - ROW_GAP}`;
+  } else {
+    const end = stops[N - 1];
+    trailD += ` L ${end.x} ${yr}`;
+    trailD += goingRight
+      ? ` C ${end.x + 110} ${yr - 30} ${SX + 150} ${SY + 60} ${SX} ${SY + 6}`
+      : ` C ${end.x - 110} ${yr - 30} ${SX - 150} ${SY + 60} ${SX} ${SY + 6}`;
+  }
+}
+
+/* percent coordinates so HTML stop buttons overlay the SVG at any width */
+const pct = (x: number, y: number) => ({
+  x: ((x / W) * 100).toFixed(2),
+  y: ((y / H) * 100).toFixed(2),
+});
+const stopPts = stops.map((s) => ({ id: s.id, ...pct(s.x, s.y) }));
+const summitPt = pct(SX, SY);
 ---
 
 <Base
   title="The Grit Zone — Growing with Gritty"
-  description="Help Gritty the Goat choose what grit looks like, feel the Power of YET, and tell Gritty how you showed grit today — right on your own device."
+  description="Climb the Grit Trail with Gritty the Goat, feel the Power of YET, and tell Gritty how you showed grit today — right on your own device."
 >
   <section class="band">
     <div class="wrap intro">
-      <p class="eyebrow">Gritty's World</p>
-      <h1>The Grit Zone 💪</h1>
-      <Bubble tail={false}>
-        "Sometimes I'm not sure what to do. Can you help me? Let's practice
-        grit together!"
-      </Bubble>
+      <div class="intro-copy">
+        <p class="eyebrow">Gritty's World</p>
+        <h1>The Grit Zone 💪</h1>
+        <Bubble tail={false}>
+          "Welcome to the Grit Zone! Pick a game — let's practice grit
+          together."
+        </Bubble>
+      </div>
+
+      {/* Art spot: Kim's trailhead painting drops in here at exactly this
+          shape (3:2 — a 1536×1024 image fits with no cropping). The sign in
+          the scene stays blank; the site overlays the words, same as the
+          Erin School sign in the hero. The copy button is for the grown-up
+          building the site, so it whispers. */}
+      <div class="art-spot" data-art-spot>
+        <span class="art-emoji" aria-hidden="true">🎨</span>
+        <p class="art-note">Kim's trailhead painting goes here</p>
+        <p class="art-size">shows at 3:2 — generate at 1536 × 1024</p>
+        <button type="button" class="art-copy" data-copy-prompt>
+          Copy the full art prompt
+        </button>
+      </div>
     </div>
   </section>
 
-  <section class="band band-sky" aria-labelledby="quiz-h">
+  <section class="band band-sky arcade" aria-labelledby="zone-h">
     <div class="wrap">
-      <h2 id="quiz-h">Can you help Gritty?</h2>
-      <p class="note">Pick what a goat with grit would do. There are no
-      points and no timers — just you and Gritty, figuring it out.</p>
+      <h2 id="zone-h" class="visually-hidden">Pick a game</h2>
 
       <noscript>
         <p class="note"><strong>Psst:</strong> the ⭐ shows the grit choice!</p>
         <style is:inline>
+          /* Without JS the games unfold as honest sections: tabs and the
+             trail map (both JS machines) step aside, every scenario shows
+             with its star marked, and the panels all appear. */
+          .gz-tabs { display: none; }
+          .gz-panel[hidden] { display: block; }
+          [data-quiz] .scenario { display: grid !important; }
           .scenario[data-answer='a'] .choice[data-key='a']::after,
           .scenario[data-answer='b'] .choice[data-key='b']::after,
           .scenario[data-answer='c'] .choice[data-key='c']::after { content: ' ⭐'; }
           .scenario [data-cheer][hidden] { display: grid; }
-          /* nothing to press, so Gritty's idea is simply already said */
           .scenario [data-ask] { display: none; }
           .scenario [data-ask-said][hidden] { display: block; }
+          .scenario [data-flee] { display: none; }
         </style>
       </noscript>
 
-      <div class="quiz" data-quiz>
-        <p class="progress" data-progress hidden></p>
-        {scenarios.map((s, i) => (
-          <article class="scenario card" data-scenario data-answer={s.data.answer}>
-            <h3 class="situation">
-              <span class="q-num" aria-hidden="true">{i + 1}</span>
-              {s.data.situation}
-            </h3>
-            <div class="choices" role="group" aria-label="What should Gritty do?">
-              {([['a', s.data.choiceA], ['b', s.data.choiceB], ['c', s.data.choiceC]] as const).map(([key, text]) => (
-                <button type="button" class="choice" data-key={key}>
-                  <b aria-hidden="true">{key.toUpperCase()}</b>
-                  <span>{text}</span>
-                </button>
-              ))}
+      <div class="gz-tabs" role="tablist" aria-label="Pick a game">
+        <button class="gz-tab" role="tab" id="tab-trail" aria-controls="panel-trail"
+                aria-selected="true" data-tab>
+          <span class="ico" aria-hidden="true">⛰️</span>
+          <span>The Grit Trail</span>
+        </button>
+        <button class="gz-tab" role="tab" id="tab-yet" aria-controls="panel-yet"
+                aria-selected="false" tabindex="-1" data-tab>
+          <span class="ico" aria-hidden="true">✨</span>
+          <span>Power of YET</span>
+        </button>
+        <button class="gz-tab" role="tab" id="tab-day" aria-controls="panel-day"
+                aria-selected="false" tabindex="-1" data-tab>
+          <span class="ico" aria-hidden="true">💛</span>
+          <span>My Grit Day</span>
+        </button>
+      </div>
+
+      {/* ————— Game 1: the Grit Trail ————— */}
+      <section class="gz-panel" id="panel-trail" role="tabpanel"
+               aria-labelledby="tab-trail" tabindex="0">
+        <div class="panel-head">
+          <h2>Can you help Gritty?</h2>
+          <p class="note">Tap the glowing stop and climb the trail with
+          Gritty — one challenge at a time. No points and no timers, just
+          you and a goat figuring it out.</p>
+        </div>
+
+        <div class="trail" data-trail data-sx={summitPt.x} data-sy={summitPt.y} hidden>
+          <div class="trail-scene" style={`aspect-ratio: ${W} / ${H};`}>
+            <svg class="trail-art" viewBox={`0 0 ${W} ${H}`} aria-hidden="true"
+                 preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <linearGradient id="gz-sky" x1="0" y1="0" x2="0" y2="1">
+                  <stop class="sky-top" offset="0" />
+                  <stop class="sky-low" offset="1" />
+                </linearGradient>
+              </defs>
+              <rect class="sky" x="0" y="0" width={W} height={H} fill="url(#gz-sky)" rx="22" />
+              <circle class="sun-core" cx={W - 116} cy="112" r="56" />
+              <circle class="sun" cx={W - 116} cy="112" r="42" />
+              <g class="cloud">
+                <ellipse cx="130" cy="120" rx="58" ry="24" />
+                <ellipse cx="172" cy="104" rx="40" ry="20" />
+              </g>
+              <g class="cloud c2">
+                <ellipse cx="540" cy="82" rx="48" ry="20" />
+                <ellipse cx="500" cy="70" rx="30" ry="15" />
+              </g>
+              {/* the range: shoulder hills left and right keep the upper
+                  switchbacks on green, the main peak carries the flag */}
+              <path class="hill-back" d={`M -40 ${H} Q 20 ${rowY(rows - 2) + 60} 85 ${rowY(rows - 2) + 20} Q 150 ${rowY(rows - 2) - 90} 220 ${rowY(rows - 2) + 30} Q 300 ${H - 170} 440 ${H} Z`} />
+              <path class="hill-back" d={`M 250 ${H} Q 440 ${H - 190} 525 ${rowY(rows - 1) + 70} Q 615 ${rowY(rows - 1) - 100} 705 ${rowY(rows - 1) + 50} Q 770 ${H - 170} ${W + 40} ${H} Z`} />
+              <path class="mountain" d={`M -40 ${H + 40} C ${W * 0.14} ${H - 280} ${SX - 200} ${SY + 170} ${SX - 10} ${SY - 60} C ${SX + 160} ${SY + 130} ${W * 0.82} ${H - 260} ${W + 40} ${H + 40} Z`} />
+              <path class="snow" d={`M ${SX - 68} ${SY + 26} C ${SX - 40} ${SY - 18} ${SX - 24} ${SY - 52} ${SX - 10} ${SY - 60} C ${SX + 4} ${SY - 44} ${SX + 34} ${SY - 16} ${SX + 62} ${SY + 30} C ${SX + 30} ${SY + 52} ${SX - 34} ${SY + 50} ${SX - 68} ${SY + 26} Z`} />
+              <path class="meadow" d={`M -40 ${H - 130} C 200 ${H - 172} 560 ${H - 96} ${W + 40} ${H - 150} L ${W + 40} ${H} L -40 ${H} Z`} />
+              {/* the trail: a cream path with gold stitches */}
+              <path class="trail-under" d={trailD} />
+              <path class="trail-stitch" d={trailD} />
+              {/* the summit flag */}
+              <g class="flag">
+                <line x1={SX} y1={SY + 8} x2={SX} y2={SY - 58} />
+                <path d={`M ${SX} ${SY - 58} L ${SX + 52} ${SY - 44} L ${SX} ${SY - 30} Z`} />
+              </g>
+              {/* a few daisies in the front grass */}
+              <g class="daisy" transform={`translate(96 ${H - 60})`}><circle r="9" /><circle class="mid" r="3.6" /></g>
+              <g class="daisy" transform={`translate(710 ${H - 74})`}><circle r="8" /><circle class="mid" r="3.2" /></g>
+              <g class="daisy" transform={`translate(410 ${H - 42})`}><circle r="7" /><circle class="mid" r="3" /></g>
+            </svg>
+
+            {/* The stops are real buttons overlaying the drawing, so little
+                fingers get true 48px targets and screen readers get words. */}
+            {stopPts.map((s, i) => (
+              <button type="button" class="stop" data-stop data-id={s.id}
+                      data-x={s.x} data-y={s.y}
+                      style={`left: ${s.x}%; top: ${s.y}%;`} disabled>
+                <span class="stop-num" aria-hidden="true">{i + 1}</span>
+                <span class="stop-star" aria-hidden="true">⭐</span>
+              </button>
+            ))}
+
+            {/* Gritty walks the map — progress you can watch, not count */}
+            <div class="walker" data-walker aria-hidden="true">
+              <img src={u('/images/gritty/gritty-face.webp')} alt=""
+                   width="52" height="52" />
             </div>
-            {s.data.hint && (
-              <div class="ask">
-                <button type="button" class="ask-btn" data-ask>
-                  <img src={u("/images/gritty/gritty-face.webp")} alt=""
-                       width="34" height="34" loading="lazy" />
-                  Ask Gritty for an idea
-                </button>
-                <p class="ask-said" data-ask-said role="status" hidden>
-                  "{s.data.hint}"
-                </p>
+          </div>
+
+          <button type="button" class="btn btn-gold trail-play" data-play>
+            ▶️ Play the glowing challenge
+          </button>
+        </div>
+
+        <div class="quiz" data-quiz>
+          {scenarios.map((s, i) => (
+            <article class="scenario card" data-scenario data-answer={s.data.answer}>
+              <button type="button" class="flee" data-flee>⬅️ Back to the trail</button>
+              <h3 class="situation">
+                <span class="q-num" aria-hidden="true">{i + 1}</span>
+                {s.data.situation}
+              </h3>
+              <div class="choices" role="group" aria-label="What should Gritty do?">
+                {([['a', s.data.choiceA], ['b', s.data.choiceB], ['c', s.data.choiceC]] as const).map(([key, text]) => (
+                  <button type="button" class="choice" data-key={key}>
+                    <b aria-hidden="true">{key.toUpperCase()}</b>
+                    <span>{text}</span>
+                  </button>
+                ))}
               </div>
-            )}
-            <p class="nudge" data-nudge role="status" hidden>
-              Hmm — would that help Gritty keep going? Try another one!
-            </p>
-            <div class="cheer" data-cheer role="status" hidden>
-              <p class="cheer-title">⭐ Gritty's Grit Choice!</p>
-              <p class="cheer-motto">"I have grit! I don't quit!"</p>
-              {s.data.cheer && <p class="cheer-why">{s.data.cheer}</p>}
-              <p class="cheer-what">Grit means we keep trying, learn from
-              mistakes, and use strategies when something is difficult.</p>
-            </div>
-            <button type="button" class="btn btn-gold" data-next hidden>
-              {i + 1 < scenarios.length ? 'Next challenge ➡️' : 'See how you did! 🌟'}
-            </button>
-          </article>
-        ))}
+              {s.data.hint && (
+                <div class="ask">
+                  <button type="button" class="ask-btn" data-ask>
+                    <img src={u('/images/gritty/gritty-face.webp')} alt=""
+                         width="34" height="34" loading="lazy" />
+                    Ask Gritty for an idea
+                  </button>
+                  <p class="ask-said" data-ask-said role="status" hidden>
+                    "{s.data.hint}"
+                  </p>
+                </div>
+              )}
+              <p class="nudge" data-nudge role="status" hidden>
+                Hmm — would that help Gritty keep going? Try another one!
+              </p>
+              <div class="cheer" data-cheer role="status" hidden>
+                <p class="cheer-title">⭐ Gritty's Grit Choice!</p>
+                <p class="cheer-motto">"I have grit! I don't quit!"</p>
+                {s.data.cheer && <p class="cheer-why">{s.data.cheer}</p>}
+                <p class="cheer-what">Grit means we keep trying, learn from
+                mistakes, and use strategies when something is difficult.</p>
+              </div>
+              <button type="button" class="btn btn-gold" data-back hidden>
+                Back to the trail ⛰️
+              </button>
+            </article>
+          ))}
+        </div>
+
         <div class="finale card" data-finale tabindex="-1" hidden>
           <span class="finale-emoji" aria-hidden="true">🌟</span>
-          <h3>You helped Gritty {scenarios.length} times!</h3>
-          <p>You know what grit looks like: trying again, taking a breath,
-          asking for help, and never giving up.</p>
+          <h3>You climbed the whole trail!</h3>
+          <p>You helped Gritty {scenarios.length} times. You know what grit
+          looks like: trying again, taking a breath, asking for help, and
+          never giving up.</p>
           <p class="finale-motto">"I have grit! I don't quit!"</p>
-          <button type="button" class="btn btn-primary" data-replay>🔁 Play again</button>
+          <button type="button" class="btn btn-primary" data-replay>🔁 Start a new climb</button>
         </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <section class="band" aria-labelledby="yet-h">
-    <div class="wrap yet-wrap">
-      <h2 id="yet-h">The Power of YET</h2>
-      <p class="note">One little word turns "I can't" into "not yet."
-      Press the big gold button and watch it work.</p>
-
-      <ul class="yet-list" data-yet-static role="list">
-        {yets.map((y) => (
-          <li data-sentence={y.data.sentence} data-tip={y.data.tip ?? ''}>
-            {y.data.sentence} <b class="yet-gold">YET!</b>
-            {y.data.tip && <span class="yet-tip-static">Gritty says: "{y.data.tip}"</span>}
-          </li>
-        ))}
-      </ul>
-
-      <div class="yet-machine card" data-yet hidden>
-        <p class="yet-line">
-          <span data-yet-sentence></span>
-          <b class="yet-gold yet-word" data-yet-word hidden>YET!</b>
-        </p>
-        <p class="yet-cheer" data-yet-cheer role="status" hidden>
-          YET is a magic word — it means your brain is still growing! 🧠
-        </p>
-        <p class="yet-tip" data-yet-tip hidden></p>
-        <div class="yet-buttons">
-          <button type="button" class="btn btn-gold yet-press" data-yet-press>YET!</button>
-          <button type="button" class="btn btn-ghost" data-yet-next hidden>Another one ➡️</button>
+      {/* ————— Game 2: the YET Machine ————— */}
+      <section class="gz-panel" id="panel-yet" role="tabpanel"
+               aria-labelledby="tab-yet" tabindex="0" hidden>
+        <div class="panel-head">
+          <h2>The Power of YET</h2>
+          <p class="note">One little word turns "I can't" into "not yet."
+          Press the big gold button and watch it work.</p>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <section class="band band-deep" aria-labelledby="checkin-h">
-    <div class="wrap checkin-wrap">
-      <h2 id="checkin-h">How did YOU have grit today?</h2>
-      <p class="note">Tap everything you did today — Gritty wants to hear it!</p>
-      <ul class="checkin" role="list" data-checkin>
-        {checkin.map(({ emoji, label }) => (
-          <li>
-            <label class="check-chip">
-              <input type="checkbox" data-check={label} />
-              <span class="chip-emoji" aria-hidden="true">{emoji}</span>
-              <span>Today I… {label.toLowerCase()}</span>
-            </label>
-          </li>
-        ))}
-      </ul>
-      <p class="checkin-cheer" data-checkin-cheer role="status" hidden>
-        🎉 WOW! You showed grit today!
-      </p>
-      <p class="streak" data-streak role="status" hidden></p>
-      <p class="privacy">This stays right here on your device — only you can
-      see it. Nothing is ever sent anywhere.</p>
+        <ul class="yet-list" data-yet-static role="list">
+          {yets.map((y) => (
+            <li data-sentence={y.data.sentence} data-tip={y.data.tip ?? ''}>
+              {y.data.sentence} <b class="yet-gold">YET!</b>
+              {y.data.tip && <span class="yet-tip-static">Gritty says: "{y.data.tip}"</span>}
+            </li>
+          ))}
+        </ul>
+
+        <div class="yet-machine card" data-yet hidden>
+          <div class="yet-screen">
+            <p class="yet-line">
+              <span data-yet-sentence></span>
+              <b class="yet-gold yet-word" data-yet-word hidden>YET!</b>
+            </p>
+            <p class="yet-cheer" data-yet-cheer role="status" hidden>
+              YET is a magic word — it means your brain is still growing! 🧠
+            </p>
+          </div>
+          <p class="yet-tip" data-yet-tip hidden></p>
+          <div class="yet-buttons">
+            <button type="button" class="yet-press" data-yet-press>YET!</button>
+            <button type="button" class="btn btn-ghost" data-yet-next hidden>Another one ➡️</button>
+          </div>
+        </div>
+      </section>
+
+      {/* ————— Game 3: My Grit Day ————— */}
+      <section class="gz-panel" id="panel-day" role="tabpanel"
+               aria-labelledby="tab-day" tabindex="0" hidden>
+        <div class="panel-head">
+          <h2>How did YOU have grit today?</h2>
+          <p class="note">Tap every badge you earned today — Gritty wants to
+          hear it!</p>
+        </div>
+        <ul class="checkin" role="list" data-checkin>
+          {checkin.map(({ emoji, label }) => (
+            <li>
+              <label class="check-chip">
+                <input type="checkbox" data-check={label}
+                       aria-label={`Today I ${label.toLowerCase()}`} />
+                <span class="coin">
+                  <span class="chip-emoji" aria-hidden="true">{emoji}</span>
+                </span>
+                <span class="coin-label" aria-hidden="true">{label}</span>
+              </label>
+            </li>
+          ))}
+        </ul>
+        <p class="checkin-cheer" data-checkin-cheer role="status" hidden>
+          🎉 WOW! You showed grit today!
+        </p>
+        <p class="streak" data-streak role="status" hidden></p>
+        <p class="privacy">This stays right here on your device — only you can
+        see it. Nothing is ever sent anywhere.</p>
+      </section>
     </div>
   </section>
 
@@ -174,30 +361,153 @@ const checkin = [
   </section>
 </Base>
 
-<script>
-  /* ——— Can you help Gritty? — one scenario at a time ——— */
-  const quiz = document.querySelector<HTMLElement>('[data-quiz]');
-  if (quiz) {
-    const cards = [...quiz.querySelectorAll<HTMLElement>('[data-scenario]')];
-    const progress = quiz.querySelector<HTMLElement>('[data-progress]')!;
-    const finale = quiz.querySelector<HTMLElement>('[data-finale]')!;
+<!-- Sparks are created by JS, so their keyframes must be global — scoped
+     keyframes can't reach JS-made elements. Same pattern as the hero. -->
+<style is:global>
+  @keyframes gz-spark {
+    0% { translate: 0 0; scale: 0; opacity: 1; }
+    20% { scale: 1; }
+    100% { translate: var(--dx) var(--dy); scale: 0.4; opacity: 0; }
+  }
+</style>
 
-    const show = (i: number, focus = false) => {
-      cards.forEach((c, j) => { c.hidden = j !== i; });
-      progress.hidden = false;
-      progress.textContent = `Challenge ${i + 1} of ${cards.length}`;
-      if (focus) cards[i].querySelector<HTMLElement>('.situation')?.focus?.();
+<script>
+  /* ————————————————————————————————————————————————
+     The Grit Zone plays by the house research rules (V3-CRAFT):
+     hit-stop before every payoff, springs not fades, something permanent
+     left behind after each celebration, praise that stays specific and
+     understated, and reduced motion as replacement — the star still
+     appears, it just doesn't fly.
+     ———————————————————————————————————————————————— */
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+
+  /* gold sparks — celebration only, and never under reduced motion */
+  function burst(el: Element, count = 12) {
+    if (calm.matches) return;
+    const r = el.getBoundingClientRect();
+    const box = document.createElement('div');
+    box.style.cssText =
+      `position:fixed;left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px;` +
+      'z-index:150;pointer-events:none;';
+    const hues = ['#D9A93F', '#7FA86B', '#2C5F8A', '#BDD7E7', '#F2D48A'];
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('i');
+      const ang = (Math.PI * 2 * i) / count;
+      const dist = 58 + (i % 3) * 24;
+      s.style.cssText =
+        'position:absolute;width:9px;height:9px;border-radius:50%;' +
+        `background:${hues[i % hues.length]};` +
+        `--dx:${Math.cos(ang) * dist}px;--dy:${Math.sin(ang) * dist - 30}px;` +
+        `animation:gz-spark 800ms ease-out ${i * 12}ms forwards;`;
+      box.appendChild(s);
+    }
+    document.body.appendChild(box);
+    setTimeout(() => box.remove(), 1250);
+  }
+
+  const replay = (el: Element, cls: string) => {
+    el.classList.remove(cls);
+    void (el as HTMLElement).offsetWidth;
+    el.classList.add(cls);
+  };
+
+  /* ——— the arcade tabs: three games, one on stage at a time ——— */
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-tab]')];
+  const panels = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls')!)!);
+  function selectTab(n: number, focus = false) {
+    tabs.forEach((t, j) => {
+      t.setAttribute('aria-selected', String(j === n));
+      t.tabIndex = j === n ? 0 : -1;
+      panels[j].hidden = j !== n;
+    });
+    replay(panels[n], 'enter');
+    if (focus) tabs[n].focus();
+  }
+  tabs.forEach((t, n) => {
+    t.addEventListener('click', () => selectTab(n));
+    t.addEventListener('keydown', (e) => {
+      const move = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (move) selectTab((n + move + tabs.length) % tabs.length, true);
+      else if (e.key === 'Home') selectTab(0, true);
+      else if (e.key === 'End') selectTab(tabs.length - 1, true);
+      else return;
+      e.preventDefault();
+    });
+  });
+
+  /* ——— Game 1: the Grit Trail ——— */
+  const trail = document.querySelector<HTMLElement>('[data-trail]');
+  const quiz = document.querySelector<HTMLElement>('[data-quiz]');
+  if (trail && quiz) {
+    const cards = [...quiz.querySelectorAll<HTMLElement>('[data-scenario]')];
+    const stops = [...trail.querySelectorAll<HTMLButtonElement>('[data-stop]')];
+    const walker = trail.querySelector<HTMLElement>('[data-walker]')!;
+    const playBtn = trail.querySelector<HTMLElement>('[data-play]')!;
+    const finale = document.querySelector<HTMLElement>('[data-finale]')!;
+
+    /* progress lives on this device only, like the check-in */
+    const KEY = 'gg-grit-trail';
+    const load = (): string[] => {
+      try {
+        const s = JSON.parse(localStorage.getItem(KEY) ?? 'null');
+        return Array.isArray(s?.done) ? s.done : [];
+      } catch { return []; }
     };
+    const save = () => {
+      try { localStorage.setItem(KEY, JSON.stringify({ done: [...done] })); }
+      catch { /* private window — the climb still works, it just won't keep */ }
+    };
+    const done = new Set<string>(load());
+    const ids = stops.map((s) => s.dataset.id!);
+
+    const currentIdx = () => ids.findIndex((id) => !done.has(id));
+
+    /* the map is the scoreboard: stars stay (permanence), the next stop
+       glows (the idle hint), the rest is just trail ahead */
+    function render(justId?: string) {
+      const cur = currentIdx();
+      stops.forEach((el, i) => {
+        const isDone = done.has(el.dataset.id!);
+        el.classList.toggle('done', isDone);
+        el.classList.toggle('current', i === cur);
+        el.disabled = !isDone && i !== cur;
+        el.setAttribute('aria-label',
+          isDone ? `Challenge ${i + 1} — you earned this star! Play it again`
+          : i === cur ? `Challenge ${i + 1} — Gritty is waiting. Tap to play!`
+          : `Challenge ${i + 1} — farther up the trail`);
+        if (el.dataset.id === justId) { replay(el, 'just'); burst(el); }
+      });
+      const at = cur === -1
+        ? { x: trail.dataset.sx!, y: trail.dataset.sy! }
+        : { x: stops[cur].dataset.x!, y: stops[cur].dataset.y! };
+      walker.style.left = `${at.x}%`;
+      walker.style.top = `${at.y}%`;
+      if (justId) replay(walker, 'hop');
+      finale.hidden = cur !== -1;
+      playBtn.hidden = cur === -1;
+    }
+
+    const showTrail = () => {
+      cards.forEach((c) => { c.hidden = true; });
+      trail.hidden = false;
+    };
+    function openChallenge(i: number) {
+      trail.hidden = true;
+      finale.hidden = true;
+      cards.forEach((c, j) => { c.hidden = j !== i; });
+      cards[i].querySelector<HTMLElement>('.situation')?.focus();
+    }
 
     cards.forEach((card, i) => {
-      card.querySelector('.situation')?.setAttribute('tabindex', '-1');
+      const situation = card.querySelector<HTMLElement>('.situation')!;
+      situation.setAttribute('tabindex', '-1');
       const nudge = card.querySelector<HTMLElement>('[data-nudge]')!;
       const cheer = card.querySelector<HTMLElement>('[data-cheer]')!;
-      const next = card.querySelector<HTMLElement>('[data-next]')!;
-
-      /* "Ask Gritty for an idea" — a strategy, offered before the choice */
+      const back = card.querySelector<HTMLElement>('[data-back]')!;
+      const flee = card.querySelector<HTMLElement>('[data-flee]')!;
       const ask = card.querySelector<HTMLButtonElement>('[data-ask]');
       const askSaid = card.querySelector<HTMLElement>('[data-ask-said]');
+
       ask?.addEventListener('click', () => {
         askSaid!.hidden = false;
         ask.hidden = true;
@@ -207,51 +517,72 @@ const checkin = [
         btn.addEventListener('click', () => {
           if (card.classList.contains('solved')) return;
           if (btn.dataset.key === card.dataset.answer) {
+            /* hit stop: a beat between the press and the payoff makes the
+               star feel earned rather than automatic */
             card.classList.add('solved');
-            btn.classList.add('is-grit');
-            nudge.hidden = true;
-            cheer.hidden = false;
-            next.hidden = false;
+            setTimeout(() => {
+              btn.classList.add('is-grit');
+              nudge.hidden = true;
+              cheer.hidden = false;
+              back.hidden = false;
+              burst(btn.querySelector('b')!);
+            }, 100);
           } else {
             btn.classList.add('tried');
+            replay(btn, 'shake');
             nudge.hidden = false;
+            /* Sesame's scaffold: after a miss, the hint offers itself */
+            if (ask && !ask.hidden) ask.classList.add('beckon');
           }
         });
       });
 
-      next.addEventListener('click', () => {
-        if (i + 1 < cards.length) {
-          show(i + 1, true);
-        } else {
-          cards.forEach((c) => { c.hidden = true; });
-          progress.hidden = true;
-          finale.hidden = false;
-          finale.focus();
-        }
-      });
-    });
-
-    quiz.querySelector('[data-replay]')?.addEventListener('click', () => {
-      cards.forEach((card) => {
+      const finish = () => {
+        const id = ids[i];
+        const fresh = !done.has(id);
+        if (fresh) { done.add(id); save(); }
+        /* reset the card so a replay starts clean */
         card.classList.remove('solved');
-        card.querySelectorAll('.choice').forEach((b) => b.classList.remove('tried', 'is-grit'));
-        card.querySelector<HTMLElement>('[data-nudge]')!.hidden = true;
-        card.querySelector<HTMLElement>('[data-cheer]')!.hidden = true;
-        card.querySelector<HTMLElement>('[data-next]')!.hidden = true;
-        const askBtn = card.querySelector<HTMLElement>('[data-ask]');
-        if (askBtn) {
-          askBtn.hidden = false;
-          card.querySelector<HTMLElement>('[data-ask-said]')!.hidden = true;
-        }
-      });
-      finale.hidden = true;
-      show(0, true);
+        card.querySelectorAll('.choice').forEach((b) => b.classList.remove('tried', 'is-grit', 'shake'));
+        nudge.hidden = true;
+        cheer.hidden = true;
+        back.hidden = true;
+        if (ask) { ask.hidden = false; ask.classList.remove('beckon'); askSaid!.hidden = true; }
+        showTrail();
+        /* let the map paint at the old state, then move — so the star pops
+           and Gritty visibly hops to the next stop. A timer, not rAF: rAF
+           never fires in a hidden tab, and the state must land regardless. */
+        setTimeout(() => {
+          render(fresh ? id : undefined);
+          const cur = currentIdx();
+          (cur === -1 ? finale : stops[cur]).focus();
+        }, 60);
+      };
+      back.addEventListener('click', finish);
+      flee.addEventListener('click', () => { showTrail(); render(); playBtn.focus(); });
     });
 
-    show(0);
+    stops.forEach((el, i) => el.addEventListener('click', () => openChallenge(i)));
+    playBtn.addEventListener('click', () => {
+      const cur = currentIdx();
+      if (cur !== -1) openChallenge(cur);
+    });
+
+    finale.querySelector('[data-replay]')?.addEventListener('click', () => {
+      done.clear();
+      save();
+      render();
+      const first = stops[0];
+      first.focus();
+      burst(first, 8);
+    });
+
+    quiz.classList.add('armed');
+    showTrail();
+    render();
   }
 
-  /* ——— The Power of YET ——— */
+  /* ——— Game 2: the YET Machine ——— */
   const yetMachine = document.querySelector<HTMLElement>('[data-yet]');
   const yetStatic = document.querySelector<HTMLElement>('[data-yet-static]');
   if (yetMachine && yetStatic) {
@@ -279,31 +610,33 @@ const checkin = [
       };
 
       pressBtn.addEventListener('click', () => {
-        wordEl.hidden = false;
-        wordEl.classList.remove('pop');
-        void wordEl.offsetWidth; /* restart the pop animation */
-        wordEl.classList.add('pop');
-        cheerEl.hidden = false;
-        /* Gritty's one idea to try — only when Kim has written one */
-        const tip = sentences[i].tip;
-        tipEl.hidden = !tip;
-        if (tip) tipEl.textContent = `Gritty says: "${tip}"`;
-        pressBtn.hidden = true;
-        nextBtn.hidden = false;
-        nextBtn.focus();
+        replay(yetMachine, 'rumble');
+        /* hit stop, then the word slams in */
+        setTimeout(() => {
+          wordEl.hidden = false;
+          replay(wordEl, 'pop');
+          burst(wordEl, 10);
+          cheerEl.hidden = false;
+          const tip = sentences[i].tip;
+          tipEl.hidden = !tip;
+          if (tip) tipEl.textContent = `Gritty says: "${tip}"`;
+          pressBtn.hidden = true;
+          nextBtn.hidden = false;
+          nextBtn.focus();
+        }, 110);
       });
 
       nextBtn.addEventListener('click', () => {
         i = (i + 1) % sentences.length;
         load(i);
-        pressBtn.focus();
+        (pressBtn as HTMLButtonElement).focus();
       });
 
       load(0);
     }
   }
 
-  /* ——— How did YOU have grit today? — saved to this device only ——— */
+  /* ——— Game 3: My Grit Day — saved to this device only ——— */
   const checkinList = document.querySelector<HTMLElement>('[data-checkin]');
   if (checkinList) {
     const boxes = [...checkinList.querySelectorAll<HTMLInputElement>('input')];
@@ -313,7 +646,7 @@ const checkin = [
     const today = new Date().toLocaleDateString('en-CA'); /* YYYY-MM-DD, local */
 
     /* localStorage can throw (private windows, blocked storage) — the
-       checklist must keep working without it. */
+       badges must keep working without it. */
     const read = (): any => {
       try { return JSON.parse(localStorage.getItem(KEY) ?? 'null'); } catch { return null; }
     };
@@ -342,22 +675,240 @@ const checkin = [
       }
     };
 
-    boxes.forEach((b) => b.addEventListener('change', refresh));
+    boxes.forEach((b) => b.addEventListener('change', () => {
+      if (b.checked) burst(b.closest('.check-chip')!.querySelector('.coin')!, 8);
+      refresh();
+    }));
     refresh();
+  }
+
+  /* ——— the art spot: one click puts the whole prompt on the clipboard ——— */
+  const copyBtn = document.querySelector<HTMLButtonElement>('[data-copy-prompt]');
+  if (copyBtn) {
+    const ART_PROMPT = `Children's picture-book illustration for "Growing with Gritty" (the world of teacher-author-illustrator Kim Rekowski). Style: soft watercolor washes with confident, slightly wobbly black ink outlines and flat colored-pencil / marker fills that show a little grain — warm, friendly, hand-made. No gradients-as-gloss, no 3D, no drop shadows, no photo textures, no vector-flat corporate look.
+
+Scene: at the bottom left, Gritty the Goat stands at the start of a winding dirt trail, looking up at the mountain, happy and determined. Gritty is a small white goat drawn exactly like this: round white face and body, big oval eyes with black pupils, small rounded black nose, gentle smile, long floppy brown ears with pink inner lining, two short candy-striped gold-and-cream horns, shaggy brown beard under the chin, brown hooves, small fluffy white tail — and he wears his little brown backpack. Beside him stands a wooden arrow-shaped trail sign on a post; leave the sign board completely BLANK (the website prints the words on it later).
+
+The dirt trail winds upward in S-curves across a big, friendly, rounded green mountain that fills the middle of the picture, with little daisies and pink flowers along the edges, a few grey pebbles, and a small wooden fence at the bottom. At the very top of the mountain: a small snow cap and a gold flag on a pole. Sky: soft watercolor blue with puffy ink-outlined white clouds, a smiling yellow sun in the upper right, and one or two tiny butterflies.
+
+Palette — use only these: sky blues #A7CBE3 and #BDD7E7, meadow greens #B9CFA4, #97BA80, #6E9A5C, #7FA86B, path tan #B98A55, gold #D9A93F, sun #F2D48A with bright center #F7E1A8, warm cream #FAF6EC, ink outline #2A3238, pink accent #E8A0A8, goat brown #B98A55.
+
+Format: landscape, 1536 × 1024 pixels, full-bleed scene with no border, no frame, no watermark, and no text or letters anywhere in the image (the wooden sign stays blank).`;
+
+    const label = copyBtn.textContent;
+    copyBtn.addEventListener('click', async () => {
+      let ok = true;
+      try { await navigator.clipboard.writeText(ART_PROMPT); }
+      catch {
+        /* older browsers: a briefly-selected textarea does the same job */
+        try {
+          const t = document.createElement('textarea');
+          t.value = ART_PROMPT;
+          document.body.appendChild(t);
+          t.select();
+          ok = document.execCommand('copy');
+          t.remove();
+        } catch { ok = false; }
+      }
+      copyBtn.textContent = ok ? '✓ Copied — paste into ChatGPT' : 'Copy failed — try again';
+      setTimeout(() => { copyBtn.textContent = label; }, 2400);
+    });
   }
 </script>
 
 <style>
-  .intro { display: grid; gap: 18px; justify-items: start; }
+  /* — the hero: words on the left, the art spot holding the door — */
+  .intro {
+    display: grid; gap: 28px; align-items: center;
+  }
+  .intro-copy { display: grid; gap: 18px; justify-items: start; }
+  @media (min-width: 860px) {
+    .intro { grid-template-columns: minmax(0, 1fr) minmax(300px, 460px); }
+  }
   .note { color: var(--gg-ink-soft); margin-top: 6px; }
 
-  /* — quiz — */
-  .quiz { margin-top: 24px; display: grid; gap: 16px; max-width: 720px; }
-  .progress {
-    font-family: var(--gg-display); font-weight: 600;
-    color: var(--gg-green-ink); font-size: var(--gg-text-small);
+  /* Setting `display` on a class silently defeats the UA's [hidden] rule —
+     author styles always win — which is exactly how the old page ended up
+     showing all fifteen cards at once. Every element this page both styles
+     and hides gets its [hidden] put back. (The noscript reveal rules win
+     over these on purpose: they're more specific.) */
+  .scenario[hidden], .cheer[hidden], .trail[hidden], .finale[hidden],
+  .yet-machine[hidden], .yet-list[hidden], .yet-word[hidden],
+  .ask-btn[hidden], .btn[hidden] { display: none; }
+
+  /* The art spot: sized exactly like the finished painting (3:2), so the
+     day Kim's trailhead scene exists it drops in with zero layout shift. */
+  .art-spot {
+    aspect-ratio: 3 / 2; width: 100%;
+    border: 3px dashed color-mix(in srgb, var(--gg-gold) 65%, transparent);
+    border-radius: var(--gg-radius);
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--gg-sky) 55%, #fff) 0%,
+      color-mix(in srgb, var(--gg-sky-low) 70%, #fff) 55%,
+      color-mix(in srgb, var(--gg-hill-back) 60%, var(--gg-paper)) 100%);
+    display: grid; place-content: center; justify-items: center;
+    gap: 6px; padding: 20px; text-align: center;
   }
-  .scenario { padding: 28px; display: grid; gap: 16px; }
+  .art-emoji { font-size: 2.1rem; }
+  .art-note { font-family: var(--gg-display); font-weight: 600; color: var(--gg-blue-deep); }
+  .art-size { font-size: var(--gg-text-small); color: var(--gg-ink-soft); }
+  .art-copy {
+    margin-top: 8px; min-height: var(--gg-tap); padding: 8px 18px;
+    background: #fff; color: var(--gg-blue);
+    border: 2.5px solid var(--gg-blue); border-radius: 999px;
+    font-family: var(--gg-display); font-weight: 600; font-size: 0.95rem;
+    cursor: pointer; transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .art-copy:hover { background: color-mix(in srgb, var(--gg-sky) 40%, #fff); transform: translateY(-1px); }
+  .art-copy:active { transform: scale(0.97); }
+
+  /* — the arcade: three big game buttons, one stage — */
+  .arcade { padding-block: 44px 64px; }
+  .gz-tabs {
+    display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+    margin-bottom: 30px;
+  }
+  .gz-tab {
+    display: grid; justify-items: center; gap: 2px;
+    min-width: 148px; min-height: var(--gg-tap); padding: 12px 20px;
+    background: var(--gg-card); color: var(--gg-blue);
+    border: 2.5px solid rgba(44, 95, 138, 0.25); border-radius: 18px;
+    font-family: var(--gg-display); font-weight: 600; font-size: 1.02rem;
+    cursor: pointer; box-shadow: var(--gg-shadow);
+    transition: translate 0.16s ease, border-color 0.16s ease,
+                background 0.16s ease, box-shadow 0.16s ease;
+  }
+  .gz-tab .ico { font-size: 1.8rem; }
+  .gz-tab:hover { translate: 0 -3px; border-color: var(--gg-blue); }
+  .gz-tab:active { scale: 0.96; }
+  .gz-tab[aria-selected='true'] {
+    border-color: var(--gg-gold); background: #FFFDF4;
+    translate: 0 -3px; box-shadow: var(--gg-shadow-lift);
+  }
+  .gz-panel { outline: none; }
+  .gz-panel.enter { animation: panel-in 380ms var(--gg-ease-back); }
+  @keyframes panel-in {
+    from { opacity: 0; translate: 0 14px; scale: 0.99; }
+    to { opacity: 1; translate: 0 0; scale: 1; }
+  }
+  .panel-head { max-width: 720px; margin: 0 auto 22px; text-align: center; }
+  .panel-head .note { margin-inline: auto; }
+
+  /* — the trail map — */
+  .trail { display: grid; justify-items: center; gap: 18px; }
+  .trail-scene {
+    position: relative; width: min(100%, 620px);
+    border-radius: var(--gg-radius);
+    box-shadow: var(--gg-shadow);
+  }
+  .trail-art { display: block; width: 100%; height: auto; }
+  .sky-top { stop-color: var(--gg-sky-high); }
+  .sky-low { stop-color: var(--gg-sky-low); }
+  .sun { fill: var(--gg-sun); }
+  .sun-core { fill: var(--gg-sun-core); opacity: 0.55; }
+  .cloud ellipse { fill: #fff; opacity: 0.92; }
+  .hill-back { fill: var(--gg-hill-back); }
+  .mountain { fill: var(--gg-hill-mid); }
+  .snow { fill: var(--gg-paper); opacity: 0.9; }
+  .meadow { fill: var(--gg-meadow); }
+  .trail-under {
+    fill: none; stroke: var(--gg-paper); stroke-width: 24;
+    stroke-linecap: round; stroke-linejoin: round; opacity: 0.92;
+  }
+  .trail-stitch {
+    fill: none; stroke: var(--gg-gold-ink); stroke-width: 4.5;
+    stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 1 26; opacity: 0.5;
+  }
+  .flag line { stroke: var(--gg-ink); stroke-width: 5; stroke-linecap: round; }
+  .flag path { fill: var(--gg-gold); stroke: var(--gg-ink); stroke-width: 3; stroke-linejoin: round; }
+  .daisy circle { fill: #fff; }
+  .daisy .mid { fill: var(--gg-sun); }
+
+  /* the stops: pebbles ahead, a glow where Gritty waits, stars that stay */
+  .stop {
+    position: absolute; translate: -50% -50%;
+    display: grid; place-items: center;
+    width: 30px; height: 30px; padding: 0;
+    background: color-mix(in srgb, var(--gg-paper) 88%, var(--gg-ink));
+    border: 2px solid color-mix(in srgb, var(--gg-ink) 22%, transparent);
+    border-radius: 50%;
+    font-family: var(--gg-display); font-weight: 600;
+    color: var(--gg-ink-soft); font-size: 0.78rem;
+    transition: width 0.25s var(--gg-ease-back), height 0.25s var(--gg-ease-back),
+                border-color 0.25s ease, background 0.25s ease;
+  }
+  .stop:disabled { cursor: default; }
+  .stop .stop-star { display: none; font-size: 1.25rem; line-height: 1; }
+  .stop.done {
+    width: 46px; height: 46px; cursor: pointer;
+    background: #FFFDF4; border: 2.5px solid var(--gg-gold);
+  }
+  .stop.done .stop-num { display: none; }
+  .stop.done .stop-star { display: block; }
+  .stop.done:hover { scale: 1.12; }
+  .stop.current {
+    width: 58px; height: 58px; cursor: pointer;
+    background: var(--gg-card); border: 3px solid var(--gg-gold);
+    color: var(--gg-blue); font-size: 1.2rem; z-index: 2;
+  }
+  .stop.current::after {
+    content: ''; position: absolute; inset: -7px; border-radius: 50%;
+    border: 3px solid var(--gg-gold);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .stop.current::after { animation: stop-pulse 1.6s ease-in-out infinite; }
+  }
+  @keyframes stop-pulse {
+    0%, 100% { scale: 1; opacity: 0.9; }
+    50% { scale: 1.22; opacity: 0.25; }
+  }
+  .stop.just .stop-star { animation: star-in 650ms var(--gg-ease-bouncy); }
+  @keyframes star-in { from { scale: 0; rotate: -40deg; } to { scale: 1; rotate: 0deg; } }
+
+  /* Gritty on the map: he stands just above the stop he's thinking about */
+  .walker {
+    position: absolute; z-index: 3; pointer-events: none;
+    translate: -50% -128%;
+    transition: left 900ms var(--gg-ease-bouncy), top 900ms var(--gg-ease-bouncy);
+  }
+  .walker img {
+    display: block; width: 52px; height: 52px; border-radius: 50%;
+    background: var(--gg-sky); border: 3px solid #fff;
+    box-shadow: var(--gg-shadow);
+  }
+  .walker.hop { animation: walker-hop 640ms var(--gg-ease-back); }
+  @keyframes walker-hop {
+    0% { scale: 1 1; }
+    25% { scale: 1.08 0.9; }
+    55% { scale: 0.94 1.1; translate: -50% -160%; }
+    80% { scale: 1.04 0.96; }
+    100% { scale: 1 1; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .walker img { animation: walker-breathe 3.7s ease-in-out infinite; }
+  }
+  @keyframes walker-breathe { 0%, 100% { scale: 1 1; } 50% { scale: 1 1.04; } }
+  .trail-play { font-size: 1.15rem; }
+
+  /* — the challenge stage — */
+  .quiz { display: grid; gap: 16px; max-width: 720px; margin-inline: auto; }
+  /* JS will hide all but the active card the moment it runs; this rule
+     covers the beat before that so the trail never shares the stage with
+     fifteen stacked cards. Browsers without the scripting query just show
+     a brief flash, and no-JS browsers fall through to the noscript rules. */
+  @media (scripting: enabled) {
+    .quiz:not(.armed) .scenario { display: none; }
+  }
+  .scenario { padding: 26px 28px 28px; display: grid; gap: 16px; }
+  .flee {
+    justify-self: start; padding: 6px 10px; margin: -6px 0 -4px -10px;
+    background: none; border: none; cursor: pointer;
+    font-family: var(--gg-display); font-weight: 600; font-size: 0.92rem;
+    color: var(--gg-ink-soft); border-radius: 999px;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+  .flee:hover { color: var(--gg-blue); background: color-mix(in srgb, var(--gg-sky) 35%, transparent); }
   .situation { display: flex; gap: 14px; align-items: baseline; }
   .situation:focus { outline: none; }
   .q-num {
@@ -376,14 +927,25 @@ const checkin = [
     transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
   }
   .choice:hover { border-color: var(--gg-blue); transform: translateY(-1px); }
+  .choice:active { transform: scale(0.98); }
   .choice b {
     flex: none; width: 30px; height: 30px; border-radius: 50%;
     display: inline-grid; place-items: center;
     background: var(--gg-blue); color: #fff; font-size: 0.9rem;
+    transition: scale 0.2s var(--gg-ease-back);
   }
+  .choice:hover b { scale: 1.12; }
   .choice.tried { opacity: 0.45; border-style: dashed; }
+  .choice.shake { animation: choice-no 380ms ease; }
+  @keyframes choice-no {
+    0%, 100% { translate: 0 0; }
+    25% { translate: -6px 0; }
+    50% { translate: 5px 0; }
+    75% { translate: -3px 0; }
+  }
   .choice.is-grit { border-color: var(--gg-gold); background: #FFFDF4; }
-  .choice.is-grit b { background: var(--gg-gold); }
+  .choice.is-grit b { background: var(--gg-gold); animation: badge-spin 600ms var(--gg-ease-bouncy); }
+  @keyframes badge-spin { from { scale: 0.4; rotate: -120deg; } to { scale: 1; rotate: 0deg; } }
   .solved .choice { cursor: default; }
   .solved .choice:hover { transform: none; }
   .nudge { color: var(--gg-ink-soft); font-style: italic; }
@@ -400,6 +962,16 @@ const checkin = [
   }
   .ask-btn img { border-radius: 50%; background: var(--gg-sky); }
   .ask-btn:hover { background: color-mix(in srgb, var(--gg-sky) 40%, #fff); transform: translateY(-1px); }
+  /* after a miss, the idea button raises its hand */
+  @media (prefers-reduced-motion: no-preference) {
+    .ask-btn.beckon { animation: beckon 1.5s ease-in-out infinite; }
+  }
+  .ask-btn.beckon { border-color: var(--gg-gold); }
+  @keyframes beckon {
+    0%, 100% { translate: 0 0; }
+    12% { translate: 0 -4px; }
+    24% { translate: 0 0; }
+  }
   .ask-said {
     font-family: var(--gg-hand); font-size: 1.3rem; line-height: 1.35;
     color: var(--gg-blue-deep);
@@ -412,6 +984,15 @@ const checkin = [
     display: grid; gap: 6px;
     background: #FFFDF4; border: 3px solid var(--gg-gold);
     border-radius: var(--gg-radius-small); padding: 16px 18px;
+  }
+  /* the payoff arrives in small waves — follow-through, not a slab */
+  .cheer:not([hidden]) > * { animation: cheer-rise 460ms var(--gg-ease-back) both; }
+  .cheer:not([hidden]) > :nth-child(2) { animation-delay: 80ms; }
+  .cheer:not([hidden]) > :nth-child(3) { animation-delay: 160ms; }
+  .cheer:not([hidden]) > :nth-child(4) { animation-delay: 240ms; }
+  @keyframes cheer-rise {
+    from { opacity: 0; translate: 0 10px; scale: 0.97; }
+    to { opacity: 1; translate: 0 0; scale: 1; }
   }
   .cheer-title {
     font-family: var(--gg-display); font-weight: 600; font-size: 1.3rem;
@@ -429,35 +1010,52 @@ const checkin = [
   }
   .scenario .btn { justify-self: start; }
   .finale {
-    padding: 40px 32px; display: grid; gap: 12px;
+    padding: 40px 32px; margin-top: 22px; display: grid; gap: 12px;
     justify-items: center; text-align: center;
+    max-width: 620px; margin-inline: auto;
   }
   .finale:focus { outline: none; }
   .finale-emoji { font-size: 3rem; }
   .finale-motto { font-family: var(--gg-hand); font-size: 1.6rem; color: var(--gg-blue); }
 
-  /* — the Power of YET — */
-  .yet-wrap { display: grid; justify-items: start; }
+  /* — the YET machine — */
   .yet-gold { color: var(--gg-gold-ink); font-weight: 800; }
   .yet-list {
-    list-style: none; margin-top: 20px; display: grid; gap: 10px;
-    font-family: var(--gg-hand); font-size: 1.5rem;
+    list-style: none; display: grid; gap: 10px; max-width: 640px;
+    margin-inline: auto; font-family: var(--gg-hand); font-size: 1.5rem;
   }
   .yet-machine {
-    margin-top: 24px; padding: 36px 32px; width: min(100%, 640px);
+    padding: 26px 26px 32px; width: min(100%, 620px); margin-inline: auto;
     display: grid; gap: 18px; justify-items: center; text-align: center;
+    border: 3px solid rgba(44, 95, 138, 0.25);
+  }
+  .yet-machine.rumble { animation: rumble 480ms ease; }
+  @keyframes rumble {
+    0%, 100% { rotate: 0deg; }
+    20% { rotate: -0.8deg; }
+    45% { rotate: 0.9deg; }
+    70% { rotate: -0.5deg; }
+  }
+  /* the screen: deep meadow-night blue, so the gold word can really shine */
+  .yet-screen {
+    width: 100%; min-height: 170px;
+    display: grid; place-content: center; gap: 10px; padding: 22px 20px;
+    background: var(--gg-blue-deep);
+    border-radius: var(--gg-radius-small);
+    box-shadow: inset 0 4px 14px rgba(0, 0, 0, 0.35);
   }
   .yet-line {
-    font-family: var(--gg-hand); font-size: clamp(1.7rem, 4.5vw, 2.4rem);
-    line-height: 1.3;
+    font-family: var(--gg-hand); font-size: clamp(1.7rem, 4.5vw, 2.3rem);
+    line-height: 1.3; color: #fff; max-width: 22ch;
   }
+  .yet-screen .yet-gold { color: var(--gg-gold); }
   .yet-word { display: inline-block; font-family: var(--gg-display); }
-  .yet-word.pop { animation: yet-pop 0.45s cubic-bezier(0.2, 1.6, 0.4, 1); }
+  .yet-word.pop { animation: yet-pop 700ms var(--gg-ease-bouncy); }
   @keyframes yet-pop {
-    0% { transform: scale(0.2) rotate(-8deg); }
-    100% { transform: scale(1) rotate(0deg); }
+    from { scale: 0.2; rotate: -10deg; }
+    to { scale: 1; rotate: 0deg; }
   }
-  .yet-cheer { color: var(--gg-green-ink); font-weight: 700; }
+  .yet-cheer { color: var(--gg-sun-core); font-weight: 700; font-size: 1.02rem; }
   .yet-tip {
     font-family: var(--gg-hand); font-size: 1.3rem; line-height: 1.35;
     color: var(--gg-blue-deep);
@@ -469,37 +1067,72 @@ const checkin = [
     display: block; font-family: var(--gg-body); font-size: var(--gg-text-small);
     color: var(--gg-ink-soft);
   }
-  .yet-buttons { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
-  .yet-press { font-size: 1.5rem; padding: 0.6em 1.8em; }
+  .yet-buttons { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; align-items: center; }
+  /* a real arcade button: it has depth, and pressing it presses it */
+  .yet-press {
+    width: 104px; height: 104px; border-radius: 50%;
+    background: var(--gg-gold); color: #fff;
+    border: 3px solid color-mix(in srgb, var(--gg-gold-ink) 55%, var(--gg-gold));
+    box-shadow: 0 9px 0 var(--gg-gold-ink), 0 16px 22px -10px rgba(138, 100, 20, 0.55);
+    font-family: var(--gg-display); font-weight: 700; font-size: 1.5rem;
+    cursor: pointer;
+    transition: translate 0.1s ease, box-shadow 0.1s ease, scale 0.15s ease;
+  }
+  .yet-press:hover { scale: 1.05; }
+  .yet-press:active {
+    translate: 0 7px;
+    box-shadow: 0 2px 0 var(--gg-gold-ink), 0 6px 12px -8px rgba(138, 100, 20, 0.55);
+  }
 
-  /* — check-in — */
-  .checkin-wrap { display: grid; gap: 16px; justify-items: start; }
+  /* — My Grit Day: badges you tap into being — */
   .checkin {
-    list-style: none; display: grid; gap: 12px;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    width: 100%; max-width: 860px;
+    list-style: none; display: grid; gap: 18px 12px;
+    grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+    width: 100%; max-width: 760px; margin-inline: auto;
   }
   .check-chip {
-    display: flex; gap: 12px; align-items: center;
-    min-height: var(--gg-tap); padding: 12px 16px; cursor: pointer;
-    background: var(--gg-card); border: 2.5px solid rgba(44, 95, 138, 0.25);
-    border-radius: var(--gg-radius-small);
-    font-family: var(--gg-display); font-weight: 500; color: var(--gg-blue);
-    transition: border-color 0.15s ease, background 0.15s ease;
+    display: grid; justify-items: center; gap: 8px; cursor: pointer;
   }
-  .check-chip:hover { border-color: var(--gg-blue); }
-  .check-chip:has(input:checked) {
-    border-color: var(--gg-green); background: color-mix(in srgb, var(--gg-green) 14%, #fff);
-    color: var(--gg-green-ink);
+  .check-chip input {
+    position: absolute; width: 1px; height: 1px;
+    margin: -1px; overflow: hidden; clip-path: inset(50%);
   }
-  .check-chip:has(input:focus-visible) { outline: 3px solid var(--gg-gold); outline-offset: 3px; }
-  .check-chip input { width: 22px; height: 22px; accent-color: var(--gg-green-ink); flex: none; }
-  .chip-emoji { font-size: 1.4rem; }
+  .coin {
+    width: 96px; height: 96px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--gg-card); border: 3px solid rgba(44, 95, 138, 0.25);
+    box-shadow: var(--gg-shadow);
+    transition: border-color 0.2s ease, background 0.2s ease,
+                rotate 0.3s var(--gg-ease-back), scale 0.2s ease;
+  }
+  .chip-emoji { font-size: 2.1rem; }
+  .coin-label {
+    font-family: var(--gg-display); font-weight: 600; font-size: 0.95rem;
+    color: var(--gg-blue); text-align: center; max-width: 12ch;
+  }
+  .check-chip:hover .coin { border-color: var(--gg-blue); scale: 1.06; }
+  .check-chip:active .coin { scale: 0.94; }
+  .check-chip:has(input:checked) .coin {
+    border-color: var(--gg-gold); background: #FFFDF4; rotate: -5deg;
+    animation: coin-pop 550ms var(--gg-ease-bouncy);
+  }
+  @keyframes coin-pop {
+    0% { scale: 0.85 1.1; }
+    45% { scale: 1.12 0.9; }
+    100% { scale: 1 1; }
+  }
+  .check-chip:has(input:checked) .coin-label { color: var(--gg-gold-ink); }
+  .check-chip:has(input:focus-visible) .coin { outline: 3px solid var(--gg-gold); outline-offset: 3px; }
   .checkin-cheer {
     font-family: var(--gg-hand); font-size: 1.5rem; color: var(--gg-gold-ink);
+    text-align: center; margin-top: 18px;
   }
-  .streak { font-weight: 800; color: var(--gg-green-ink); }
-  .privacy { font-size: var(--gg-text-small); color: var(--gg-ink-soft); }
+  .streak { font-weight: 800; color: var(--gg-green-ink); text-align: center; }
+  .checkin-cheer, .streak, .privacy { margin-inline: auto; }
+  .privacy {
+    font-size: var(--gg-text-small); color: var(--gg-ink-soft);
+    text-align: center; margin-top: 12px;
+  }
 
   .next-up {
     display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px;
