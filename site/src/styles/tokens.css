@@ -11,6 +11,9 @@
   --gg-blue-deep:  #1F4666;  /* pressed/hover state of Gritty Blue       */
   --gg-green:      #7FA86B;  /* Meadow Green — growth accents, banners   */
   --gg-green-ink:  #4E7140;  /* meadow green dark enough for text        */
+  --gg-green-lift: #5F844F;  /* green-ink lifted a step — display type   */
+                             /* only: 4.0:1 on paper clears AA for large */
+                             /* text, not for the small stuff ink covers */
   --gg-gold:       #D9A93F;  /* Gold Star — achievement only             */
   --gg-gold-ink:   #8A6414;  /* gold dark enough for small text          */
   --gg-sky:        #BDD7E7;  /* Sky Wash — soft washes and bands         */

@@ -72,9 +72,11 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
   }
   /* one word, one size, one weight — the colours alone tell the parts */
   .wordmark-text { display: grid; gap: 2px; line-height: 1.1; }
+  /* one step lighter than green-ink so "with" sits up out of the blue
+     without shouting — still the muted meadow green, not a leaf green */
   .wordmark em {
     font-style: normal; font-weight: inherit; font-size: inherit;
-    color: var(--gg-green-ink);
+    color: var(--gg-green-lift);
   }
   /* the motto rides under the name — the site introduces itself in full */
   /* dressed exactly like a nav label, so the header speaks one language */
