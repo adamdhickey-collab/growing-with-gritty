@@ -41,6 +41,12 @@ a:hover { color: var(--gg-blue-deep); }
 .band-sky { background: linear-gradient(180deg, color-mix(in srgb, var(--gg-sky) 42%, var(--gg-paper)), var(--gg-paper)); }
 .band-deep { background: var(--gg-paper-deep); }
 
+/* A page that ends on paper leaves air before the footer. A page that
+   ends on its own coloured ground meets the footer edge to edge — the
+   air would show as a tan sliver of body between two coloured blocks. */
+main > :last-child { margin-bottom: 72px; }
+main > .band-deep:last-child { margin-bottom: 0; }
+
 /* eyebrow label */
 .eyebrow {
   font-weight: 800;

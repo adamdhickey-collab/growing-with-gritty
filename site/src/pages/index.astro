@@ -187,6 +187,7 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
      that the white card still lifts off it. ── */
   .band-grown {
     background: color-mix(in srgb, var(--gg-green) 22%, var(--gg-paper));
+    margin-bottom: 0; /* its own ground — it meets the footer, no paper between */
   }
 
   .grown-cta {
