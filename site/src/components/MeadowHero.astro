@@ -82,11 +82,6 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     </div>
     <img class="tree" src={u("/images/scenery/tree.webp")} alt=""
          width="420" height="573" loading="lazy" />
-    {/* Early-morning mist: it lies on the far ridge and the feet of the
-        school and tree (everything at z2 and below), while the near
-        meadow, the grass, and Gritty stay crisp in front — the distance
-        recedes and the content carries the scene. */}
-    <div class="mist" aria-hidden="true"></div>
     <img class="meadow-layer near" src={u("/images/scenery/meadow-near.webp")} alt=""
          width="5376" height="560" />
     <img class="bushes" src={u("/images/scenery/bushes.webp")} alt=""
@@ -197,20 +192,6 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     position: absolute; z-index: 2; right: 3%; bottom: 128px;
     width: clamp(96px, 14vw, 216px); height: auto;
     transform-origin: 50% 100%;
-  }
-
-  /* the mist itself: one soft band along the ridge line plus two uneven
-     drifts, so it reads as weather rather than a film. Static gradients —
-     costs nothing, moves nothing. Same z as school and tree; later in the
-     DOM, so it lies over them. */
-  .mist {
-    position: absolute; z-index: 2; left: 0; right: 0; bottom: 60px;
-    height: clamp(180px, 44%, 330px);
-    background:
-      radial-gradient(120% 80% at 22% 82%, var(--gg-mist-air) 0%, transparent 60%),
-      radial-gradient(130% 85% at 76% 88%, var(--gg-mist-air) 0%, transparent 64%),
-      linear-gradient(180deg, transparent 0%,
-        var(--gg-mist-air) 46%, var(--gg-mist-air) 80%, transparent 100%);
   }
 
   .bushes {

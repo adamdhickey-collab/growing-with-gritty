@@ -26,11 +26,6 @@
   --gg-hill-mid:  #97BA80;  /* middle hill                              */
   --gg-meadow:    #6E9A5C;  /* the front grass Gritty stands in         */
 
-  /* morning mist — lies over scenery that sits BEHIND content, so the
-     content is always the loudest thing on the page. Used by the hero's
-     far distance (ridge, school, tree). */
-  --gg-mist-air: rgba(236, 244, 247, 0.5);   /* white leaning to sky     */
-
   /* type */
   --gg-display: 'Fredoka Variable', 'Fredoka', 'Comic Sans MS', sans-serif;
   --gg-body: 'Nunito Variable', 'Nunito', 'Trebuchet MS', sans-serif;
