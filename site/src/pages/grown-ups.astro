@@ -2,8 +2,14 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { u } from '../lib/url';
+import { buyLabel } from '../lib/buy';
 
 const printables = await getCollection('printables');
+
+/* The books behind the guide — only ones with a buy link, in series order. */
+const buyableBooks = (await getCollection('books'))
+  .filter((b) => b.data.buyLink)
+  .sort((a, b) => a.data.order - b.data.order);
 
 const kindLabels: Record<string, string> = {
   'coloring-page': '🖍️ Coloring page',
@@ -83,6 +89,31 @@ const groups = [
       the site collects no names, no accounts, and no personal information.</p>
     </div>
   </section>
+
+  {buyableBooks.length > 0 && (
+    <section class="band" aria-labelledby="own-h">
+      <div class="wrap own card">
+        <div class="own-copy">
+          <p class="eyebrow">📚 Bring Gritty home</p>
+          <h2 id="own-h">The books behind the guide</h2>
+          <p>Every printable and conversation starter here grows out of one of
+          Kim's four books. Tap a cover to get your copy on Amazon — or
+          <a href={u("/books")}>look inside the books</a> first.</p>
+        </div>
+        <ul class="own-books" role="list">
+          {buyableBooks.map((b) => (
+            <li>
+              <a href={b.data.buyLink} target="_blank" rel="noopener"
+                 aria-label={`${buyLabel(b.data.buyLink!)}: ${b.data.title} (opens in a new tab)`}>
+                <img src={u(b.data.cover)} alt="" width="160" height="160" loading="lazy" />
+                <span>{b.data.title}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
 </Base>
 
 <style>
@@ -102,4 +133,28 @@ const groups = [
   .dl { padding: 20px; display: grid; gap: 10px; justify-items: start; }
   .dl img { border-radius: var(--gg-radius-small); }
   .kind { font-size: 0.88rem; font-weight: 800; color: var(--gg-green-ink); }
+
+  /* — bring Gritty home — */
+  .own { padding: 36px 40px; display: grid; gap: 24px; }
+  .own-copy { display: grid; gap: 10px; max-width: 62ch; }
+  .own-copy p { color: var(--gg-ink-soft); }
+  .own-books {
+    list-style: none;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 18px;
+  }
+  .own-books a {
+    display: grid; gap: 8px; justify-items: center; text-align: center;
+    text-decoration: none;
+    font-family: var(--gg-display); font-weight: 500;
+    font-size: 0.95rem; line-height: 1.3;
+  }
+  .own-books img {
+    width: 100%; max-width: 160px; height: auto;
+    border-radius: var(--gg-radius-small);
+    box-shadow: var(--gg-shadow);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .own-books a:hover img { transform: translateY(-3px) rotate(-0.6deg); box-shadow: var(--gg-shadow-lift); }
+  .own-books a:hover span { text-decoration: underline; text-decoration-thickness: 2px; }
 </style>

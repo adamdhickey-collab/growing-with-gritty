@@ -3,6 +3,7 @@ import { getCollection, getEntry, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Bubble from '../../components/Bubble.astro';
 import { u } from '../../lib/url';
+import { buyLabel } from '../../lib/buy';
 
 export async function getStaticPaths() {
   const books = await getCollection('books');
@@ -38,7 +39,12 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
           <h1>{title}</h1>
           <div class="story flow"><Content /></div>
           <div class="actions">
-            {buyLink && <a class="btn btn-gold" href={buyLink}>🛒 Buy the book</a>}
+            {buyLink && (
+              <a class="btn btn-gold" href={buyLink} target="_blank" rel="noopener"
+                 aria-label={`${buyLabel(buyLink)}: ${title} (opens in a new tab)`}>
+                🛒 {buyLabel(buyLink)}
+              </a>
+            )}
             {sheet && <a class="btn btn-ghost" href={u(sheet.data.download)}>🖍️ Activity sheet</a>}
             {!buyLink && <p class="soon">Buy link coming soon — ask at your favorite bookstore!</p>}
           </div>
@@ -62,7 +68,10 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
           </ol>
           {buyLink && (
             <p class="inside-buy">
-              <a class="btn btn-gold" href={buyLink}>🛒 Order {title}</a>
+              <a class="btn btn-gold" href={buyLink} target="_blank" rel="noopener"
+                 aria-label={`Order ${title} — ${buyLabel(buyLink)} (opens in a new tab)`}>
+                🛒 Order {title}
+              </a>
             </p>
           )}
         </div>

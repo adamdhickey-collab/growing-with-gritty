@@ -4,6 +4,7 @@ order: 1
 cover: /images/books/gritty-the-goat.webp
 ages: 4–10
 tagline: Gritty's first day of school — and the words that change everything.
+buyLink: https://www.amazon.com/dp/B0BB626P8N
 lesson: Challenging moments can be opportunities to grow. You can overcome difficult situations, learn from your experiences, and gain confidence along the way.
 characters:
   - gritty

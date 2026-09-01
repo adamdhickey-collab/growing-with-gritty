@@ -4,6 +4,7 @@ order: 2
 cover: /images/books/gritty-grows-a-garden.webp
 ages: 4–10
 tagline: Gardens — and healthy habits — take patience, care, and effort to grow.
+buyLink: https://www.amazon.com/dp/B0C9S3G195
 lesson: Gardens and healthy habits take patience, care, and consistent effort to grow. Good things come to those who keep at it!
 characters:
   - gritty

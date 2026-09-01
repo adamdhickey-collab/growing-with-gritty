@@ -16,12 +16,19 @@ will look like.)*
 4. Open the **growing-with-gritty** project. Bookmark this page — it's the
    only URL you ever need.
 
-## Adding a buy link to a book
+## Changing a book's buy link
+
+All four books already link to their Amazon pages. To change one:
 
 1. Click **Books** in the left sidebar, then the book.
-2. Paste the full Amazon address into **Buy link** (it has to start with
+2. Paste the full store address into **Buy link** (it has to start with
    `https://`).
-3. Save. The gold "Buy the book" button appears on that book's page.
+3. Save. The gold buy buttons update everywhere they appear — on the
+   book's own page, on the book cards on the homepage and Books page, and
+   in the "Bring Gritty home" strip on the Grown-Up Grit Guide. If the
+   address is an Amazon one the button says "Buy on Amazon"; any other
+   store gets "Buy the book". Clearing the field hides the buttons for
+   that book.
 
 ## Adding a printable (coloring page, cards, poster…)
 

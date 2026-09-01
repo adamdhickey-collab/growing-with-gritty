@@ -4,6 +4,7 @@ order: 4
 cover: /images/books/gritty-builds-a-tree-house.webp
 ages: 4–10
 tagline: A rhyming adventure about perseverance — with Gritty's cousin Gibby.
+buyLink: https://www.amazon.com/dp/B0H86SS24Z
 lesson: Achieving a goal often takes patience, problem-solving, and the willingness to keep trying. Any little goat can grow up with grit!
 characters:
   - gritty
