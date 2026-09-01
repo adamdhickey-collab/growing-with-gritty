@@ -40,8 +40,7 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
     </div>
   </section>
 
-  <section class="band band-world" aria-labelledby="world-h"
-           style={`--world-art: url('${u("/images/scenery/meadow-panorama.webp")}')`}>
+  <section class="band band-world" aria-labelledby="world-h">
     <div class="wrap">
       <p class="eyebrow">Gritty's World</p>
       <h2 id="world-h">Where do you want to go?</h2>
@@ -160,32 +159,9 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
     gap: 24px;
   }
 
-  /* ── the world band: Kim's meadow runs full-bleed behind the cards. The art
-     is pinned to the bottom at its own aspect ratio — a stretched daisy is an
-     oval — so the paper shows above its ragged cloud edge. That is exactly
-     where the heading sits, which is why the heading stays readable no matter
-     how tall the band gets.
-
-     Over the art lies morning mist: opaque paper behind the heading,
-     thinning toward the viewer so the meadow only peeks out at the band's
-     foot — the scene sets the mood, the cards do the talking. ── */
-  .band-world {
-    padding-block: 56px 76px;
-    background:
-      linear-gradient(180deg,
-        var(--gg-paper) 0%,
-        var(--gg-paper) 26%,
-        var(--gg-mist) 58%,
-        color-mix(in srgb, var(--gg-paper) 30%, transparent) 100%),
-      var(--world-art) bottom center / 100% auto no-repeat,
-      var(--gg-paper);
-  }
-  /* narrow screens: the band is tall and a full-width strip would be a sliver,
-     so the art runs wider than the screen and holds its left edge — where the
-     treehouse and the little garden are */
-  @media (max-width: 700px) {
-    .band-world { background-size: 190% auto; background-position: bottom left; }
-  }
+  /* ── the world band: a clean sheet of paper. The cards themselves are
+     Kim's art — on a quiet ground they do all the talking. ── */
+  .band-world { padding-block: 56px 76px; }
 
   .world-note { color: var(--gg-ink-soft); margin-top: 6px; }
   .world-grid {
@@ -208,14 +184,7 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
   .world-card h3 { margin-top: 18px; }
   .world-card p { color: var(--gg-ink-soft); }
 
-  /* this line lands on the grass, where ink-soft on green would fail contrast
-     — so it carries its own scrap of paper with it */
-  .world-more {
-    margin-top: 26px; color: var(--gg-ink-soft);
-    display: inline-block; padding: 10px 20px;
-    background: color-mix(in srgb, var(--gg-paper) 88%, transparent);
-    border-radius: var(--gg-radius);
-  }
+  .world-more { margin-top: 26px; color: var(--gg-ink-soft); }
 
   .grown-cta {
     display: flex; flex-wrap: wrap; align-items: center; gap: 20px 40px;
