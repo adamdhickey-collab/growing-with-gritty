@@ -4,7 +4,6 @@ import Base from '../layouts/Base.astro';
 import Bubble from '../components/Bubble.astro';
 import BookCard from '../components/BookCard.astro';
 import MeadowHero from '../components/MeadowHero.astro';
-import Stamp from '../components/Stamp.astro';
 import home from '../data/homepage.json';
 import { u } from '../lib/url';
 
@@ -23,38 +22,17 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
 
   <section class="band welcome">
     <div class="wrap welcome-inner">
-      <img
-        class="welcome-art"
-        src={u("/images/scenes/gritty-backpack.webp")}
-        alt="Gritty the Goat wearing a blue backpack, ready for school"
-        width="600" height="576" loading="lazy"
-      />
-      <div class="welcome-copy">
-        <p class="lede">{home.heroText}</p>
-        <p class="tagline">{home.heroTagline}</p>
-        <div class="cta">
-          <a class="btn btn-primary" href={u("/meet-gritty")}>🐐 Meet Gritty</a>
-          <a class="btn btn-gold" href={u("/books")}>📚 See the books</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="band" aria-label="Gritty's four values">
-    <div class="wrap stamps">
-      <Stamp emoji="🌱" label="Be Determined" tone="green" tilt={-3} />
-      <Stamp emoji="💛" label="Be Kind" tone="gold" tilt={2} />
-      <Stamp emoji="⭐" label="Believe in Yourself" tone="blue" tilt={-2} />
-      <Stamp emoji="⛰️" label="Never Give Up" tone="green" tilt={3} />
-    </div>
-  </section>
-
-  <section class="band band-sky">
-    <div class="wrap">
-      <p class="eyebrow">Books by Kim Rekowski</p>
-      <h2>Four adventures, one big idea: keep trying</h2>
-      <div class="book-grid">
-        {books.map((book) => <BookCard book={book} />)}
+      <h2 class="tagline">{home.heroTagline}</h2>
+      <p class="lede">{home.heroText}</p>
+      <div class="cta">
+        <a class="btn btn-primary cta-big" href={u("/meet-gritty")}>
+          <img src={u("/images/nav/meet-gritty.webp")} alt="" width="64" height="64" />
+          <span>Meet Gritty</span>
+        </a>
+        <a class="btn btn-gold cta-big" href={u("/books")}>
+          <img src={u("/images/nav/books.webp")} alt="" width="64" height="64" />
+          <span>See the books</span>
+        </a>
       </div>
     </div>
   </section>
@@ -100,6 +78,16 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
     </div>
   </section>
 
+  <section class="band band-sky">
+    <div class="wrap">
+      <p class="eyebrow">Books by Kim Rekowski</p>
+      <h2>Four adventures, one big idea: keep trying</h2>
+      <div class="book-grid">
+        {books.map((book) => <BookCard book={book} />)}
+      </div>
+    </div>
+  </section>
+
   <section class="band">
     <div class="wrap grown-cta card">
       <div>
@@ -121,31 +109,31 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
 </Base>
 
 <style>
-  .welcome { padding-block: 44px; }
+  /* ── the welcome: words only — Gritty already made his entrance in the
+     hero, so this section speaks up instead of repeating him ── */
+  .welcome { padding-block: 52px 44px; }
   .welcome-inner {
-    display: grid; grid-template-columns: minmax(0, 230px) minmax(0, 1fr);
-    gap: 12px 40px; align-items: center; justify-content: center;
+    display: grid; gap: 20px; justify-items: center; text-align: center;
   }
-  .welcome-art { width: 100%; height: auto; display: block; }
-  .welcome-copy { display: grid; gap: 18px; justify-items: start; }
-  .lede { font-size: 1.15rem; color: var(--gg-ink-soft); max-width: 52ch; }
   .tagline {
-    font-family: var(--gg-display); font-weight: 600; font-size: 1.35rem;
-    color: var(--gg-green-ink); max-width: 20ch;
+    font-family: var(--gg-display); font-weight: 600;
+    font-size: clamp(1.7rem, 3.6vw, 2.4rem); line-height: 1.15;
+    color: var(--gg-green-ink); text-wrap: balance;
   }
-  .cta { display: flex; flex-wrap: wrap; gap: 14px; }
-
-  @media (max-width: 700px) {
-    .welcome-inner {
-      grid-template-columns: 1fr; justify-items: center; text-align: center;
-    }
-    .welcome-art { max-width: 220px; }
-    .welcome-copy { justify-items: center; }
-    .tagline { max-width: none; }
-    .cta { justify-content: center; }
+  .lede {
+    font-size: clamp(1.15rem, 1.8vw, 1.35rem); line-height: 1.6;
+    color: var(--gg-ink-soft); max-width: 54ch; text-wrap: pretty;
   }
-
-  .stamps { display: flex; flex-wrap: wrap; gap: 24px 40px; justify-content: center; }
+  .cta { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; margin-top: 6px; }
+  /* the crayon nav icons, at a size where the drawing actually reads */
+  .cta-big {
+    display: inline-flex; align-items: center; gap: 13px;
+    font-size: 1.2rem; padding: 10px 30px 10px 14px;
+  }
+  .cta-big img {
+    width: 52px; height: 52px; object-fit: contain;
+    background: #fff; border-radius: 50%; padding: 5px;
+  }
 
   .book-grid {
     margin-top: 28px;
