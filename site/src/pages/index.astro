@@ -29,7 +29,10 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
           <img src={u("/images/nav/meet-gritty.webp")} alt="" width="64" height="64" />
           <span>Meet Gritty</span>
         </a>
-        <a class="btn btn-gold cta-big" href={u("/books")}>
+        {/* on the sunshine band a gold button would melt into the sky —
+            and white-on-gold text never met AA anyway (≈2.2:1). A white
+            paper button with Gritty Blue does both jobs. */}
+        <a class="btn btn-ghost cta-big" href={u("/books")}>
           <img src={u("/images/nav/books.webp")} alt="" width="64" height="64" />
           <span>See the books</span>
         </a>
@@ -111,21 +114,36 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
 
 <style>
   /* ── the welcome: words only — Gritty already made his entrance in the
-     hero, so this section speaks up instead of repeating him ── */
-  .welcome { padding-block: 52px 44px; }
+     hero, so this section speaks up instead of repeating him. It sits in
+     full sunshine: the meadow's own yellows, light at the grass line and
+     warming as it goes. Every color on the sun re-checked for AA —
+     blue-deep ≈ 7.5:1, ink ≈ 10:1; green-ink and ink-soft (the paper-band
+     colors) drop to ≈ 4.4:1 here, which is why they don't come along. ── */
+  .welcome {
+    padding-block: 52px 48px;
+    background: linear-gradient(180deg, var(--gg-sun-core), var(--gg-sun));
+  }
   .welcome-inner {
     display: grid; gap: 20px; justify-items: center; text-align: center;
   }
   .tagline {
     font-family: var(--gg-display); font-weight: 600;
     font-size: clamp(1.7rem, 3.6vw, 2.4rem); line-height: 1.15;
-    color: var(--gg-green-ink); text-wrap: balance;
+    color: var(--gg-blue-deep); text-wrap: balance;
   }
   .lede {
     font-size: clamp(1.15rem, 1.8vw, 1.35rem); line-height: 1.6;
-    color: var(--gg-ink-soft); max-width: 54ch; text-wrap: pretty;
+    color: var(--gg-ink); max-width: 54ch; text-wrap: pretty;
   }
   .cta { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; margin-top: 6px; }
+  /* the books button: white paper so it pops off the sun, Gritty Blue
+     text at ≈ 6.7:1 (the global ghost is see-through, which on yellow
+     would tint it green) */
+  .welcome .btn-ghost { background: #fff; }
+  .welcome .btn-ghost:hover { background: color-mix(in srgb, var(--gg-sky) 35%, #fff); }
+  /* the gold focus ring vanishes on its own color (≈1.8:1) — on this band
+     the ring goes deep blue (≈8:1, WCAG 1.4.11 wants 3:1) */
+  .welcome :focus-visible { outline-color: var(--gg-blue-deep); }
   /* the crayon nav icons, at a size where the drawing actually reads */
   .cta-big {
     display: inline-flex; align-items: center; gap: 13px;
