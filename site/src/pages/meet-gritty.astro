@@ -65,7 +65,9 @@ const gritIs: { icon: string; label: string }[] = [
       <div class="char-grid">
         {rendered.map(({ c, Content }) => (
           <article class="char-card card">
-            {c.data.portrait ? (
+            {c.data.scene ? (
+              <img class="scene" src={u(c.data.scene)} alt={`${c.data.name}, hand-drawn by Kim Rekowski`} width="600" height="600" loading="lazy" />
+            ) : c.data.portrait ? (
               <img class="portrait" src={u(c.data.portrait)} alt={`${c.data.name}, hand-drawn by Kim Rekowski`} width="320" height="416" loading="lazy" />
             ) : (
               <div class="portrait coming" aria-hidden="true">
@@ -105,10 +107,20 @@ const gritIs: { icon: string; label: string }[] = [
 
   .char-grid {
     margin-top: 28px;
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     gap: 24px;
   }
-  .char-card { padding: 24px; display: grid; gap: 8px; justify-items: start; }
+  /* Like the homepage's doors: the art is square and sits flush at the top,
+     the words get the padding. A card still on a cutout portrait keeps its
+     old frame until its scene lands. */
+  .char-card { padding: 0 0 24px; display: grid; gap: 8px; justify-items: start; overflow: hidden; }
+  .char-card > * { padding-inline: 20px; }
+  .char-card > .portrait, .char-card > .portrait.coming { margin-top: 24px; }
+  .char-card h3 { margin-top: 16px; }
+  .char-card > .scene {
+    padding: 0; width: 100%; height: auto; aspect-ratio: 1 / 1;
+    object-fit: cover; display: block; background: var(--gg-sky);
+  }
   .portrait {
     width: 100%; max-width: 220px; height: auto; margin-inline: auto;
     object-fit: contain;

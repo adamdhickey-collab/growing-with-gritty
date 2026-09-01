@@ -45,6 +45,9 @@ const characters = defineCollection({
     /* Kim's art. Optional: cards show a friendly "portrait coming soon"
        frame until her drawing is scanned — never stand-in or generated art. */
     portrait: optionalString,
+    /* The square tile for the Meet Gritty cards: the same drawing on its
+       own brand color with one object at its feet. Falls back to portrait. */
+    scene: optionalString,
     /* One line under the name: "The little goat with big grit". */
     role: optionalString,
   }),

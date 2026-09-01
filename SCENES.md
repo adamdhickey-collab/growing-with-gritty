@@ -101,3 +101,99 @@ cd site && for f in ~/Downloads/gritty-scenes-2/*.png; do npm run add-image -- "
 code changes needed — the homepage cards pick up the new art as-is.
 (`gritty-backpack.webp` is the fifth scene in that folder and isn't part of
 this round.)
+
+---
+
+# Scene art, round three — the whole herd
+
+> **Status: all five landed, 1 Sep 2026**, as `meet-*.webp` in
+> `site/public/images/scenes/`. The Meet Gritty cards read them from a new
+> `scene` field on each character; `portrait` (the cutout) stays for the
+> small avatars on the book pages.
+
+The "Gritty's family & friends" cards on Meet Gritty sat on white with Kim's
+cutout portraits. This round gives each goat the homepage treatment: the same
+drawing, untouched, on its own brand color with a green grass strip and one
+object at its feet.
+
+| Character | File | Background | Object | Why |
+|---|---|---|---|---|
+| Gritty | `meet-gritty.webp` | Meadow Green `#7FA86B` | blue school backpack | first day of school; the meadow he stands in |
+| Grandpa Goat | `meet-grandpa-goat.webp` | Gritty Blue `#2C5F8A` | wooden "I have GRIT! I don't quit!" sign | his words started it all |
+| Gabby | `meet-gabby.webp` | Blush Pink `#FDB8B9` (`--gg-pink`) | daisies tied with pink gingham | the friendship expert; matches her flower and bow |
+| Grandma Goat | `meet-grandma-goat.webp` | Sun `#F2D48A` | wicker snack basket | "don't forget a good snack"; her straw hat |
+| Gibby | `meet-gibby.webp` | Sky `#A7CBE3` | toolbox, hammer, boards | the tree house he learned patience building |
+
+`--gg-pink` was added to `tokens.css` for this round, sampled from the calm
+tile so the two pinks match.
+
+## The prompts
+
+Working method: **one prompt per message, attach the cutout portrait from
+`site/public/images/characters/`**, and paste the shared block above each
+prompt every time.
+
+> Use the attached goat drawing as the exact character reference. Keep the
+> goat EXACTLY as drawn: same pose, same proportions, same facial expression,
+> same colors, same thick black hand-inked outlines, same colored-pencil
+> shading, same accessories. Do not redraw, restyle, add to, or remove
+> anything on the goat. Only add a background and one object.
+>
+> Style: hand-drawn children's picture book illustration, colored pencil and
+> crayon texture, thick black outlines, flat saturated background with soft
+> pencil grain, square 1:1 image. The goat stands centered on a strip of green
+> grass along the bottom (about the bottom quarter). Place the object on the
+> grass at the goat's feet, small enough that the goat stays the focus. No
+> other scenery, no extra characters, no text unless the prompt says so.
+
+**1 · Gritty** — *attach `gritty-standing.webp`* (the red-backpack take was
+generated too; the blue one landed)
+
+> Background: a flat meadow green, hex #7FA86B, filling the whole image behind
+> the goat. Grass strip along the bottom in a slightly darker green, hex
+> #6E9A5C, with a few simple crayon grass tufts.
+> Object: a small blue school backpack sitting on the grass beside Gritty's
+> front hooves, straps open, zipper pull showing, drawn in the same
+> thick-outline crayon style.
+
+**2 · Grandpa Goat** — *attach `grandpa-goat.webp`*
+
+> Background: a flat Gritty Blue, hex #2C5F8A, filling the whole image behind
+> the goat. Green grass strip along the bottom, hex #7FA86B, with a few simple
+> crayon grass tufts.
+> Object: a hand-painted wooden sign on a short post planted in the grass next
+> to Grandpa Goat, reading "I have GRIT! I don't quit!" in bold, friendly
+> hand-lettered letters, in the same thick-outline crayon style.
+
+**3 · Gabby** — *attach `gabby.webp`*
+
+> Background: a flat soft pink, hex #FDB8B9, filling the whole image behind
+> the goat. Green grass strip along the bottom, hex #7FA86B, with a few simple
+> crayon grass tufts.
+> Object: a small bunch of white daisies with yellow centers, tied together
+> with a pink gingham ribbon that matches Gabby's bow, lying on the grass
+> beside her front hooves, in the same thick-outline crayon style.
+
+**4 · Grandma Goat** — *attach `grandma-goat.webp`*
+
+> Background: a flat warm sun yellow, hex #F2D48A, filling the whole image
+> behind the goat. Green grass strip along the bottom, hex #7FA86B, with a few
+> simple crayon grass tufts.
+> Object: a small wicker picnic basket on the grass beside Grandma Goat, with
+> a pink gingham cloth peeking out and a couple of red apples and a cookie
+> visible on top, in the same thick-outline crayon style.
+
+**5 · Gibby** — *attach `gibby.webp`*
+
+> Background: a flat light sky blue, hex #A7CBE3, filling the whole image
+> behind the goat. Green grass strip along the bottom, hex #7FA86B, with a few
+> simple crayon grass tufts.
+> Object: a small wooden toolbox on the grass beside Gibby with a hammer
+> handle sticking out, and two or three short wooden boards leaning against
+> it, in the same thick-outline crayon style.
+
+## Landing them
+
+```bash
+cd site && for n in meet-gritty meet-grandpa-goat meet-gabby meet-grandma-goat meet-gibby; do npm run add-image -- "scenes/$n" ~/Downloads/$n.png --replace; done
+```
