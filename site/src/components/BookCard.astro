@@ -2,12 +2,14 @@
 import type { CollectionEntry } from 'astro:content';
 import { u } from '../lib/url';
 import { buyLabel } from '../lib/buy';
+import Icon from './Icon.astro';
 import IconCart from './IconCart.astro';
 
 interface Props { book: CollectionEntry<'books'>; headingLevel?: 2 | 3 }
 const { book, headingLevel = 3 } = Astro.props;
 const H = headingLevel === 2 ? 'h2' : 'h3';
-const { title, order, cover, ages, tagline, buyLink } = book.data;
+const { title, order, cover, ages, tagline, buyLink, spreads } = book.data;
+const hasInside = spreads.length > 0;
 ---
 
 <article class="book-card card">
@@ -22,11 +24,24 @@ const { title, order, cover, ages, tagline, buyLink } = book.data;
     <H class="title"><a href={u(`/books/${book.id}`)}>{title}</a></H>
     <p class="ages">Book {order}{ages && ` · Ages ${ages}`}</p>
     {tagline && <p class="tagline">{tagline}</p>}
-    {buyLink && (
-      <a class="btn btn-gold buy" href={buyLink} target="_blank" rel="noopener"
-         aria-label={`${buyLabel(buyLink)}: ${title} (opens in a new tab)`}>
-        <IconCart />{buyLabel(buyLink)}
-      </a>
+    {(hasInside || buyLink) && (
+      <div class="actions">
+        {/* Two doors, stacked: a peek at real pages first, the shop second.
+            The peek is the paper-and-blue button so the gold one still
+            reads as the single "buy" moment on the card. */}
+        {hasInside && (
+          <a class="btn btn-ghost" href={u(`/books/${book.id}#inside`)}
+             aria-label={`Take a look inside ${title}`}>
+            <Icon name="ui-look-inside" size="1.45em" />Take a look inside
+          </a>
+        )}
+        {buyLink && (
+          <a class="btn btn-gold" href={buyLink} target="_blank" rel="noopener"
+             aria-label={`${buyLabel(buyLink)}: ${title} (opens in a new tab)`}>
+            <IconCart />{buyLabel(buyLink)}
+          </a>
+        )}
+      </div>
     )}
   </div>
 </article>
@@ -49,8 +64,11 @@ const { title, order, cover, ages, tagline, buyLink } = book.data;
   .title a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
   .ages { font-size: 0.85rem; font-weight: 800; color: var(--gg-green-ink); margin-top: 2px; }
   .tagline { font-size: var(--gg-text-small); color: var(--gg-ink-soft); margin-top: 6px; }
-  /* whichever line of copy comes last takes up the slack, so the button
-     keeps its 14px breath and still lands on the card's floor */
+  /* whichever line of copy comes last takes up the slack, so the buttons
+     keep their 14px breath and still land on the card's floor */
   .meta p:last-of-type { margin-bottom: auto; }
-  .buy { margin-top: 14px; font-size: 0.95rem; }
+  /* the two buttons share one width — the card's — so the stack reads as a
+     pair rather than two pills of different lengths hugging the left edge */
+  .actions { margin-top: 14px; align-self: stretch; display: grid; gap: 10px; }
+  .actions .btn { justify-content: center; font-size: 0.95rem; }
 </style>
