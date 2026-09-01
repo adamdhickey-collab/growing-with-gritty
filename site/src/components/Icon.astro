@@ -1,44 +1,101 @@
 ---
-/* A drawn icon from public/images/icons — Kim's marker-doodle set, the
- * replacement for the system emoji the site used to render inline.
+/* The site's icon system: Fluent Emoji Flat (Microsoft, MIT) by way of
+ * Iconify, inlined as SVG at build time — nothing fetched at runtime.
  *
- * Decorative by design: the word beside it always carries the meaning, so
- * the image stays alt="" and aria-hidden, same contract as Stamp's disc.
- * Sized in em (like IconCart) so it scales with whatever text it sits next
- * to, instead of needing a pixel size at every call site.
+ * Call sites ask for a MEANING ("action-idea"), not a glyph name, so the
+ * artwork underneath can change without touching a single page. The map
+ * below is the only place that knows Fluent's vocabulary.
  *
- * The art is ink-on-transparent, so it needs a light ground — paper, a card,
- * a ghost button. On a solid blue or gold button the outline goes muddy, and
- * those spots still use emoji. ICONS.md §4 tracks what is still to draw.
+ * Being SVG, these scale to any size without going soft, and they fill
+ * their box — the drawn PNGs carried ~15% padding, which is why everything
+ * used to read a size smaller than it was set.
+ *
+ * Decorative by contract: alt-less and aria-hidden, because the word beside
+ * an icon always carries the meaning. Kim's own art still holds the header
+ * nav and the two big welcome buttons; this set is for everything else.
  */
-import { u } from '../lib/url';
+import { Icon as Iconify } from 'astro-icon/components';
+
+const ICONS: Record<string, string> = {
+  /* feelings — the Calming Corner picker, and the Mistake Maker's oops */
+  'feeling-angry': 'angry-face',
+  'feeling-sad': 'crying-face',
+  'feeling-worried': 'worried-face',
+  'feeling-frustrated': 'persevering-face',
+  'feeling-tired': 'sleepy-face',
+  'feeling-nervous': 'anxious-face-with-sweat',
+  'feeling-silly-oops': 'winking-face-with-tongue',
+
+  /* what grit looks like */
+  'action-try-again': 'counterclockwise-arrows-button',
+  'action-idea': 'light-bulb',
+  'action-ask-for-help': 'handshake',
+  'action-calm-break': 'person-in-lotus-position',
+  'action-something-new': 'sparkles',
+  'action-hard-thing': 'puzzle-piece',
+  'action-keep-going': 'person-climbing',
+  'action-brain-grows': 'brain',
+  'action-strong': 'flexed-biceps',
+  'action-mountain-streak': 'mountain',
+  'action-celebrate': 'party-popper',
+
+  /* hearts and stars */
+  'badge-star': 'star',
+  'badge-star-burst': 'glowing-star',
+  'heart-kind': 'yellow-heart',
+  'heart-believe': 'red-heart',
+  'heart-hands-helped': 'heart-hands',
+
+  /* calm-down strategies */
+  'calm-breathe': 'wind-face',
+  'calm-five-senses': 'hand-with-fingers-splayed',
+  'calm-water': 'droplet',
+  'calm-flower-candle': 'cherry-blossom',
+  'calm-kind-thought': 'thought-balloon',
+  'calm-movement': 'person-walking',
+  'calm-talk-grown-up': 'speaking-head',
+  'calm-leaf': 'herb',
+
+  /* printables */
+  'printable-coloring-page': 'crayon',
+  'printable-discussion-cards': 'speech-balloon',
+  'printable-journal': 'notebook',
+  'printable-certificate': 'trophy',
+  'printable-book-guide': 'books',
+  'printable-classroom': 'school',
+
+  /* interface */
+  'ui-download': 'down-arrow',
+  'ui-next-arrow': 'right-arrow',
+  'ui-back': 'left-arrow',
+  'ui-play': 'play-button',
+  'ui-buy-cart': 'shopping-cart',
+  'ui-look-inside': 'open-book',
+};
 
 interface Props {
   name: string;
-  /* any CSS length; em keeps it tied to the surrounding type */
+  /* any CSS length; em ties it to the type beside it */
   size?: string;
   class?: string;
 }
-const { name, size = '1.15em', class: cls } = Astro.props;
+const { name, size = '1.3em', class: cls } = Astro.props;
+
+const glyph = ICONS[name];
+if (!glyph) {
+  /* fails the build rather than shipping a hole where an icon should be */
+  throw new Error(
+    `Icon "${name}" is not in the map in src/components/Icon.astro. ` +
+      `Known names: ${Object.keys(ICONS).join(', ')}`
+  );
+}
 ---
 
-<img
-  class:list={['gg-icon', cls]}
-  src={u(`/images/icons/${name}.webp`)}
-  alt=""
+{/* inline width/height rather than a scoped class: Astro's scoped styles
+    don't reach inside a child component, and this is a child component. */}
+<Iconify
+  name={`fluent-emoji-flat:${glyph}`}
+  class={cls}
   aria-hidden="true"
-  width="256"
-  height="256"
-  loading="lazy"
-  decoding="async"
-  style={`--icon-size:${size}`}
+  style={`width:${size};height:${size};flex:none;vertical-align:-0.15em`}
 />
-
-<style>
-  .gg-icon {
-    width: var(--icon-size, 1.15em);
-    height: var(--icon-size, 1.15em);
-    flex: none; /* its own flex item, so a button's gap actually separates it */
-    object-fit: contain;
-  }
-</style>

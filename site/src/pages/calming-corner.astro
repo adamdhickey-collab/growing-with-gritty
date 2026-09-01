@@ -26,7 +26,7 @@ const feelings = [
   <section class="band">
     <div class="wrap intro">
       <p class="eyebrow">Gritty's World</p>
-      <h1>The Calming Corner <Icon name="action-calm-break" /></h1>
+      <h1>The Calming Corner <Icon name="action-calm-break" size="1.1em" /></h1>
       <Bubble tail={false}>
         "Big feelings happen to everyone. Let's help your body feel calm."
       </Bubble>
@@ -45,7 +45,7 @@ const feelings = [
             data-response={f.response}
             aria-pressed="false"
           >
-            <Icon name={f.icon} size="2.6rem" />
+            <Icon name={f.icon} size="3.6rem" />
             <span>{f.label}</span>
           </button>
         ))}
@@ -70,7 +70,7 @@ const feelings = [
           <details class="strategy card">
             <summary>
               {s.data.icon
-                ? <Icon name={s.data.icon} size="2.1rem" />
+                ? <Icon name={s.data.icon} size="3rem" />
                 : s.data.emoji
                   ? <span class="strat-emoji" aria-hidden="true">{s.data.emoji}</span>
                   : <Icon name="calm-leaf" size="2.1rem" />}
@@ -98,7 +98,7 @@ const feelings = [
       <div class="breath-circle" data-circle aria-hidden="true"><span>🐐</span></div>
       <p class="breath-cue" data-cue role="status">Ready when you are.</p>
       <button type="button" class="btn btn-primary" data-breathe-btn>
-        🌬️ Breathe with Gritty
+        <Icon name="calm-breathe" /><span data-breathe-label>Breathe with Gritty</span>
       </button>
     </div>
   </section>
@@ -106,7 +106,7 @@ const feelings = [
   <section class="band">
     <div class="wrap next-up card">
       <p>Feeling calm and ready for a challenge? Gritty could use your help.</p>
-      <a class="btn btn-primary" href={u('/grit-zone')}>💪 Visit the Grit Zone</a>
+      <a class="btn btn-primary" href={u('/grit-zone')}><Icon name="action-strong" /> Visit the Grit Zone</a>
     </div>
   </section>
 </Base>
@@ -131,6 +131,7 @@ const feelings = [
     const circle = breathe.querySelector<HTMLElement>('[data-circle]')!;
     const cue = breathe.querySelector<HTMLElement>('[data-cue]')!;
     const btn = breathe.querySelector<HTMLElement>('[data-breathe-btn]')!;
+    const btnLabel = btn.querySelector<HTMLElement>('[data-breathe-label]')!;
     const ROUNDS = 5;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let running = false;
@@ -139,13 +140,13 @@ const feelings = [
       running = false;
       clearTimeout(timer);
       circle.classList.remove('in');
-      btn.textContent = '🌬️ Breathe with Gritty';
+      btnLabel.textContent = 'Breathe with Gritty';
       cue.textContent = message;
     };
 
     const round = (n: number) => {
       if (n > ROUNDS) {
-        stop('You did it! How does your body feel? 💛');
+        stop('You did it! How does your body feel?');
         return;
       }
       cue.textContent = `Breath ${n} of ${ROUNDS} — smell the flower… breathe in…`;
@@ -163,7 +164,7 @@ const feelings = [
         return;
       }
       running = true;
-      btn.textContent = 'Stop';
+      btnLabel.textContent = 'Stop';
       round(1);
     });
   }
@@ -205,7 +206,6 @@ const feelings = [
   }
   .strategy summary::-webkit-details-marker { display: none; }
   .strategy summary:hover { background: color-mix(in srgb, var(--gg-sky) 30%, transparent); }
-  .strat-emoji { font-size: 1.6rem; flex: none; }
   .strat-name { flex: 1; }
   .strat-chevron { transition: rotate 0.2s ease; color: var(--gg-ink-soft); }
   .strategy[open] .strat-chevron { rotate: 180deg; }

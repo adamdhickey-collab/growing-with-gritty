@@ -1,3 +1,11 @@
+# The icon system
+
+> **Superseded, 1 Sep 2026.** The site now uses **Fluent Emoji Flat**
+> (Microsoft, MIT) through Iconify — see §7. Everything above is the record of
+> the hand-drawn attempt: the inventory in §1 is still the accurate map of
+> every icon slot on the site, and §5's prompts still work if drawn art is
+> ever wanted again.
+
 # Emoji inventory → hand-drawn icon set
 
 Every place the live site (`site/src`) currently renders a system emoji as an
@@ -584,3 +592,47 @@ that button restyled to `btn-ghost`.
   machine stage, and the "Another mistake" button were all on screen from first
   paint. Invisible before because the leaking elements were empty; the drawn
   icon inside them made it obvious. Fixed the way grit-zone does.
+
+---
+
+## 7. The library switch — Fluent Emoji Flat
+
+The hand-drawn set was inconsistent from one icon to the next, which is what a
+freehand set does across 41 drawings. Replaced with a real system.
+
+**How it works.** `astro-icon` + `@iconify-json/fluent-emoji-flat`, configured
+in `astro.config.mjs`. SVGs are **inlined at build time** — nothing is fetched
+at runtime, so there is no CDN, no CSP problem, and no extra request per icon.
+Being vector, they stay sharp at any size and fill their box, which is why
+everything now reads larger even where the number barely changed: the drawn
+PNGs carried ~15% internal padding.
+
+**`components/Icon.astro` is still the only file that knows.** Call sites ask
+for a meaning — `<Icon name="action-idea" />` — and the map inside translates
+to Fluent's vocabulary. Every page kept working through the swap without an
+edit. An unknown name throws at build time rather than shipping a hole.
+
+**Kept as Kim's own art, untouched:** the seven header nav icons, and the two
+big welcome buttons under the hero.
+
+**Sizes, roughly doubled where they were smallest:** feelings 3.6rem, calm
+strategies 3rem, grit cards 3.6rem, check-in coins 3.4rem, tabs 2.9rem, stamps
+66px, finale 4.5rem, inline default 1.3em. Several wrapper spans had a
+`font-size` that clipped a taller inline SVG; they now size to their contents.
+
+**Everything is an icon again**, including the spots the drawn set couldn't
+hold: full-colour glyphs read fine on the solid blue and gold buttons where
+ink-on-transparent art went muddy, so `ui-download`, the cart, and the Grit
+Trail's own controls are all wired now.
+
+**Licence:** MIT (Microsoft). No attribution requirement.
+
+### Two loose ends
+
+- The 41 drawn `.webp` files in `public/images/icons/` are now unreferenced
+  (~630KB). Left in place deliberately — they're committed, and they may still
+  be wanted for print or a future pass. Safe to delete whenever.
+- Four `🐐` remain, standing in for Gritty: the Meet Gritty portrait
+  placeholder, the Calming Corner breath circle, and two spots on a book page.
+  A stock library goat would be wrong for him — these should point at
+  `gritty-face.webp`, which the site already ships.

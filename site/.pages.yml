@@ -318,26 +318,22 @@ content:
         label: Icon
         type: select
         description: >-
-          One of Kim's drawn icons. Leave blank to use the emoji below
-          instead.
+          The picture on the card. Leave blank for a plain leaf.
         options:
           values:
+            - calm-breathe
             - calm-five-senses
             - calm-flower-candle
-            - calm-movement
-            - calm-water
-            - calm-breathe
             - calm-kind-thought
+            - calm-leaf
+            - calm-movement
+            - calm-talk-grown-up
+            - calm-water
             - action-calm-break
             - action-try-again
             - action-ask-for-help
+            - heart-kind
             - badge-star
-      - name: emoji
-        label: Emoji
-        type: string
-        description: >-
-          One emoji for the card, like 🌬️. Only used when no icon is picked
-          above.
       - name: steps
         label: The steps
         type: text

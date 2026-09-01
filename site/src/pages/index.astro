@@ -5,6 +5,7 @@ import Bubble from '../components/Bubble.astro';
 import BookCard from '../components/BookCard.astro';
 import MeadowHero from '../components/MeadowHero.astro';
 import home from '../data/homepage.json';
+import Icon from '../components/Icon.astro';
 import { u } from '../lib/url';
 
 const books = (await getCollection('books')).sort((a, b) => a.data.order - b.data.order);
@@ -76,7 +77,7 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
       </div>
       <p class="world-more">
         Made a mistake today? Lucky you —
-        <a href={u("/mistake-maker")}>visit the Mistake Maker 🧠</a>
+        <a href={u("/mistake-maker")}>visit the Mistake Maker</a> <Icon name="action-brain-grows" />
       </p>
     </div>
   </section>

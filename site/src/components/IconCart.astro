@@ -1,19 +1,7 @@
 ---
-/* The cart on buy buttons. An inline SVG rather than the 🛒 emoji: it
- * inherits the button's text color, scales with its font size, and sits as
- * its own flex item so the button's gap actually separates it from the
- * label.
- *
- * ui-buy-cart.webp exists and is good, but it is ink-on-transparent art and
- * these buttons are solid gold — the drawn cart goes to a dark speck on that
- * ground, where this SVG stays crisp white. It needs either a light-ground
- * slot or a cream-ink variant before it can take this spot (ICONS.md §6). */
+/* The cart on buy buttons. Its own component so the three buy buttons stay
+ * one decision — and because this spot has changed art twice already. */
+import Icon from './Icon.astro';
 ---
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1.05em" height="1.05em"
-     fill="none" stroke="currentColor" stroke-width="2.1"
-     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <circle cx="9.5" cy="20" r="1.5" />
-  <circle cx="16.5" cy="20" r="1.5" />
-  <path d="M3.5 4h2.2l2.3 11a1.8 1.8 0 0 0 1.76 1.4h6.9a1.8 1.8 0 0 0 1.75-1.36L20.5 8.2H6.6" />
-</svg>
+<Icon name="ui-buy-cart" size="1.45em" />

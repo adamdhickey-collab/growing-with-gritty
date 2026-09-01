@@ -50,7 +50,7 @@ const groups = [
   {groups.length === 0 ? (
     <section class="band">
       <div class="wrap empty card">
-        <span class="big" aria-hidden="true"><Icon name="printable-coloring-page" size="3.4rem" /></span>
+        <span class="big" aria-hidden="true"><Icon name="printable-coloring-page" size="4.5rem" /></span>
         <h2>The first printables are on their way!</h2>
         <p>Kim is getting her coloring pages, discussion cards, and posters
         ready right now. Check back soon — or
@@ -73,7 +73,7 @@ const groups = [
                   {kindLabels[p.data.kind]?.emoji}
                   {kindLabels[p.data.kind]?.label ?? p.data.kind}
                 </p>
-                <a class="btn btn-primary" href={u(p.data.download)}>⬇️ Download PDF</a>
+                <a class="btn btn-primary" href={u(p.data.download)}><Icon name="ui-download" /> Download PDF</a>
               </li>
             ))}
           </ul>
@@ -127,7 +127,7 @@ const groups = [
     display: grid; gap: 12px; justify-items: center; text-align: center;
     padding: 48px 32px;
   }
-  .empty .big { font-size: 3rem; }
+  .empty .big { display: grid; place-items: center; line-height: 0; }
   .empty p { color: var(--gg-ink-soft); }
   .blurb { color: var(--gg-ink-soft); margin-top: 4px; }
   .dl-grid {

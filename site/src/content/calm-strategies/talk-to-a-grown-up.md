@@ -1,6 +1,7 @@
 ---
 order: 8
 name: Talk to a trusted grown-up
+icon: calm-talk-grown-up
 emoji: 🗣️
 steps: |-
   Find your grown-up.

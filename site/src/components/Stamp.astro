@@ -1,23 +1,20 @@
 ---
-/* The hand-stamped value circles. A decorative mark + a label that carries
-   the meaning, so the mark can stay aria-hidden.
-   Pass `icon` for one of Kim's drawn icons; `emoji` is the fallback for the
-   marks she hasn't drawn yet (see ICONS.md §4). */
+/* The hand-stamped value circles: a decorative icon inside a dashed disc,
+   with a label that carries the meaning so the icon can stay aria-hidden. */
 import Icon from './Icon.astro';
 
 interface Props {
-  icon?: string;
-  emoji?: string;
+  icon: string;
   label: string;
   tone?: 'green' | 'gold' | 'blue';
   tilt?: number;
 }
-const { icon, emoji, label, tone = 'green', tilt = 0 } = Astro.props;
+const { icon, label, tone = 'green', tilt = 0 } = Astro.props;
 ---
 
 <figure class:list={['stamp', `s-${tone}`]} style={`--tilt:${tilt}deg`}>
   <div class="disc" aria-hidden="true">
-    {icon ? <Icon name={icon} size="54px" /> : emoji}
+    <Icon name={icon} size="66px" />
   </div>
   <figcaption>{label}</figcaption>
 </figure>

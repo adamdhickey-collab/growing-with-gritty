@@ -11,7 +11,7 @@ const yets = (await getCollection('yet-sentences')).sort((a, b) => a.data.order 
 /* The private "How did YOU have grit today?" checklist. Fixed list, not CMS:
    it mirrors the "what is grit" vocabulary used across the site. The label
    strings are also the localStorage keys — changing one orphans saved days. */
-const checkin: { icon?: string; emoji?: string; label: string }[] = [
+const checkin: { icon: string; label: string }[] = [
   { icon: 'action-try-again', label: 'Kept trying' },
   { icon: 'action-something-new', label: 'Tried something new' },
   { icon: 'action-idea', label: 'Learned from a mistake' },
@@ -91,7 +91,7 @@ const summitPt = pct(SX, SY);
     <div class="wrap intro">
       <div class="intro-copy">
         <p class="eyebrow">Gritty's World</p>
-        <h1>The Grit Zone 💪</h1>
+        <h1>The Grit Zone <Icon name="action-strong" size="1.1em" /></h1>
         <Bubble tail={false}>
           "Welcome to the Grit Zone! Pick a game — let's practice grit
           together."
@@ -136,12 +136,12 @@ const summitPt = pct(SX, SY);
       <div class="gz-tabs" role="tablist" aria-label="Pick a game">
         <button class="gz-tab" role="tab" id="tab-trail" aria-controls="panel-trail"
                 aria-selected="true" data-tab>
-          <span class="ico" aria-hidden="true"><Icon name="action-mountain-streak" size="2.3rem" /></span>
+          <span class="ico" aria-hidden="true"><Icon name="action-mountain-streak" size="2.9rem" /></span>
           <span>The Grit Trail</span>
         </button>
         <button class="gz-tab" role="tab" id="tab-yet" aria-controls="panel-yet"
                 aria-selected="false" tabindex="-1" data-tab>
-          <span class="ico" aria-hidden="true"><Icon name="action-something-new" size="2.3rem" /></span>
+          <span class="ico" aria-hidden="true"><Icon name="action-something-new" size="2.9rem" /></span>
           <span>Power of YET</span>
         </button>
         <button class="gz-tab" role="tab" id="tab-day" aria-controls="panel-day"
@@ -210,7 +210,7 @@ const summitPt = pct(SX, SY);
                       data-x={s.x} data-y={s.y}
                       style={`left: ${s.x}%; top: ${s.y}%;`} disabled>
                 <span class="stop-num" aria-hidden="true">{i + 1}</span>
-                <span class="stop-star" aria-hidden="true"><Icon name="badge-star" size="1.25rem" /></span>
+                <span class="stop-star" aria-hidden="true"><Icon name="badge-star" size="1.7rem" /></span>
               </button>
             ))}
 
@@ -222,14 +222,14 @@ const summitPt = pct(SX, SY);
           </div>
 
           <button type="button" class="btn btn-gold trail-play" data-play>
-            ▶️ Play the glowing challenge
+            <Icon name="ui-play" /> Play the glowing challenge
           </button>
         </div>
 
         <div class="quiz" data-quiz>
           {scenarios.map((s, i) => (
             <article class="scenario card" data-scenario data-answer={s.data.answer}>
-              <button type="button" class="flee" data-flee>⬅️ Back to the trail</button>
+              <button type="button" class="flee" data-flee><Icon name="ui-back" /> Back to the trail</button>
               <h3 class="situation">
                 <span class="q-num" aria-hidden="true">{i + 1}</span>
                 {s.data.situation}
@@ -265,20 +265,20 @@ const summitPt = pct(SX, SY);
                 mistakes, and use strategies when something is difficult.</p>
               </div>
               <button type="button" class="btn btn-gold" data-back hidden>
-                Back to the trail ⛰️
+                Back to the trail <Icon name="action-mountain-streak" />
               </button>
             </article>
           ))}
         </div>
 
         <div class="finale card" data-finale tabindex="-1" hidden>
-          <span class="finale-emoji" aria-hidden="true"><Icon name="badge-star-burst" size="3rem" /></span>
+          <span class="finale-emoji" aria-hidden="true"><Icon name="badge-star-burst" size="4.5rem" /></span>
           <h3>You climbed the whole trail!</h3>
           <p>You helped Gritty {scenarios.length} times. You know what grit
           looks like: trying again, taking a breath, asking for help, and
           never giving up.</p>
           <p class="finale-motto">"I have grit! I don't quit!"</p>
-          <button type="button" class="btn btn-primary" data-replay>🔁 Start a new climb</button>
+          <button type="button" class="btn btn-primary" data-replay><Icon name="action-try-again" /> Start a new climb</button>
         </div>
       </section>
 
@@ -307,7 +307,8 @@ const summitPt = pct(SX, SY);
               <b class="yet-gold yet-word" data-yet-word hidden>YET!</b>
             </p>
             <p class="yet-cheer" data-yet-cheer role="status" hidden>
-              YET is a magic word — it means your brain is still growing! 🧠
+              YET is a magic word — it means your brain is still growing!
+              <Icon name="action-brain-grows" />
             </p>
           </div>
           <p class="yet-tip" data-yet-tip hidden></p>
@@ -327,14 +328,14 @@ const summitPt = pct(SX, SY);
           hear it!</p>
         </div>
         <ul class="checkin" role="list" data-checkin>
-          {checkin.map(({ icon, emoji, label }) => (
+          {checkin.map(({ icon, label }) => (
             <li>
               <label class="check-chip">
                 <input type="checkbox" data-check={label}
                        aria-label={`Today I ${label.toLowerCase()}`} />
                 <span class="coin">
                   <span class="chip-emoji" aria-hidden="true">
-                    {icon ? <Icon name={icon} size="2.8rem" /> : emoji}
+                    <Icon name={icon} size="3.4rem" />
                   </span>
                 </span>
                 <span class="coin-label" aria-hidden="true">{label}</span>
@@ -356,7 +357,7 @@ const summitPt = pct(SX, SY);
   <section class="band">
     <div class="wrap next-up card">
       <p>Made a mistake today? Lucky you — mistakes are how brains grow.</p>
-      <a class="btn btn-primary" href={u('/mistake-maker')}>🧠 Visit the Mistake Maker</a>
+      <a class="btn btn-primary" href={u('/mistake-maker')}><Icon name="action-brain-grows" /> Visit the Mistake Maker</a>
     </div>
   </section>
 </Base>
@@ -737,7 +738,7 @@ const summitPt = pct(SX, SY);
     transition: translate 0.16s ease, border-color 0.16s ease,
                 background 0.16s ease, box-shadow 0.16s ease;
   }
-  .gz-tab .ico { font-size: 1.8rem; }
+  .gz-tab .ico { display: grid; place-items: center; line-height: 0; }
   .gz-tab:hover { translate: 0 -3px; border-color: var(--gg-blue); }
   .gz-tab:active { scale: 0.96; }
   .gz-tab[aria-selected='true'] {
@@ -798,13 +799,13 @@ const summitPt = pct(SX, SY);
                 border-color 0.25s ease, background 0.25s ease;
   }
   .stop:disabled { cursor: default; }
-  .stop .stop-star { display: none; font-size: 1.25rem; line-height: 1; }
+  .stop .stop-star { display: none; line-height: 0; }
   .stop.done {
     width: 46px; height: 46px; cursor: pointer;
     background: #FFFDF4; border: 2.5px solid var(--gg-gold);
   }
   .stop.done .stop-num { display: none; }
-  .stop.done .stop-star { display: block; }
+  .stop.done .stop-star { display: grid; place-items: center; }
   .stop.done:hover { scale: 1.12; }
   .stop.current {
     width: 58px; height: 58px; cursor: pointer;
@@ -974,7 +975,7 @@ const summitPt = pct(SX, SY);
     max-width: 620px; margin-inline: auto;
   }
   .finale:focus { outline: none; }
-  .finale-emoji { font-size: 3rem; }
+  .finale-emoji { display: grid; place-items: center; line-height: 0; }
   .finale-motto { font-family: var(--gg-hand); font-size: 1.6rem; color: var(--gg-blue); }
 
   /* — the YET machine — */
@@ -1064,7 +1065,7 @@ const summitPt = pct(SX, SY);
     transition: border-color 0.2s ease, background 0.2s ease,
                 rotate 0.3s var(--gg-ease-back), scale 0.2s ease;
   }
-  .chip-emoji { font-size: 2.1rem; }
+  .chip-emoji { display: grid; place-items: center; line-height: 0; }
   .coin-label {
     font-family: var(--gg-display); font-weight: 600; font-size: 0.95rem;
     color: var(--gg-blue); text-align: center; max-width: 12ch;
