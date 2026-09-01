@@ -99,13 +99,12 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     font-family: var(--gg-display); font-weight: 600;
     font-size: 0.8rem; line-height: 1.1;
     color: var(--gg-blue-deep);
-    /* The motto stretches to the name's own width — the grid column is
-       set by the name, and text-align-last justifies the single line into
-       it, so the two lines start and end together. The half-pixel keeps
-       the left inks on one column: Fredoka's B carries 0.5px less left
-       bearing than the name's G. */
-    text-align: justify;
-    text-align-last: justify;
+    /* Left-aligned under the name at its natural word spacing — it used
+       to be justified out to the name's width, which stretched the gaps
+       between four short words. The half-pixel keeps the left inks on one
+       column: Fredoka's B carries 0.5px less left bearing than the
+       name's G. */
+    text-align: left;
     padding-left: 0.5px;
   }
 
@@ -141,8 +140,8 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     .bar { justify-content: center; }
     .wordmark { font-size: 1.45rem; gap: 5px; }
     /* the name shrinks here but the motto didn't, so the motto became the
-       wider of the two and there was nothing left to justify into. A step
-       down puts the name back in charge of the column. */
+       wider of the two and poked out past the name. A step down puts the
+       name back in charge of the column. */
     .site-motto { font-size: 0.75rem; }
     /* same trick at the small size: 96px drawn, 84px footprint */
     .wordmark img { width: 96px; height: 96px; margin: -6px -3px -6px -9px; }
