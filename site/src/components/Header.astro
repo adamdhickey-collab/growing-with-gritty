@@ -53,8 +53,17 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
   /* His head is the way home, so it acts like him: the same curious tilt
      the nav drawings do on hover, a crouch while pressed, and — on click —
      the very hop he does down in the meadow, before the page follows him. */
+  /* The drawing carries about 6% of clear air on every side, so at 116px
+     the ink itself only spans ~101px. He's rendered at 132px (ink ~115px)
+     but keeps a 116px footprint: the negative margins fold the extra back
+     into the box, so the header stays 141px tall and the wordmark doesn't
+     move. He spills 8px into the header's own 12px padding above and
+     below — nothing clips — and the horizontal split (12 left, 4 right)
+     lets him grow mostly outward into the page gutter, holding the gap
+     between his face and the name at ~10px. */
   .wordmark img {
-    width: 116px; height: 116px; object-fit: contain;
+    width: 132px; height: 132px; object-fit: contain;
+    margin: -8px -4px -8px -12px;
     transform-origin: 50% 88%; /* he springs from the chin, hooves planted */
     transition: rotate 0.18s var(--gg-ease-back), scale 0.18s var(--gg-ease-back);
   }
@@ -131,7 +140,8 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
        wider of the two and there was nothing left to justify into. A step
        down puts the name back in charge of the column. */
     .site-motto { font-size: 0.75rem; }
-    .wordmark img { width: 84px; height: 84px; }
+    /* same trick at the small size: 96px drawn, 84px footprint */
+    .wordmark img { width: 96px; height: 96px; margin: -6px -3px -6px -9px; }
     nav { margin-left: 0; justify-content: center; }
     nav a { min-width: 68px; font-size: 0.75rem; }
     nav a img { width: 38px; height: 38px; }
