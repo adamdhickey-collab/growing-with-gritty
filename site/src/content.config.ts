@@ -120,9 +120,8 @@ const calmStrategies = defineCollection({
   schema: z.object({
     order: z.number(),
     name: z.string(),
-    /* One of Kim's drawn icons (public/images/icons). Preferred when set;
-       `emoji` stays as the fallback for strategies she adds herself and for
-       the marks still to be drawn — see ICONS.md. */
+    /* An icon name from the map in src/components/Icon.astro — the CMS
+       offers these as a dropdown. Blank falls back to a leaf. */
     icon: optionalString,
     emoji: optionalString,
     /* One step per line — the page turns lines into a numbered list, so a

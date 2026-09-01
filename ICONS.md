@@ -629,10 +629,10 @@ Trail's own controls are all wired now.
 
 ### Two loose ends
 
-- The 41 drawn `.webp` files in `public/images/icons/` are now unreferenced
-  (~630KB). Left in place deliberately — they're committed, and they may still
-  be wanted for print or a future pass. Safe to delete whenever.
-- Four `🐐` remain, standing in for Gritty: the Meet Gritty portrait
-  placeholder, the Calming Corner breath circle, and two spots on a book page.
-  A stock library goat would be wrong for him — these should point at
-  `gritty-face.webp`, which the site already ships.
+- The 41 drawn `.webp` files in `public/images/icons/` were deleted once the
+  library landed and nothing referenced them (~700KB). They remain in git
+  history — `git show 41d5fb8:site/public/images/icons/<name>.webp` brings any
+  of them back if they're ever wanted for print.
+- The four `🐐` are gone. The two that meant Gritty use his own art; the two
+  that stand in for an undrawn character use a generic `goat` icon, so they
+  can't put his face beside someone else's name.
