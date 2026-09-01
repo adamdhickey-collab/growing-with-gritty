@@ -26,6 +26,12 @@
   --gg-hill-mid:  #97BA80;  /* middle hill                              */
   --gg-meadow:    #6E9A5C;  /* the front grass Gritty stands in         */
 
+  /* morning mist — lies over scenery that sits BEHIND content, so the
+     content is always the loudest thing on the page. Warm paper fog for
+     art on paper grounds; cool air haze for the hero's far distance. */
+  --gg-mist:     rgba(250, 246, 236, 0.66);  /* --gg-paper, 66% veil     */
+  --gg-mist-air: rgba(236, 244, 247, 0.5);   /* white leaning to sky     */
+
   /* type */
   --gg-display: 'Fredoka Variable', 'Fredoka', 'Comic Sans MS', sans-serif;
   --gg-body: 'Nunito Variable', 'Nunito', 'Trebuchet MS', sans-serif;

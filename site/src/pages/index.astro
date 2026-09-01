@@ -146,10 +146,19 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
      is pinned to the bottom at its own aspect ratio — a stretched daisy is an
      oval — so the paper shows above its ragged cloud edge. That is exactly
      where the heading sits, which is why the heading stays readable no matter
-     how tall the band gets. ── */
+     how tall the band gets.
+
+     Over the art lies morning mist: opaque paper behind the heading,
+     thinning toward the viewer so the meadow only peeks out at the band's
+     foot — the scene sets the mood, the cards do the talking. ── */
   .band-world {
     padding-block: 56px 76px;
     background:
+      linear-gradient(180deg,
+        var(--gg-paper) 0%,
+        var(--gg-paper) 26%,
+        var(--gg-mist) 58%,
+        color-mix(in srgb, var(--gg-paper) 30%, transparent) 100%),
       var(--world-art) bottom center / 100% auto no-repeat,
       var(--gg-paper);
   }
