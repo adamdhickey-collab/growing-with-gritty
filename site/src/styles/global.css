@@ -72,6 +72,13 @@ a:hover { color: var(--gg-blue-deep); }
 .btn-primary:hover { background: var(--gg-blue-deep); color: #fff; }
 .btn-gold { background: var(--gg-gold); color: #fff; box-shadow: 0 8px 16px -8px rgba(138, 100, 20, 0.6); }
 .btn-gold:hover { background: #C79430; color: #fff; }
+
+/* Gold is a light ground, and the icon set is full-colour art: a grey cart
+   or a blue arrow sinks into it while the white label beside it stays
+   crisp. Inside a gold button an icon stops being a picture and behaves
+   like the text — same white, same weight of presence. Blue buttons are
+   dark enough that the colour still reads, so they keep it. */
+.btn-gold svg { filter: brightness(0) invert(1); }
 .btn-ghost { background: transparent; color: var(--gg-blue); border: 2.5px solid var(--gg-blue); }
 .btn-ghost:hover { background: color-mix(in srgb, var(--gg-sky) 45%, transparent); color: var(--gg-blue-deep); }
 

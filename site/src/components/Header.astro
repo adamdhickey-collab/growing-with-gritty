@@ -28,8 +28,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <nav aria-label="Main">
       {links.map(({ href, label, icon }) => (
         <a href={u(href)} aria-current={path.startsWith(href) ? 'page' : undefined}>
-          <img class={`ico-${icon}`} src={u(`/images/nav/${icon}.webp`)}
-               alt="" width="64" height="64" loading="eager" />
+          <img src={u(`/images/nav/${icon}.webp`)} alt="" width="64" height="64" loading="eager" />
           <span>{label}</span>
         </a>
       ))}
@@ -78,6 +77,12 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
   .wordmark em {
     font-style: normal; font-weight: inherit; font-size: inherit;
     color: var(--gg-green-lift);
+    /* h followed by a capital G leaves 1.8px where the wordmark's other
+       letter gaps sit at 1.2 — enough to read as a word break in a name
+       that is meant to be one word. Closed to the median. In em so it
+       holds at the smaller header size too; only this one boundary moves,
+       the letters inside "with" keep their own spacing. */
+    margin-right: -0.026em;
   }
   /* the motto rides under the name — the site introduces itself in full */
   /* dressed exactly like a nav label, so the header speaks one language */
@@ -85,11 +90,13 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     font-family: var(--gg-display); font-weight: 600;
     font-size: 0.8rem; line-height: 1.1;
     color: var(--gg-blue-deep);
-    /* The two lines share a left edge, but their first glyphs don't: at
-       these sizes Fredoka's B carries 0.5px less left bearing than the
-       name's G, so the motto reads a touch further left. This puts the
-       two inks on the same edge; a whole pixel overshoots by the same
-       half it was out by. */
+    /* The motto stretches to the name's own width — the grid column is
+       set by the name, and text-align-last justifies the single line into
+       it, so the two lines start and end together. The half-pixel keeps
+       the left inks on one column: Fredoka's B carries 0.5px less left
+       bearing than the name's G. */
+    text-align: justify;
+    text-align-last: justify;
     padding-left: 0.5px;
   }
 
@@ -108,7 +115,6 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
   }
   nav a img { width: 48px; height: 48px; object-fit: contain;
               transition: rotate 0.18s var(--gg-ease-back), scale 0.18s var(--gg-ease-back); }
-  nav a img.ico-meet-gritty { width: 58px; height: 58px; }
   nav a:hover { background: color-mix(in srgb, var(--gg-sky) 45%, transparent); translate: 0 -2px; }
   nav a:hover img { rotate: -5deg; scale: 1.12; }
   nav a:focus-visible { outline: 3px solid var(--gg-gold); outline-offset: 2px; }
@@ -121,11 +127,14 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
   @media (max-width: 900px) {
     .bar { justify-content: center; }
     .wordmark { font-size: 1.45rem; gap: 5px; }
+    /* the name shrinks here but the motto didn't, so the motto became the
+       wider of the two and there was nothing left to justify into. A step
+       down puts the name back in charge of the column. */
+    .site-motto { font-size: 0.75rem; }
     .wordmark img { width: 84px; height: 84px; }
     nav { margin-left: 0; justify-content: center; }
     nav a { min-width: 68px; font-size: 0.75rem; }
     nav a img { width: 38px; height: 38px; }
-    nav a img.ico-meet-gritty { width: 46px; height: 46px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
