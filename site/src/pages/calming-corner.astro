@@ -71,7 +71,9 @@ const feelings = [
             <summary>
               {s.data.icon
                 ? <Icon name={s.data.icon} size="2.1rem" />
-                : <span class="strat-emoji" aria-hidden="true">{s.data.emoji ?? '🌿'}</span>}
+                : s.data.emoji
+                  ? <span class="strat-emoji" aria-hidden="true">{s.data.emoji}</span>
+                  : <Icon name="calm-leaf" size="2.1rem" />}
               <span class="strat-name">{s.data.name}</span>
               <span class="strat-chevron" aria-hidden="true">▾</span>
             </summary>

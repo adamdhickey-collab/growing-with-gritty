@@ -41,7 +41,7 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
             data-learned={m.data.learned ?? FALLBACK_LEARNED}
           >
             <p class="oops-line"><Icon name="feeling-silly-oops" /> {m.data.oops}</p>
-            <p class="learned-line">💡 {m.data.learned ?? FALLBACK_LEARNED}</p>
+            <p class="learned-line"><Icon name="action-idea" /> {m.data.learned ?? FALLBACK_LEARNED}</p>
           </article>
         ))}
       </div>
@@ -56,7 +56,7 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
           <button type="button" class="btn btn-gold big-btn" data-turn>
             🔄 Turn my OOPS into I LEARNED!
           </button>
-          <p class="learned-line" hidden data-stage-learned-line>💡 <span
+          <p class="learned-line" hidden data-stage-learned-line><Icon name="action-idea" /> <span
             data-stage-learned role="status"></span></p>
           <button type="button" class="btn btn-ghost" data-again hidden>
             <Icon name="feeling-silly-oops" /> Another mistake, please!
@@ -73,7 +73,7 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
       pick one of these.</p>
       <div class="moves">
         <Stamp icon="action-try-again" label="Try Again" tone="blue" tilt={-3} />
-        <Stamp emoji="💡" label="Learn From It" tone="gold" tilt={2} />
+        <Stamp icon="action-idea" label="Learn From It" tone="gold" tilt={2} />
         <Stamp icon="action-ask-for-help" label="Ask for Help" tone="green" tilt={-2} />
         <Stamp icon="action-calm-break" label="Take a Break" tone="blue" tilt={3} />
       </div>

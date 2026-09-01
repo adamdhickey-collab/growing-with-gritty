@@ -1,6 +1,7 @@
 ---
 order: 1
 name: Take 5 slow breaths
+icon: calm-breathe
 emoji: 🌬️
 steps: |-
   Sit up tall like a mountain goat.

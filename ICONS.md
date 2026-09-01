@@ -243,6 +243,38 @@ skin, dot eyes, rosy round cheeks. Head only, no shoulders, no shirt."*
 
 ---
 
+## 5½. Round two results — 1 Sep 2026, afternoon delivery
+
+Eleven came back (`feeling-angry` wasn't in the zip). Six passed QC, landed,
+and their emoji were swapped for icons in the pages:
+
+- **Landed:** `action-idea` (ray tips clip the canvas edge — usable, but worth
+  a polish redo someday), `calm-leaf`, `heart-kind`, `calm-breathe`,
+  `calm-kind-thought`, `action-celebrate`.
+- **Bounced — still owed for round three:**
+
+| File | Why it bounced |
+|---|---|
+| `feeling-tired` | A different child entirely: ink-zigzag helmet hair, flat vector face — nothing like `ref-icon-child` |
+| `feeling-worried` | Same wrong child and rendering |
+| `feeling-angry` | Not in the delivery |
+| `calm-talk-grown-up` | Faceless heads with detached floating hair — unsettling, unreadable |
+| `action-strong` | Still a brown blob; no improvement on round one |
+| `action-brain-grows` | Angular crumple reads as a squashed apple, not a brain |
+
+The whole afternoon batch rendered harder-edged than round one — flat
+polygonal vector rather than wobbly ink and pencil grain. Since group A runs
+on words only (see below), round three should bolt this onto each prompt:
+*"Curves must be round and hand-wobbly, never faceted or polygonal. Fills
+show colored-pencil grain. This is a child's-book doodle, NOT geometric
+vector iconography."* The six that landed got away with it; the five that
+bounced didn't.
+
+The solid blue/gold buttons (Breathe, Visit the Grit Zone, Visit the Mistake
+Maker, the Oops/Turn machine buttons) keep their emoji on purpose —
+ink-on-transparent art goes muddy on those grounds (see Icon.astro's header
+note).
+
 ## 5. Round two — 11 prompts
 
 **Group A takes no attachment.** Tried on 1 Sep: attaching `ref-icon-style.png`

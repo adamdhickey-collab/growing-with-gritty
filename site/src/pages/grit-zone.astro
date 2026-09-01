@@ -14,11 +14,11 @@ const yets = (await getCollection('yet-sentences')).sort((a, b) => a.data.order 
 const checkin: { icon?: string; emoji?: string; label: string }[] = [
   { icon: 'action-try-again', label: 'Kept trying' },
   { icon: 'action-something-new', label: 'Tried something new' },
-  { emoji: '💡', label: 'Learned from a mistake' },
+  { icon: 'action-idea', label: 'Learned from a mistake' },
   { icon: 'action-ask-for-help', label: 'Asked for help' },
   { icon: 'heart-hands-helped', label: 'Helped someone' },
   { icon: 'action-calm-break', label: 'Took a calming break' },
-  { emoji: '💛', label: 'Was kind' },
+  { icon: 'heart-kind', label: 'Was kind' },
   { icon: 'badge-star', label: 'Believed in myself' },
 ];
 
@@ -146,7 +146,7 @@ const summitPt = pct(SX, SY);
         </button>
         <button class="gz-tab" role="tab" id="tab-day" aria-controls="panel-day"
                 aria-selected="false" tabindex="-1" data-tab>
-          <span class="ico" aria-hidden="true">💛</span>
+          <span class="ico" aria-hidden="true"><Icon name="heart-kind" size="2.3rem" /></span>
           <span>My Grit Day</span>
         </button>
       </div>
@@ -343,7 +343,7 @@ const summitPt = pct(SX, SY);
           ))}
         </ul>
         <p class="checkin-cheer" data-checkin-cheer role="status" hidden>
-          🎉 WOW! You showed grit today!
+          <Icon name="action-celebrate" /> WOW! You showed grit today!
         </p>
         <p class="streak" hidden data-streak-line><Icon
           name="action-mountain-streak" /> <span data-streak role="status"></span></p>

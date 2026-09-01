@@ -1,6 +1,7 @@
 ---
 order: 7
 name: Use a kind thought
+icon: calm-kind-thought
 emoji: 💭
 steps: |-
   Pick a kind thought that is true — like "I can do hard things" or "This feeling will pass."
