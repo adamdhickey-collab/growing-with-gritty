@@ -86,7 +86,8 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
          width="5376" height="560" />
     <img class="bushes" src={u("/images/scenery/bushes.webp")} alt=""
          width="460" height="292" loading="lazy" />
-    <div class="grass-border"></div>
+    <div class="grass-border"
+         style={`--grass-art: url('${u("/images/scenery/grass-border.webp")}')`}></div>
   </div>
 
   <div class="hero-copy">
@@ -205,7 +206,7 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
   .grass-border {
     position: absolute; z-index: 7; left: -1%; right: -1%; bottom: -4px;
     height: 82px;
-    background: url("/images/scenery/grass-border.webp") repeat-x bottom center / auto 82px;
+    background: var(--grass-art) repeat-x bottom center / auto 82px;
     transform-origin: 50% 100%;
   }
 
