@@ -46,6 +46,20 @@ a:hover { color: var(--gg-blue-deep); }
    Calming Corner already owns in the scene art. */
 .band-blush { background: color-mix(in srgb, var(--gg-pink) 34%, var(--gg-paper)); }
 
+/* Hero grounds — one accent per page, so each of Gritty's rooms announces
+   itself the moment you land. Mixed over card white, not paper: white
+   starts brighter, so the same accent travels further before the eyebrow
+   stops clearing AA. Gold-ink at 0.82rem is the palette's tightest text
+   (4.86:1 on bare paper), and it sets every ceiling below — each figure
+   sits a notch inside that accent's measured limit, putting gold-ink at
+   4.5:1 with a little room and the blue headings at 5.6:1. Deepen one and
+   the eyebrow drops under the bar — Meet Gritty has no eyebrow today, but
+   hero-sky is priced as though it did, so any page can wear any of them. */
+.hero-meadow { background: color-mix(in srgb, var(--gg-green) 18%, var(--gg-card)); }
+.hero-sun    { background: color-mix(in srgb, var(--gg-sun)   44%, var(--gg-card)); }
+.hero-rose   { background: color-mix(in srgb, var(--gg-pink)  34%, var(--gg-card)); }
+.hero-sky    { background: color-mix(in srgb, var(--gg-sky)   44%, var(--gg-card)); }
+
 /* A page that ends on paper leaves air before the footer. A page that
    ends on its own coloured ground meets the footer edge to edge — the
    air would show as a tan sliver of body between two coloured blocks. */
