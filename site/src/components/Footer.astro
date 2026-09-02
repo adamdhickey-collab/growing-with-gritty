@@ -74,5 +74,14 @@ const year = new Date().getFullYear();
   .a11y { font-size: var(--gg-text-small); color: #fff; }
   .a11y a { color: #fff; text-decoration-thickness: 2px; }
 
-  .legal { font-size: 0.88rem; color: var(--gg-sky); max-width: 60ch; }
+  /* Sky on this blue measures 4.51:1 — it cleared AA for small text by
+     a hundredth, which is not a margin so much as a coincidence, and any
+     later nudge to either token would have broken it silently. Mixing a
+     little card white into the sky lifts it to 5.07:1 while staying the
+     same cool, quiet grey-blue against the white footer links. Sized at
+     the site's own informational floor rather than 0.88rem. */
+  .legal {
+    font-size: var(--gg-text-small); max-width: 60ch;
+    color: color-mix(in srgb, var(--gg-sky) 72%, var(--gg-card));
+  }
 </style>

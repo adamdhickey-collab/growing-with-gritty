@@ -196,6 +196,18 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     font-family: var(--gg-display); font-weight: 600;
     font-size: 4.1cqw; line-height: 1; letter-spacing: 0.01em;
     color: #fff; white-space: nowrap;
+    /* An ink edge, the same one every drawn thing on this site wears.
+       White lettering alone sat on painted board: sampled across the
+       word, about a quarter of the paint behind it came out lighter
+       than 4.5:1, and the palest patch reached 1.28:1 — the letters
+       dissolved exactly where the panel catches the light. A 1px ink
+       outline makes them hold against any paint underneath, without
+       moving a single pixel of the layout the sign is aligned to. */
+    text-shadow:
+      1px 0 0 var(--gg-ink), -1px 0 0 var(--gg-ink),
+      0 1px 0 var(--gg-ink), 0 -1px 0 var(--gg-ink),
+      1px 1px 0 var(--gg-ink), -1px -1px 0 var(--gg-ink),
+      1px -1px 0 var(--gg-ink), -1px 1px 0 var(--gg-ink);
   }
 
   .tree {
@@ -573,7 +585,13 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
       box.style.cssText =
         `position:fixed;left:${r.left + r.width / 2}px;top:${r.top + r.height / 3}px;` +
         'z-index:150;pointer-events:none;';
-      const hues = ['#D9A93F', '#7FA86B', '#2C5F8A', '#BDD7E7', '#F2D48A'];
+      /* The tokens themselves, not their values re-typed as hex. These
+       land in an inline `background:`, and the sparks are appended to
+       <body>, so each var() resolves against :root the same way every
+       other colour on the site does — retune a token and the
+       celebration follows it instead of quietly drifting off-brand. */
+    const hues = ['var(--gg-gold)', 'var(--gg-green)', 'var(--gg-blue)',
+                  'var(--gg-sky)', 'var(--gg-sun)'];
       for (let i = 0; i < 12; i++) {
         const s = document.createElement('i');
         const ang = (Math.PI * 2 * i) / 12;

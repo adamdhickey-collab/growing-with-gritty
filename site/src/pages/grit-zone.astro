@@ -372,8 +372,11 @@ const tabArt = {                        /* pixel sprites for the three game tabs
           <div class:list={['cab-screen', 'stage', 'finale-screen',
                             { 'has-bg': !!stageBg && !summit, 'has-summit': !!summit }]}
                style={stageBg && !summit ? `--stage-bg: url('${stageBg}');` : undefined}>
+            {/* lazy: the summit only appears after six challenges, and
+                `hidden` does not stop a fetch — without this every visit
+                pays for a screen most of them never reach */}
             {summit
-              ? <img class="finale-art" src={summit}
+              ? <img class="finale-art" src={summit} loading="lazy"
                      alt="Gritty stands on the mountaintop beside the flag, looking out over the whole meadow far below."
                      width="1536" height="1024" />
               : <img class="finale-flag" src={u('/images/grit-zone/flag.webp')} alt="" width="110" height="110" />}
@@ -511,7 +514,13 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     box.style.cssText =
       `position:fixed;left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px;` +
       'z-index:150;pointer-events:none;';
-    const hues = ['#D9A93F', '#7FA86B', '#2C5F8A', '#BDD7E7', '#F2D48A'];
+    /* The tokens themselves, not their values re-typed as hex. These
+       land in an inline `background:`, and the sparks are appended to
+       <body>, so each var() resolves against :root the same way every
+       other colour on the site does — retune a token and the
+       celebration follows it instead of quietly drifting off-brand. */
+    const hues = ['var(--gg-gold)', 'var(--gg-green)', 'var(--gg-blue)',
+                  'var(--gg-sky)', 'var(--gg-sun)'];
     for (let i = 0; i < count; i++) {
       const s = document.createElement('i');
       const ang = (Math.PI * 2 * i) / count;
@@ -887,6 +896,16 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     font-family: var(--gg-display); font-weight: 600;
     font-size: 2.7cqw; line-height: 1; letter-spacing: 0.02em;
     color: #fff; white-space: nowrap;
+    /* Same ink edge as the Erin School sign, and for the same reason:
+       white on the painted board measured 2.67:1 at its worst and only
+       3.98:1 on average, so the words never cleared AA against the wood
+       they sit on. The outline does it without resizing the lettering,
+       which is registered to the drawn board. */
+    text-shadow:
+      1px 0 0 var(--gg-ink), -1px 0 0 var(--gg-ink),
+      0 1px 0 var(--gg-ink), 0 -1px 0 var(--gg-ink),
+      1px 1px 0 var(--gg-ink), -1px -1px 0 var(--gg-ink),
+      1px -1px 0 var(--gg-ink), -1px 1px 0 var(--gg-ink);
   }
 
   /* — the arcade: three cartridges, one machine —
@@ -1148,9 +1167,13 @@ const tabArt = {                        /* pixel sprites for the three game tabs
   @media (scripting: enabled) {
     .quiz:not(.armed) .scenario { display: none; }
   }
+  /* the way out of a challenge, so it gets the same 48px floor every
+     other control on the site gets — this is the button a stuck child
+     reaches for. The negative margin keeps the bigger box from pushing
+     the HUD's words off their line. */
   .flee {
     padding: 6px 10px; margin-left: -8px;
-    min-height: 36px; display: inline-flex; align-items: center; gap: 0.4em;
+    min-height: var(--gg-tap); display: inline-flex; align-items: center; gap: 0.4em;
     background: none; border: none; cursor: pointer;
     font: inherit; color: var(--gg-card); border-radius: 8px;
     transition: background 0.15s ease;

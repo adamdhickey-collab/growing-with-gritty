@@ -12,7 +12,9 @@ const buyableBooks = (await getCollection('books'))
   .filter((b) => b.data.buyLink)
   .sort((a, b) => a.data.order - b.data.order);
 
-const kindLabels: Record<string, { icon?: string; emoji?: string; label: string }> = {
+/* Every kind maps to an icon; there is no emoji fallback and never was,
+   so the type does not offer one. */
+const kindLabels: Record<string, { icon?: string; label: string }> = {
   'coloring-page': { icon: 'printable-coloring-page', label: 'Coloring page' },
   'discussion-cards': { icon: 'printable-discussion-cards', label: 'Discussion cards' },
   'calm-down-cards': { icon: 'action-calm-break', label: 'Calm-down cards' },
@@ -70,7 +72,6 @@ const groups = [
                 <h3>{p.data.title}</h3>
                 <p class="kind">
                   {kindLabels[p.data.kind]?.icon && <Icon name={kindLabels[p.data.kind].icon!} />}
-                  {kindLabels[p.data.kind]?.emoji}
                   {kindLabels[p.data.kind]?.label ?? p.data.kind}
                 </p>
                 <a class="btn btn-primary" href={u(p.data.download)}><Icon name="ui-download" /> Download PDF</a>

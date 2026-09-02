@@ -148,33 +148,51 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
     const pos = nav.querySelector<HTMLElement>('[data-spreads-pos]')!;
     const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches
       || document.documentElement.dataset.motion === 'calm';
-    /* where a spread's centre sits in the strip's scroll space */
-    const centre = (li: HTMLElement) =>
-      li.getBoundingClientRect().left - strip.getBoundingClientRect().left
-      + strip.scrollLeft + li.offsetWidth / 2;
+    /* Where each spread's centre sits in the strip's scroll space.
+       Measured once and cached: this used to run getBoundingClientRect
+       twice per spread on every scroll event, forcing a fresh layout
+       dozens of times per swipe. The geometry only moves when the strip
+       is resized, so that is the only thing that clears the cache. */
+    let centres: number[] | null = null;
+    const measure = () => {
+      const base = strip.getBoundingClientRect().left - strip.scrollLeft;
+      centres = items.map((li) =>
+        li.getBoundingClientRect().left - base + li.offsetWidth / 2);
+    };
+    const centre = (i: number) => {
+      if (!centres) measure();
+      return centres![i];
+    };
     const index = () => {
       const mid = strip.scrollLeft + strip.clientWidth / 2;
       let best = 0, gap = Infinity;
-      items.forEach((li, i) => {
-        const d = Math.abs(centre(li) - mid);
+      items.forEach((_, i) => {
+        const d = Math.abs(centre(i) - mid);
         if (d < gap) { gap = d; best = i; }
       });
       return best;
     };
     const go = (i: number) => {
-      const li = items[Math.max(0, Math.min(items.length - 1, i))];
-      strip.scrollTo({ left: centre(li) - strip.clientWidth / 2, behavior: calm() ? 'auto' : 'smooth' });
+      const n = Math.max(0, Math.min(items.length - 1, i));
+      strip.scrollTo({ left: centre(n) - strip.clientWidth / 2, behavior: calm() ? 'auto' : 'smooth' });
     };
+    /* The counter is a live region, so it must only be written when it
+       actually changes: assigning the same string still replaces the text
+       node, and a screen reader reads every one of those. A single swipe
+       fires dozens of scroll events over three spreads — that was dozens
+       of announcements of a number that had moved twice. */
+    let said = '';
     const update = () => {
       const i = index();
       prev.disabled = i === 0;
       next.disabled = i === items.length - 1;
-      pos.textContent = `${i + 1} of ${items.length}`;
+      const label = `${i + 1} of ${items.length}`;
+      if (label !== said) { said = label; pos.textContent = label; }
     };
     prev.addEventListener('click', () => go(index() - 1));
     next.addEventListener('click', () => go(index() + 1));
     strip.addEventListener('scroll', update, { passive: true });
-    addEventListener('resize', update);
+    addEventListener('resize', () => { centres = null; update(); });
     nav.hidden = items.length < 2;
     update();
   }
