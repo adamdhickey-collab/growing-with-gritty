@@ -18,8 +18,22 @@ const year = new Date().getFullYear();
       <a href={u("/about")}>About Kim</a>
     </nav>
     {/* On every page, so motion can be paused from wherever it is noticed —
-        the meadow carries a second, closer copy of the same switch. */}
-    <MotionToggle />
+        the meadow carries a second, closer copy of the same switch. The
+        conformance line rides beside it: the switch is the most visible
+        piece of the standard being claimed, so the claim stands next to
+        the proof rather than buried in the copyright line. */}
+    <div class="tools">
+      <MotionToggle />
+      {/* Names the standard and its level, and links to the standard
+          itself so the claim can be checked. "Built to meet" is the honest
+          verb: this is Kim's own conformance claim, not a third-party
+          certification, and nothing here should imply one. */}
+      <p class="a11y">Built to meet <a
+        href="https://www.w3.org/TR/WCAG22/"
+        target="_blank" rel="noopener"
+        aria-label="WCAG 2.2 Level AA — the accessibility standard this site is built to meet (opens in a new tab)"
+      >WCAG 2.2 Level AA</a></p>
+    </div>
     <p class="legal">
       © {year} Kim Rekowski · All character art by Kim Rekowski ·
       This site collects no personal information — activities happen right on
@@ -47,5 +61,18 @@ const year = new Date().getFullYear();
     display: inline-flex; align-items: center; border-radius: 999px;
   }
   nav a:hover { background: rgba(255, 255, 255, 0.14); color: #fff; }
+  /* the switch and the claim share a row, and wrap to two on a phone */
+  .tools {
+    display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: center; gap: 10px 20px;
+  }
+  /* Small, as asked — but not below the site's own informational floor
+     (--gg-text-small), and lettered in white rather than the sky the
+     legal line uses: sky on this blue is 4.51:1, which clears AA for
+     small text by a hundredth. A line whose whole subject is
+     accessibility should not sit on that margin, so it takes the 6.8:1. */
+  .a11y { font-size: var(--gg-text-small); color: #fff; }
+  .a11y a { color: #fff; text-decoration-thickness: 2px; }
+
   .legal { font-size: 0.88rem; color: var(--gg-sky); max-width: 60ch; }
 </style>
