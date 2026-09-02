@@ -54,7 +54,7 @@ const feelings = [
         <span class="stand">
           <img
             class="feel-gritty"
-            src={u("/images/characters/gritty-standing.webp")}
+            src={u("/images/characters/gritty-standing-right.webp")}
             alt="" aria-hidden="true"
             width="878" height="1097" loading="lazy"
           />
@@ -190,28 +190,29 @@ const feelings = [
 
   /* A small Gritty and his answer sit together, centred under the faces,
      and the bubble keeps its tail so the words read as him talking to the
-     child. The drawing faces left, so his stand is mirrored to put his head
-     (not his tail) beside the bubble — the stand rather than the picture,
-     so the shadow measured off the drawing flips with him. The tail dots
-     are raised from the bubble's default line to meet his mouth, which
-     sits at about 46% of the drawing's height when the two are centred
-     on each other. */
+     child. He uses the right-facing drawing (gritty-standing-right.webp:
+     Kim's standing Gritty mirrored, with his eyes left as drawn so he
+     still glances toward the bubble) to put his head, not his tail, beside
+     his words. The tail dots are raised from the bubble's default line to
+     meet his mouth, which sits at about 46% of the drawing's height when
+     the two are centred on each other. */
   .feel-answer {
     display: grid; grid-template-columns: auto auto;
     gap: 48px; align-items: center; justify-content: center;
     justify-self: stretch;
   }
-  .stand { position: relative; display: block; width: 132px; transform: scaleX(-1); }
+  .stand { position: relative; display: block; width: 132px; }
   .feel-gritty { position: relative; z-index: 1; display: block; width: 100%; height: auto; }
   /* The same pool of shade Gritty stands in on the hero grounds — see
-     GrittyHero.astro for the geometry. */
+     GrittyHero.astro for the geometry — mirrored left-to-right to match
+     the right-facing drawing. */
   .stand::before {
     content: ''; position: absolute; z-index: 0;
-    left: 10%; right: -2%; bottom: -1%; height: 10%;
+    left: -2%; right: 10%; bottom: -1%; height: 10%;
     background:
-      radial-gradient(40% 48% at 58% 58%, rgba(40, 48, 54, 0.52) 0%,
+      radial-gradient(40% 48% at 42% 58%, rgba(40, 48, 54, 0.52) 0%,
         rgba(40, 48, 54, 0.36) 45%, rgba(40, 48, 54, 0) 78%),
-      radial-gradient(58% 62% at 54% 52%, rgba(40, 48, 54, 0.26) 0%,
+      radial-gradient(58% 62% at 46% 52%, rgba(40, 48, 54, 0.26) 0%,
         rgba(40, 48, 54, 0.14) 52%, rgba(40, 48, 54, 0) 82%);
     mix-blend-mode: multiply;
   }
