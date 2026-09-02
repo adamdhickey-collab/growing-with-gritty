@@ -247,7 +247,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
               </defs>
               {/* the whole landscape is one drawing; only the trail is code,
                   so the stops always sit on it */}
-              <image class="backdrop" href={u('/images/grit-zone/trail-bg.webp')}
+              <image class="backdrop" style="image-rendering: pixelated;" href={u('/images/grit-zone/trail-bg.webp')}
                      x="0" y="0" width={W} height={H}
                      preserveAspectRatio="xMidYMin slice" clip-path="url(#gz-frame)" />
               {/* the trail: an inked edge, a sandy tread, and a run of
@@ -256,7 +256,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
               <path class="trail-mid" d={trailD} />
               <path class="trail-stitch" d={trailD} />
               {/* the summit flag */}
-              <image class="flag" href={u('/images/grit-zone/flag.webp')}
+              <image class="flag" style="image-rendering: pixelated;" href={u('/images/grit-zone/flag.webp')}
                      x={flagX} y={flagY} width={FLAG} height={FLAG} />
             </svg>
 
@@ -864,7 +864,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
      with cqw type so they hold at every width — the Erin School trick. */
   .trailhead { position: relative; container-type: inline-size; }
   .trailhead img {
-    display: block; width: 100%; height: auto;
+    display: block; width: 100%; height: auto; image-rendering: pixelated;
     border-radius: var(--gg-radius); box-shadow: var(--gg-shadow);
   }
   .trailhead-sign {
@@ -949,8 +949,9 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     object-fit: contain; image-rendering: pixelated;
   }
   .cab-marquee.small img { width: min(100%, 340px); max-height: 110px; }
-  /* a HUD with only its tile pushes it to the right, where it belongs */
-  .cab-hud:has(> :only-child) { justify-content: flex-end; }
+  /* a HUD left holding only its stop tile pushes it right, where it
+     belongs; a HUD holding only a title keeps it on the left */
+  .cab-hud:has(> .hud-tile:only-child) { justify-content: flex-end; }
   .cab-hud {
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
     min-height: 36px; padding-inline: 2px;
@@ -1037,9 +1038,15 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     color: var(--gg-ink); font-size: calc(0.82rem + var(--row) * 0.12rem);
     transition: width 0.25s var(--gg-ease-back), height 0.25s var(--gg-ease-back);
   }
+  /* Every drawing in this game is pixel art shown far smaller than the
+     file it comes from — a 512px sprite in a 64px tile. Left alone the
+     browser resamples it smoothly, which rounds the hard edges off and
+     makes crisp pixel art look like a blurry drawing. `pixelated` keeps
+     the squares square. Applied to every sprite on this page. */
   .stop::before {
     content: ''; position: absolute; inset: 0; z-index: -1;
     background: var(--stop-ahead) center / 100% 100% no-repeat;
+    image-rendering: pixelated;
   }
   /* the number is a level tile */
   .stop .stop-num {
@@ -1086,6 +1093,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     display: block; width: 64px; height: 64px;
     border-radius: var(--gg-radius-small); background: var(--gg-sky);
     border: 3px solid var(--gg-ink); box-shadow: 4px 4px 0 var(--gg-ink);
+    image-rendering: pixelated;
   }
   .walker.hop { animation: walker-hop 640ms var(--gg-ease-back); }
   @keyframes walker-hop {
@@ -1238,6 +1246,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
   .ask-btn img {
     width: 34px; height: 34px; border-radius: 6px;
     background: var(--gg-sky); border: 2px solid var(--gg-ink);
+    image-rendering: pixelated;
   }
   .ask-btn:hover { translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink); }
   .ask-btn:active { translate: 3px 3px; box-shadow: 1px 1px 0 var(--gg-ink); }
@@ -1270,7 +1279,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     border: 3px solid var(--gg-ink); border-radius: 8px;
     box-shadow: 4px 4px 0 var(--gg-gold-ink);
   }
-  .cheer-coin { grid-row: 1 / span 2; width: 72px; height: 72px; }
+  .cheer-coin { grid-row: 1 / span 2; width: 72px; height: 72px; image-rendering: pixelated; }
   .cheer-why, .cheer-what { grid-column: 1 / -1; }
   /* the payoff arrives in small waves — follow-through, not a slab */
   .cheer:not([hidden]) > * { animation: cheer-rise 460ms var(--gg-ease-back) both; }

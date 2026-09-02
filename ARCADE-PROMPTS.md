@@ -447,6 +447,19 @@ pixels is the same size as the pixels in the meadow behind him. If he
 looks chunkier or simpler than the bushes and flowers, he is wrong.
 ```
 
+**Landed 2 Sep 2026.** Round three worked: Gritty stands on the peak
+on-model, facing right, at the meadow's own resolution, with a proper
+backpack and legs. The trailhead-as-model-sheet trick is the reason —
+remember it for any future full-body Gritty.
+
+**One thing the whole set needed afterwards.** Every sprite on the page
+is shown far smaller than its file (a 512px face in a 64px tile), and by
+default a browser resamples that smoothly — which softens the hard edges
+and makes crisp pixel art look like a blurry drawing. The fix is
+`image-rendering: pixelated`, now on every drawing in the Grit Zone. If
+a new pixel asset ever lands somewhere else on the site, it needs the
+same line or it will look wrong no matter how good the file is.
+
 **How to judge the result before landing it.** Put the new picture beside
 the trailhead drawing. If Gritty looks like the same goat drawn by the
 same hand, it is right. If he looks like a bigger, blockier cousin, ask
