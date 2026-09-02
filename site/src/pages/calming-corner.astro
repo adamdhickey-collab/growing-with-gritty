@@ -96,7 +96,11 @@ const feelings = [
     </div>
   </section>
 
-  <section class="band band-deep" aria-labelledby="breathe-h">
+  <section
+    class="band band-pond"
+    aria-labelledby="breathe-h"
+    style={`--pond-art: url('${u("/images/scenery/breathe-pond.webp")}')`}
+  >
     <div class="wrap breathe-wrap" data-breathe>
       <h2 id="breathe-h">Breathe with Gritty</h2>
       <p class="note">Five slow breaths, together. Smell the flower… blow
@@ -183,12 +187,18 @@ const feelings = [
   .note { color: var(--gg-ink-soft); margin-top: 6px; }
 
   /* A small Gritty stands to the left of the answer and the bubble keeps its
-     tail, so the words read as him talking to the child. */
+     tail, so the words read as him talking to the child. The drawing faces
+     left, so it's mirrored here to put his head (not his tail) beside the
+     bubble, and the tail dots are raised from the bubble's default line to
+     meet his mouth, which sits at about 46% of the drawing's height when
+     the two are centred on each other. */
   .feel-answer {
     display: grid; grid-template-columns: auto auto;
     gap: 48px; align-items: center;
   }
-  .feel-gritty { width: 100%; max-width: 132px; height: auto; }
+  .feel-gritty { width: 100%; max-width: 132px; height: auto; transform: scaleX(-1); }
+  .feel-answer :global(.bubble)::before { top: 44%; }
+  .feel-answer :global(.bubble)::after { top: 38%; }
   /* Narrow phones: he steps above his words rather than squeezing them, and
      the bubble drops its tail — there's no goat beside it now. */
   @media (max-width: 560px) {
@@ -239,6 +249,28 @@ const feelings = [
   }
 
   /* — breathing — */
+  /* — the still pond —
+     The backdrop is a 3:1 painting drawn edge to edge: the dandelion at the
+     left, the candle at the right, and the ripple rings dead centre, under
+     the breathing circle. So it is laid in at full width along the bottom of
+     the band rather than cropped to cover — cover zooms past both edges on a
+     phone and throws the flower and the candle away, which is most of what
+     the picture is saying. Above it, --gg-pond-sky continues the paint's own
+     top row. */
+  .band-pond {
+    background-image: var(--pond-art), var(--gg-pond-sky);
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: 100% auto, cover;
+  }
+  /* The band re-inks itself the way the hero grounds do. On a narrow screen
+     the words sit on the deep end of that sky (#74BBF6), where --gg-blue
+     reaches only 3.3:1 and --gg-ink-soft 3.1:1 — so the heading and the
+     breath cue take --gg-blue-deep (4.8:1 there, 8.9:1 over the pale centre)
+     and the note takes --gg-ink (6.3:1). */
+  .band-pond h2, .band-pond .breath-cue { color: var(--gg-blue-deep); }
+  .band-pond .note { color: var(--gg-ink); }
+
   .breathe-wrap { display: grid; gap: 18px; justify-items: center; text-align: center; }
   .breath-circle {
     width: 150px; height: 150px; margin-block: 20px; border-radius: 50%;
