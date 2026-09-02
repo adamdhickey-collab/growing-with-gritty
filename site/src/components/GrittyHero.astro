@@ -20,12 +20,14 @@ const { eyebrow } = Astro.props;
 
   <div class="hero-stage">
     <Bubble side="right"><slot name="quote" /></Bubble>
-    <img
-      class="hero-art"
-      src={u('/images/characters/gritty-standing.webp')}
-      alt="Gritty the Goat, hand-drawn by Kim Rekowski"
-      width="878" height="1097"
-    />
+    <span class="stand">
+      <img
+        class="hero-art"
+        src={u('/images/characters/gritty-standing.webp')}
+        alt="Gritty the Goat, hand-drawn by Kim Rekowski"
+        width="878" height="1097"
+      />
+    </span>
   </div>
 </div>
 
@@ -46,7 +48,30 @@ const { eyebrow } = Astro.props;
     align-items: center; justify-content: center; column-gap: 60px;
   }
   .hero-stage :global(.bubble) { justify-self: end; }
-  .hero-art { width: clamp(210px, 24vw, 300px); height: auto; }
+  .hero-art { position: relative; z-index: 1; display: block;
+              width: clamp(210px, 24vw, 300px); height: auto; }
+
+  /* Gritty stands ON the hero ground instead of hovering over it: a pool
+     of shade under his whole stance with a darker core where the hooves
+     meet it. The geometry is measured off the drawing — his four hooves
+     span 26%-92% of its width and bottom out at about 97% of its height —
+     so the ellipse sits under him at every size the art clamps to.
+     Multiply, not a fixed grey, because the same shadow has to sit on
+     three different hero grounds (sky, meadow, rose) and a grey wash
+     would only ever suit one of them. */
+  .stand { position: relative; display: block; }
+  .stand::before {
+    content: ''; position: absolute; z-index: 0;
+    left: 10%; right: -2%; bottom: -1%; height: 10%;
+    background:
+      /* the contact core, right where the hooves press */
+      radial-gradient(40% 48% at 58% 58%, rgba(40, 48, 54, 0.52) 0%,
+        rgba(40, 48, 54, 0.36) 45%, rgba(40, 48, 54, 0) 78%),
+      /* and the wider, softer pool around it */
+      radial-gradient(58% 62% at 54% 52%, rgba(40, 48, 54, 0.26) 0%,
+        rgba(40, 48, 54, 0.14) 52%, rgba(40, 48, 54, 0) 82%);
+    mix-blend-mode: multiply;
+  }
 
   /* Phones: one column, Gritty above his words, and the tail swings from
      the bubble's right edge to its top so it still points back at him. */
@@ -54,7 +79,8 @@ const { eyebrow } = Astro.props;
     .hero { grid-template-columns: 1fr; justify-items: center; gap: 24px; }
     .hero-copy { justify-items: center; text-align: center; }
     .hero-stage { grid-template-columns: 1fr; row-gap: 44px; justify-items: center; }
-    .hero-art { order: -1; width: min(62vw, 260px); }
+    .stand { order: -1; }
+    .hero-art { width: min(62vw, 260px); }
     .hero-stage :global(.bubble) { justify-self: center; }
     /* His mouth sits left of the drawing's centre, so the trail leans that
        way as it climbs — big dot nearest the words, small one nearest him. */
