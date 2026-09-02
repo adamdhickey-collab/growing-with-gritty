@@ -4,6 +4,8 @@ import Base from '../layouts/Base.astro';
 import Bubble from '../components/Bubble.astro';
 import Icon from '../components/Icon.astro';
 import { u } from '../lib/url';
+import fs from 'node:fs';
+import path from 'node:path';
 
 const scenarios = (await getCollection('scenarios')).sort((a, b) => a.data.order - b.data.order);
 const yets = (await getCollection('yet-sentences')).sort((a, b) => a.data.order - b.data.order);
@@ -27,15 +29,19 @@ const checkin: { icon: string; label: string }[] = [
    the mountain (the same mountain the streak line and ⛰️ icon already use).
    One challenge on screen at a time; the map is the progress display, so
    there is no "3 of 15" counter anywhere (V3-CRAFT: the map shows the
-   journey, numbers read as a contract). Geometry is computed from however
-   many scenarios Kim has written — she can add a 16th and the trail simply
-   grows another switchback. */
-const PER_ROW = 4;
-const N = scenarios.length;
+   journey, numbers read as a contract).
+
+   A climb is TRAIL_LEN stops — nine, three switchbacks of three: long
+   enough to feel like a mountain, short enough that a five-year-old sees
+   the summit in one sitting. Kim can write as many scenarios as she likes:
+   each climb takes the next TRAIL_LEN of them in order, wrapping round, so
+   "Start a new climb" brings new challenges and nothing she wrote is ever
+   left off the trail (the rotation lives in the script below). */
+const TRAIL_LEN = 9;
+const PER_ROW = 3;
+const N = Math.min(scenarios.length, TRAIL_LEN);
 const rows = Math.ceil(N / PER_ROW);
 const W = 800;
-const ROW_GAP = 150;
-const TURN_R = ROW_GAP / 2;
 const X_MIN = 170;
 const X_MAX = 630;
 /* The backdrop is one pixel-art drawing (public/images/grit-zone/trail-bg.webp,
@@ -46,13 +52,21 @@ const X_MAX = 630;
    the drawing; the drawing then scales to height and loses a sliver off
    each side. */
 const BG = { w: 1024, h: 1290, peakX: 0.568, peakY: 0.128 };
+const SCENE_H = Math.round((W * BG.h) / BG.w);
 const BOTTOM_AIR = 120;  /* room below for the trailhead */
-const TOP_ROW_Y = Math.max(320, Math.round((W * BG.h) / BG.w) - (rows - 1) * ROW_GAP - BOTTOM_AIR);
-const H = TOP_ROW_Y + (rows - 1) * ROW_GAP + BOTTOM_AIR;
+const TOP_ROW_Y = 440;   /* the top switchback, just under the rock */
+/* the switchbacks spread to fill the mountain between the two, but never
+   closer than 150 (the turns would crowd) or farther than 230 (the turns
+   would run off the sides); more rows than fit make the scene taller */
+const ROW_GAP = rows > 1
+  ? Math.min(230, Math.max(150, Math.round((SCENE_H - BOTTOM_AIR - TOP_ROW_Y) / (rows - 1))))
+  : 150;
+const TURN_R = ROW_GAP / 2;
+const H = Math.max(SCENE_H, TOP_ROW_Y + (rows - 1) * ROW_GAP + BOTTOM_AIR);
 const rowY = (r: number) => H - BOTTOM_AIR - r * ROW_GAP;
 const slotX = (k: number) => X_MIN + (k * (X_MAX - X_MIN)) / (PER_ROW - 1);
 
-const stops = scenarios.map((s, i) => {
+const stops = scenarios.slice(0, N).map((s, i) => {
   const r = Math.floor(i / PER_ROW);
   const k = i % PER_ROW;
   const x = r % 2 === 0 ? slotX(k) : slotX(PER_ROW - 1 - k);
@@ -96,6 +110,31 @@ const pct = (x: number, y: number) => ({
 });
 const stopPts = stops.map((s, i) => ({ id: s.id, row: Math.floor(i / PER_ROW), ...pct(s.x, s.y) }));
 const summitPt = pct(SX, SY);
+
+/* ——— Art that hasn't landed yet ———
+   The cabinet has slots for drawings that don't exist yet (the prompts are
+   in ARCADE-PROMPTS.md). Each slot checks for its file at build time and
+   takes a stand-in until it lands: drop the file into
+   public/images/grit-zone/ under the name below and the slot fills on the
+   next build, no code change. */
+const landed = (file: string) =>
+  fs.existsSync(path.resolve(process.cwd(), 'public/images/grit-zone', file));
+const art = (file: string) => (landed(file) ? u(`/images/grit-zone/${file}`) : null);
+/* Gritty's portrait in the dialog box, one face per beat of a challenge */
+const faces = {
+  think: art('face-think.webp') ?? u('/images/grit-zone/walker.webp'),
+  idea: art('face-idea.webp') ?? u('/images/grit-zone/walker.webp'),
+  oops: art('face-oops.webp') ?? u('/images/grit-zone/walker.webp'),
+  cheer: art('face-cheer.webp') ?? u('/images/grit-zone/walker.webp'),
+};
+const stageBg = art('stage-bg.webp');   /* sky and meadow behind the dialog boxes */
+const cursor = art('cursor.webp');      /* the menu cursor beside a choice */
+const summit = art('summit.webp');      /* Gritty on the peak, for the finale */
+const tabArt = {                        /* pixel sprites for the three game tabs */
+  trail: art('tab-trail.webp'),
+  yet: art('tab-yet.webp'),
+  day: art('tab-day.webp'),
+};
 ---
 
 <Base
@@ -151,17 +190,23 @@ const summitPt = pct(SX, SY);
       <div class="gz-tabs" role="tablist" aria-label="Pick a game">
         <button class="gz-tab" role="tab" id="tab-trail" aria-controls="panel-trail"
                 aria-selected="true" data-tab>
-          <span class="ico" aria-hidden="true"><Icon name="action-mountain-streak" size="2.9rem" /></span>
+          <span class="ico" aria-hidden="true">{tabArt.trail
+            ? <img src={tabArt.trail} alt="" width="48" height="48" />
+            : <Icon name="action-mountain-streak" size="2.9rem" />}</span>
           <span>The Grit Trail</span>
         </button>
         <button class="gz-tab" role="tab" id="tab-yet" aria-controls="panel-yet"
                 aria-selected="false" tabindex="-1" data-tab>
-          <span class="ico" aria-hidden="true"><Icon name="action-something-new" size="2.9rem" /></span>
+          <span class="ico" aria-hidden="true">{tabArt.yet
+            ? <img src={tabArt.yet} alt="" width="48" height="48" />
+            : <Icon name="action-something-new" size="2.9rem" />}</span>
           <span>Power of YET</span>
         </button>
         <button class="gz-tab" role="tab" id="tab-day" aria-controls="panel-day"
                 aria-selected="false" tabindex="-1" data-tab>
-          <span class="ico" aria-hidden="true"><Icon name="heart-kind" size="2.3rem" /></span>
+          <span class="ico" aria-hidden="true">{tabArt.day
+            ? <img src={tabArt.day} alt="" width="48" height="48" />
+            : <Icon name="heart-kind" size="2.3rem" />}</span>
           <span>My Grit Day</span>
         </button>
       </div>
@@ -176,8 +221,16 @@ const summitPt = pct(SX, SY);
           you and a goat figuring it out.</p>
         </div>
 
-        <div class="trail" data-trail data-sx={summitPt.x} data-sy={summitPt.y} hidden>
-          <div class="trail-scene"
+        {/* The cabinet: the map is the game's screen, and the button that
+            starts a challenge sits on the machine, under the screen, where
+            a start button goes. The challenge and the summit wear the same
+            shell, so tapping Play never feels like leaving the game. */}
+        <div class="trail cab" data-trail data-sx={summitPt.x} data-sy={summitPt.y} hidden>
+          <div class="cab-hud">
+            <span class="hud-title"><Icon name="action-mountain-streak" size="1.35em" /> The Grit Trail</span>
+            <span class="tile hud-tile" data-hud-stop aria-hidden="true"></span>
+          </div>
+          <div class="trail-scene cab-screen"
                style={`aspect-ratio: ${W} / ${H};`
                  + ['ahead', 'current', 'done']
                    .map((st) => ` --stop-${st}: url('${u(`/images/grit-zone/stop-${st}.webp`)}');`)
@@ -219,20 +272,33 @@ const summitPt = pct(SX, SY);
             </div>
           </div>
 
-          <button type="button" class="btn btn-gold trail-play" data-play>
-            <Icon name="ui-play" /> Play the glowing challenge
-          </button>
+          <div class="cab-bar">
+            <button type="button" class="btn btn-gold cab-btn trail-play" data-play>
+              <Icon name="ui-play" /> Play the glowing challenge
+            </button>
+          </div>
         </div>
 
         <div class="quiz" data-quiz>
           {scenarios.map((s, i) => (
-            <article class="scenario card" data-scenario data-answer={s.data.answer}>
-              <button type="button" class="flee" data-flee><Icon name="ui-back" /> Back to the trail</button>
-              <h3 class="situation">
-                <span class="q-num" aria-hidden="true">{i + 1}</span>
-                {s.data.situation}
-              </h3>
-              <div class="choices" role="group" aria-label="What should Gritty do?">
+            <article class="scenario cab" data-scenario data-id={s.id} data-answer={s.data.answer}>
+              <div class="cab-hud">
+                <button type="button" class="flee" data-flee><Icon name="ui-back" /> Back to the trail</button>
+                <span class="tile hud-tile" aria-hidden="true">Stop {i + 1}</span>
+              </div>
+              <div class:list={['cab-screen', 'stage', { 'has-bg': !!stageBg }]}
+                   style={stageBg ? `--stage-bg: url('${stageBg}');` : undefined}>
+              {/* the dialog box: Gritty's portrait tile (the same tile that
+                  walks the map) and what he's up against */}
+              <div class="say">
+                <img class="face" data-face src={faces.think} alt="" width="64" height="64"
+                     data-face-think={faces.think} data-face-idea={faces.idea}
+                     data-face-oops={faces.oops} data-face-cheer={faces.cheer} />
+                <h3 class="situation">{s.data.situation}</h3>
+              </div>
+              <div class:list={['choices', { 'has-cursor': !!cursor }]} role="group"
+                   aria-label="What should Gritty do?"
+                   style={cursor ? `--cursor: url('${cursor}');` : undefined}>
                 {([['a', s.data.choiceA], ['b', s.data.choiceB], ['c', s.data.choiceC]] as const).map(([key, text]) => (
                   <button type="button" class="choice" data-key={key}>
                     <b aria-hidden="true">{key.toUpperCase()}</b>
@@ -258,28 +324,53 @@ const summitPt = pct(SX, SY);
               <p class="nudge" data-nudge hidden>
                 Hmm — would that help Gritty keep going? Try another one!
               </p>
+              {/* the payoff: the same gold coin the map keeps, so the reward
+                  on this screen is visibly the star that lands on the trail */}
               <div class="cheer" data-cheer hidden>
-                <p class="cheer-title"><Icon name="badge-star" /> Gritty's Grit Choice!</p>
+                <img class="cheer-coin" src={u('/images/grit-zone/stop-done.webp')} alt=""
+                     width="72" height="72" loading="lazy" />
+                <p class="cheer-title">Gritty's Grit Choice!</p>
                 <p class="cheer-motto">"I have grit! I don't quit!"</p>
                 {s.data.cheer && <p class="cheer-why">{s.data.cheer}</p>}
                 <p class="cheer-what">Grit means we keep trying, learn from
                 mistakes, and use strategies when something is difficult.</p>
               </div>
-              <button type="button" class="btn btn-gold" data-back hidden>
-                Back to the trail <Icon name="action-mountain-streak" />
-              </button>
+              </div>
+              <div class="cab-bar">
+                <button type="button" class="btn btn-gold cab-btn" data-back hidden>
+                  Back to the trail <Icon name="action-mountain-streak" />
+                </button>
+              </div>
             </article>
           ))}
         </div>
 
-        <div class="finale card" data-finale tabindex="-1" hidden>
-          <span class="finale-emoji" aria-hidden="true"><Icon name="badge-star-burst" size="4.5rem" /></span>
-          <h3>You climbed the whole trail!</h3>
-          <p>You helped Gritty {scenarios.length} times. You know what grit
-          looks like: trying again, taking a breath, asking for help, and
-          never giving up.</p>
-          <p class="finale-motto">"I have grit! I don't quit!"</p>
-          <button type="button" class="btn btn-primary" data-replay><Icon name="action-try-again" /> Start a new climb</button>
+        <div class="finale cab" data-finale tabindex="-1" hidden>
+          <div class="cab-hud">
+            <span class="hud-title"><Icon name="badge-star-burst" size="1.35em" /> The summit</span>
+          </div>
+          {/* The view from the top. Once summit.webp lands it fills the
+              screen edge to edge — Gritty on the peak, the whole meadow far
+              below — and the words sit under it. Until then, the flag. */}
+          <div class:list={['cab-screen', 'stage', 'finale-screen',
+                            { 'has-bg': !!stageBg && !summit, 'has-summit': !!summit }]}
+               style={stageBg && !summit ? `--stage-bg: url('${stageBg}');` : undefined}>
+            {summit
+              ? <img class="finale-art" src={summit}
+                     alt="Gritty stands on the mountaintop beside the flag, looking out over the whole meadow far below."
+                     width="1536" height="1024" />
+              : <img class="finale-flag" src={u('/images/grit-zone/flag.webp')} alt="" width="110" height="110" />}
+            <div class="say finale-say">
+              <h3>You climbed the whole trail!</h3>
+              <p>You helped Gritty {N} times. You know what grit
+              looks like: trying again, taking a breath, asking for help, and
+              never giving up.</p>
+              <p class="finale-motto">"I have grit! I don't quit!"</p>
+            </div>
+          </div>
+          <div class="cab-bar">
+            <button type="button" class="btn btn-gold cab-btn" data-replay><Icon name="action-try-again" /> Start a new climb</button>
+          </div>
         </div>
       </section>
 
@@ -301,8 +392,11 @@ const summitPt = pct(SX, SY);
           ))}
         </ul>
 
-        <div class="yet-machine card" data-yet hidden>
-          <div class="yet-screen">
+        <div class="yet-machine cab" data-yet hidden>
+          <div class="cab-hud">
+            <span class="hud-title"><Icon name="action-something-new" size="1.35em" /> The YET machine</span>
+          </div>
+          <div class="yet-screen cab-screen">
             <p class="yet-line">
               <span data-yet-sentence></span>
               <b class="yet-gold yet-word" data-yet-word hidden>YET!</b>
@@ -313,7 +407,7 @@ const summitPt = pct(SX, SY);
             </p>
           </div>
           <p class="yet-tip" data-yet-tip hidden></p>
-          <div class="yet-buttons">
+          <div class="cab-bar yet-buttons">
             <button type="button" class="yet-press" data-yet-press>YET!</button>
             <button type="button" class="btn btn-ghost" data-yet-next hidden>Another one <Icon name="ui-next-arrow" /></button>
           </div>
@@ -452,30 +546,45 @@ const summitPt = pct(SX, SY);
     const stops = [...trail.querySelectorAll<HTMLButtonElement>('[data-stop]')];
     const walker = trail.querySelector<HTMLElement>('[data-walker]')!;
     const playBtn = trail.querySelector<HTMLElement>('[data-play]')!;
+    const hudStop = trail.querySelector<HTMLElement>('[data-hud-stop]')!;
     const finale = document.querySelector<HTMLElement>('[data-finale]')!;
 
     /* progress lives on this device only, like the check-in */
     const KEY = 'gg-grit-trail';
-    const load = (): string[] => {
+    const load = (): { done: string[]; climb: number } => {
       try {
         const s = JSON.parse(localStorage.getItem(KEY) ?? 'null');
-        return Array.isArray(s?.done) ? s.done : [];
-      } catch { return []; }
+        return {
+          done: Array.isArray(s?.done) ? s.done : [],
+          climb: Number.isInteger(s?.climb) ? s.climb : 0,
+        };
+      } catch { return { done: [], climb: 0 }; }
     };
+    const saved = load();
+    let climb = saved.climb;
+    const done = new Set<string>(saved.done);
     const save = () => {
-      try { localStorage.setItem(KEY, JSON.stringify({ done: [...done] })); }
+      try { localStorage.setItem(KEY, JSON.stringify({ done: [...done], climb })); }
       catch { /* private window — the climb still works, it just won't keep */ }
     };
-    const done = new Set<string>(load());
-    const ids = stops.map((s) => s.dataset.id!);
 
-    const currentIdx = () => ids.findIndex((id) => !done.has(id));
+    /* Which challenges are on the mountain this climb: the stops are fixed
+       (the trail is drawn at build time), the scenarios rotate through them.
+       Climb 0 is the first nine Kim wrote, climb 1 the next nine, wrapping
+       round — so every scenario gets its turn on the trail. */
+    const cardIds = cards.map((c) => c.dataset.id!);
+    const cardAt = (stop: number) => (climb * stops.length + stop) % cards.length;
+    const ids = () => stops.map((_, i) => cardIds[cardAt(i)]);
+
+    const currentIdx = () => ids().findIndex((id) => !done.has(id));
 
     /* the map is the scoreboard: stars stay (permanence), the next stop
        glows (the idle hint), the rest is just trail ahead */
     function render(justId?: string) {
       const cur = currentIdx();
+      const onTrail = ids();
       stops.forEach((el, i) => {
+        el.dataset.id = onTrail[i];
         const isDone = done.has(el.dataset.id!);
         el.classList.toggle('done', isDone);
         el.classList.toggle('current', i === cur);
@@ -494,17 +603,26 @@ const summitPt = pct(SX, SY);
       if (justId) replay(walker, 'hop');
       finale.hidden = cur !== -1;
       playBtn.hidden = cur === -1;
+      /* the HUD names the glowing stop, and the challenge's HUD answers it */
+      hudStop.hidden = cur === -1;
+      hudStop.textContent = cur === -1 ? '' : `Stop ${cur + 1}`;
     }
 
     const showTrail = () => {
       cards.forEach((c) => { c.hidden = true; });
       trail.hidden = false;
     };
+    /* open the challenge standing at stop i */
     function openChallenge(i: number) {
+      const at = cardAt(i);
       trail.hidden = true;
       finale.hidden = true;
-      cards.forEach((c, j) => { c.hidden = j !== i; });
-      cards[i].querySelector<HTMLElement>('.situation')?.focus();
+      cards.forEach((c, j) => { c.hidden = j !== at; });
+      /* the card's HUD names the stop it stands at this climb, matching
+         the map's tile, not its place in Kim's list */
+      const tile = cards[at].querySelector<HTMLElement>('.hud-tile');
+      if (tile) tile.textContent = `Stop ${i + 1}`;
+      cards[at].querySelector<HTMLElement>('.situation')?.focus();
     }
 
     cards.forEach((card, i) => {
@@ -516,10 +634,18 @@ const summitPt = pct(SX, SY);
       const flee = card.querySelector<HTMLElement>('[data-flee]')!;
       const ask = card.querySelector<HTMLButtonElement>('[data-ask]');
       const askSaid = card.querySelector<HTMLElement>('[data-ask-said]');
+      /* Gritty's portrait changes with the beat: thinking, an idea, an
+         oops, a cheer. All four are one drawing until the faces land. */
+      const face = card.querySelector<HTMLImageElement>('[data-face]');
+      const setFace = (k: 'think' | 'idea' | 'oops' | 'cheer') => {
+        const src = face?.getAttribute(`data-face-${k}`);
+        if (face && src && face.getAttribute('src') !== src) face.setAttribute('src', src);
+      };
 
       ask?.addEventListener('click', () => {
         askSaid!.hidden = false;
         ask.hidden = true;
+        setFace('idea');
         announce(`Gritty says: ${words(askSaid!)}`);
       });
 
@@ -532,6 +658,7 @@ const summitPt = pct(SX, SY);
             card.classList.add('solved');
             setTimeout(() => {
               btn.classList.add('is-grit');
+              setFace('cheer');
               nudge.hidden = true;
               cheer.hidden = false;
               back.hidden = false;
@@ -541,6 +668,7 @@ const summitPt = pct(SX, SY);
           } else {
             btn.classList.add('tried');
             replay(btn, 'shake');
+            setFace('oops');
             nudge.hidden = false;
             announce(words(nudge));
             /* Sesame's scaffold: after a miss, the hint offers itself */
@@ -550,7 +678,7 @@ const summitPt = pct(SX, SY);
       });
 
       const finish = () => {
-        const id = ids[i];
+        const id = cardIds[i];
         const fresh = !done.has(id);
         if (fresh) { done.add(id); save(); }
         /* reset the card so a replay starts clean */
@@ -560,6 +688,7 @@ const summitPt = pct(SX, SY);
         cheer.hidden = true;
         back.hidden = true;
         if (ask) { ask.hidden = false; ask.classList.remove('beckon'); askSaid!.hidden = true; }
+        setFace('think');
         showTrail();
         /* let the map paint at the old state, then move — so the star pops
            and Gritty visibly hops to the next stop. A timer, not rAF: rAF
@@ -580,8 +709,11 @@ const summitPt = pct(SX, SY);
       if (cur !== -1) openChallenge(cur);
     });
 
+    /* a new climb: the stars come off the map and the next set of
+       challenges rotates onto it */
     finale.querySelector('[data-replay]')?.addEventListener('click', () => {
       done.clear();
+      climb += 1;
       save();
       render();
       const first = stops[0];
@@ -717,8 +849,8 @@ const summitPt = pct(SX, SY);
      and hides gets its [hidden] put back. (The noscript reveal rules win
      over these on purpose: they're more specific.) */
   .scenario[hidden], .cheer[hidden], .trail[hidden], .finale[hidden],
-  .yet-machine[hidden], .yet-list[hidden], .yet-word[hidden],
-  .ask-btn[hidden], .btn[hidden] { display: none; }
+  .yet-machine[hidden], .yet-list[hidden], .yet-word[hidden], .cab[hidden],
+  .hud-tile[hidden], .ask-btn[hidden], .btn[hidden] { display: none; }
 
   /* The trailhead: Kim's painting at the exact 3:2 the spot always held.
      The words sit on the blank sign board in percentages of the painting,
@@ -738,30 +870,34 @@ const summitPt = pct(SX, SY);
     color: #fff; white-space: nowrap;
   }
 
-  /* — the arcade: three big game buttons, one stage — */
+  /* — the arcade: three cartridges, one machine —
+     Everything from here down is drawn the way the trail's pixel art is
+     drawn: an ink edge, flat fills, a hard offset shadow, and no blur or
+     soft gradient anywhere. A card floats; a game piece sits. */
   .arcade { padding-block: 44px 64px; }
   .gz-tabs {
-    display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+    display: flex; flex-wrap: wrap; gap: 14px; justify-content: center;
     margin-bottom: 30px;
   }
   .gz-tab {
     display: grid; justify-items: center; gap: 2px;
     min-width: 148px; min-height: var(--gg-tap); padding: 12px 20px;
     background: var(--gg-card); color: var(--gg-blue);
-    border: 2.5px solid rgba(44, 95, 138, 0.25); border-radius: 18px;
+    border: 3px solid var(--gg-ink); border-radius: 12px;
+    box-shadow: 4px 4px 0 var(--gg-ink);
     font-family: var(--gg-display); font-weight: 600; font-size: 1.02rem;
-    cursor: pointer; box-shadow: var(--gg-shadow);
-    transition: translate 0.16s ease, border-color 0.16s ease,
-                background 0.16s ease, box-shadow 0.16s ease;
+    cursor: pointer;
+    transition: translate 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
   }
   .gz-tab .ico { display: grid; place-items: center; line-height: 0; }
-  .gz-tab:hover { translate: 0 -3px; border-color: var(--gg-blue); }
-  .gz-tab:active { scale: 0.96; }
-  /* the chosen game: a gold-ink frame (≈5:1 on the cream — light gold
-     reaches only ≈2:1, and the lift alone is too quiet to be the state) */
+  .gz-tab .ico img { width: 48px; height: 48px; image-rendering: pixelated; }
+  .gz-tab:hover { translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink); }
+  .gz-tab:active { translate: 3px 3px; box-shadow: 1px 1px 0 var(--gg-ink); }
+  /* the chosen game is the cartridge pushed in: gold, ink-lettered (≈6:1),
+     and sitting lower than its neighbours */
   .gz-tab[aria-selected='true'] {
-    border-color: var(--gg-gold-ink); background: #FFFDF4;
-    translate: 0 -3px; box-shadow: var(--gg-shadow-lift);
+    background: var(--gg-gold); color: var(--gg-ink);
+    translate: 2px 2px; box-shadow: 2px 2px 0 var(--gg-ink);
   }
   .gz-panel { outline: none; }
   .gz-panel.enter { animation: panel-in 380ms var(--gg-ease-back); }
@@ -772,20 +908,76 @@ const summitPt = pct(SX, SY);
   .panel-head { max-width: 720px; margin: 0 auto 22px; text-align: center; }
   .panel-head .note { margin-inline: auto; }
 
-  /* — the trail map: a 16-bit overworld —
-     Hard ink frame, a chunky offset shadow, no blur anywhere: the map is
-     a game screen, not a card. Same tokens as the rest of the site, just
-     pushed the way a SNES map pushes them — ink outlines, a gold path,
-     paper number tiles. The art underneath is a drop-in: the pixel set
-     (PIXEL-PROMPTS.md) lands under the same file names. */
-  .trail { display: grid; justify-items: center; gap: 22px; }
-  .trail-scene {
-    position: relative; width: min(100%, 620px);
-    border: 4px solid var(--gg-ink);
-    border-radius: var(--gg-radius-small);
+  /* — the cabinet —
+     One machine for every screen of a game: a deep-blue shell with an ink
+     edge and a hard shadow, a HUD strip along the top, the screen inset
+     behind its own bezel, and a control bar underneath where the buttons
+     go. The map, each challenge, the cheer and the summit all wear it, so
+     pressing Play changes what's on the screen, not where you are. */
+  .cab {
+    width: min(100%, 660px); margin-inline: auto;
+    display: grid; gap: 10px; padding: 10px;
     background: var(--gg-blue-deep);
-    box-shadow: 8px 8px 0 var(--gg-blue-deep);
+    border: 4px solid var(--gg-ink); border-radius: var(--gg-radius-small);
+    box-shadow: 8px 8px 0 var(--gg-ink);
+    /* the shell is dark, so its focus ring is white; the screen is light
+       and puts the deep-blue ring back */
+    --gg-focus: var(--gg-card);
   }
+  .cab-screen {
+    --gg-focus: var(--gg-blue-deep);
+    position: relative; overflow: hidden;
+    border: 3px solid var(--gg-ink); border-radius: 8px;
+    background: var(--gg-px-sky);
+  }
+  .cab-hud {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    min-height: 36px; padding-inline: 2px;
+    color: var(--gg-card);
+    font-family: var(--gg-display); font-weight: 600;
+    font-size: var(--gg-text-small); letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .hud-title { display: inline-flex; align-items: center; gap: 0.45em; line-height: 1; }
+  .cab-bar {
+    display: flex; flex-wrap: wrap; gap: 12px 16px;
+    justify-content: center; align-items: center; padding: 4px 0 2px;
+  }
+  /* a bar with nothing showing on it folds away */
+  .cab-bar:not(:has(> :not([hidden]))) { display: none; }
+
+  /* the level tile: paper, an ink edge, a hard shadow. The number on a
+     map stop, the "Stop 2" in a HUD, the A/B/C on a choice — one shape */
+  .tile {
+    display: inline-grid; place-items: center; line-height: 1;
+    min-width: 1.6em; padding: 0.3em 0.55em 0.24em; text-align: center;
+    background: var(--gg-card); color: var(--gg-ink);
+    border: 2px solid var(--gg-ink); border-radius: 5px;
+    box-shadow: 2px 2px 0 var(--gg-ink);
+    font-family: var(--gg-display); font-weight: 700; font-size: var(--gg-text-small);
+    letter-spacing: 0.04em;
+  }
+  .hud-tile { box-shadow: 2px 2px 0 var(--gg-px-rock); }
+
+  /* the machine's buttons: square-shouldered, inked, and they press down */
+  .cab-btn {
+    font-size: 1.1rem;
+    border: 3px solid var(--gg-ink); border-radius: 10px;
+    box-shadow: 4px 4px 0 var(--gg-ink);
+    transition: translate 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
+  }
+  .cab-btn:hover { transform: none; translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink); }
+  .cab-btn:active { transform: none; translate: 3px 3px; box-shadow: 1px 1px 0 var(--gg-ink); }
+  /* the quiet button on the dark shell wears white */
+  .cab .btn-ghost { color: var(--gg-card); border-color: var(--gg-card); }
+  .cab .btn-ghost:hover {
+    color: var(--gg-card);
+    background: color-mix(in srgb, var(--gg-card) 16%, transparent);
+  }
+
+  /* — the trail map: a 16-bit overworld on the cabinet's screen —
+     The art underneath is a drop-in: the pixel set (PIXEL-PROMPTS.md)
+     lands under the same file names. */
+  .trail-scene { width: 100%; }
   .trail-art { display: block; width: 100%; height: auto; }
   /* the path is three strokes on one line: ink edge, sandy tread, and
      gold stepping-stones that march uphill (the map's idle shimmer) */
@@ -828,7 +1020,7 @@ const summitPt = pct(SX, SY);
     content: ''; position: absolute; inset: 0; z-index: -1;
     background: var(--stop-ahead) center / 100% 100% no-repeat;
   }
-  /* the number is a level tile: paper, an ink edge, a hard shadow */
+  /* the number is a level tile */
   .stop .stop-num {
     position: relative; line-height: 1;
     min-width: 1.6em; padding: 0.16em 0.3em 0.1em; text-align: center;
@@ -867,8 +1059,9 @@ const summitPt = pct(SX, SY);
     translate: -50% -128%;
     transition: left 900ms var(--gg-ease-bouncy), top 900ms var(--gg-ease-bouncy);
   }
-  /* a portrait tile, not a bubble: ink frame, sky behind, hard shadow */
-  .walker img {
+  /* a portrait tile, not a bubble: ink frame, sky behind, hard shadow.
+     The dialog box on the challenge screen uses the very same tile. */
+  .walker img, .face {
     display: block; width: 64px; height: 64px;
     border-radius: var(--gg-radius-small); background: var(--gg-sky);
     border: 3px solid var(--gg-ink); box-shadow: 4px 4px 0 var(--gg-ink);
@@ -885,17 +1078,28 @@ const summitPt = pct(SX, SY);
     .walker img { animation: walker-breathe 3.7s ease-in-out infinite; }
   }
   @keyframes walker-breathe { 0%, 100% { scale: 1 1; } 50% { scale: 1 1.04; } }
-  /* the START button: square-cornered, inked, and it presses down */
-  .trail-play {
-    font-size: 1.15rem;
-    border: 3px solid var(--gg-ink); border-radius: var(--gg-radius-small);
-    box-shadow: 5px 5px 0 var(--gg-ink);
-  }
-  .trail-play:hover { box-shadow: 5px 7px 0 var(--gg-ink); }
-  .trail-play:active { box-shadow: 1px 1px 0 var(--gg-ink); }
 
-  /* — the challenge stage — */
-  .quiz { display: grid; gap: 16px; max-width: 720px; margin-inline: auto; }
+  /* — the challenge screen —
+     Sky above, a strip of meadow below, and the words in ink-framed boxes
+     the way a game's dialog sits over its scene. Until the drawn backdrop
+     lands (stage-bg.webp) the sky is code: flat blue with a faint 4px
+     checker, the same dither the pixel sky uses. */
+  .stage {
+    display: grid; gap: 14px; align-content: start;
+    padding: 18px 18px 30px;
+    background-color: var(--gg-px-sky);
+    background-image:
+      linear-gradient(to top,
+        var(--gg-px-grass) 0 14px, var(--gg-green-ink) 14px 17px, transparent 17px),
+      repeating-conic-gradient(
+        color-mix(in srgb, var(--gg-sky) 55%, transparent) 0 25%, transparent 0 50%);
+    background-size: 100% 100%, 8px 8px;
+  }
+  .stage.has-bg {
+    background: var(--stage-bg) center bottom / cover no-repeat var(--gg-px-sky);
+    image-rendering: pixelated;
+  }
+  .quiz { display: grid; gap: 16px; }
   /* JS will hide all but the active card the moment it runs; this rule
      covers the beat before that so the trail never shares the stage with
      fifteen stacked cards. Browsers without the scripting query just show
@@ -903,125 +1107,187 @@ const summitPt = pct(SX, SY);
   @media (scripting: enabled) {
     .quiz:not(.armed) .scenario { display: none; }
   }
-  .scenario { padding: 26px 28px 28px; display: grid; gap: 16px; }
   .flee {
-    justify-self: start; padding: 6px 10px; margin: -6px 0 -4px -10px;
-    min-height: var(--gg-tap); display: inline-flex; align-items: center; gap: 0.4em;
+    padding: 6px 10px; margin-left: -8px;
+    min-height: 36px; display: inline-flex; align-items: center; gap: 0.4em;
     background: none; border: none; cursor: pointer;
-    font-family: var(--gg-display); font-weight: 600; font-size: 0.92rem;
-    color: var(--gg-ink-soft); border-radius: 999px;
-    transition: color 0.15s ease, background 0.15s ease;
+    font: inherit; color: var(--gg-card); border-radius: 8px;
+    transition: background 0.15s ease;
   }
-  .flee:hover { color: var(--gg-blue); background: color-mix(in srgb, var(--gg-sky) 35%, transparent); }
-  .situation { display: flex; gap: 14px; align-items: baseline; }
+  .flee:hover { background: color-mix(in srgb, var(--gg-card) 16%, transparent); }
+
+  /* the dialog box: an ink-framed paper box with Gritty's portrait tile
+     on the left and the situation beside it */
+  .say {
+    display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center;
+    padding: 12px 18px 12px 12px;
+    background: var(--gg-card); border: 3px solid var(--gg-ink);
+    border-radius: 8px; box-shadow: 4px 4px 0 var(--gg-ink);
+  }
+  .face { flex: none; }
+  .situation { font-size: 1.3rem; }
   .situation:focus { outline: none; }
-  .q-num {
-    flex: none; width: 34px; height: 34px; border-radius: 50%;
-    display: inline-grid; place-items: center; align-self: center;
-    background: var(--gg-sky); color: var(--gg-blue-deep); /* ≈6.6:1 on sky */
-    font-size: 1rem; font-weight: 700;
-  }
-  .choices { display: grid; gap: 10px; }
+
+  /* the menu: choices are paper tiles that press down. --cursor is the
+     drawn cursor's slot; until it lands, a gold arrow stands in. */
+  .choices { display: grid; gap: 12px; }
   .choice {
+    position: relative;
     display: flex; gap: 14px; align-items: center; text-align: left;
-    min-height: var(--gg-tap); padding: 12px 18px;
+    min-height: var(--gg-tap); padding: 10px 14px 10px 12px;
     font-family: var(--gg-body); font-size: 1.05rem; color: var(--gg-ink);
-    background: var(--gg-paper); border: 2.5px solid rgba(44, 95, 138, 0.25);
-    border-radius: var(--gg-radius-small); cursor: pointer;
-    transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+    background: var(--gg-paper); border: 3px solid var(--gg-ink);
+    border-radius: 8px; box-shadow: 4px 4px 0 var(--gg-ink); cursor: pointer;
+    transition: translate 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
   }
-  .choice:hover { border-color: var(--gg-blue); transform: translateY(-1px); }
-  .choice:active { transform: scale(0.98); }
+  .choice:hover, .choice:focus-visible {
+    background: var(--gg-card); translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink);
+  }
+  .choice:active { translate: 3px 3px; box-shadow: 1px 1px 0 var(--gg-ink); }
+  .choice::before {
+    content: ''; position: absolute; left: -17px; top: 50%; translate: 0 -50%;
+    width: 0; height: 0; border: 9px solid transparent;
+    border-left: 13px solid var(--gg-px-gold); border-right: 0;
+    filter: drop-shadow(2px 2px 0 var(--gg-ink));
+    opacity: 0; transition: opacity 0.12s ease;
+  }
+  .has-cursor .choice::before {
+    left: -18px; width: 20px; height: 20px; border: 0; filter: none;
+    background: var(--cursor) center / contain no-repeat; image-rendering: pixelated;
+  }
+  .choice:hover::before, .choice:focus-visible::before { opacity: 1; }
+  @media (prefers-reduced-motion: no-preference) {
+    .choice:hover::before, .choice:focus-visible::before { animation: cursor-nudge 0.7s ease-in-out infinite; }
+  }
+  @keyframes cursor-nudge { 50% { translate: 3px -50%; } }
   .choice b {
-    flex: none; width: 30px; height: 30px; border-radius: 50%;
-    display: inline-grid; place-items: center;
-    background: var(--gg-blue); color: #fff; font-size: 0.9rem;
+    flex: none; width: 32px; height: 32px;
+    display: inline-grid; place-items: center; line-height: 1;
+    background: var(--gg-blue); color: #fff; font-size: 0.95rem;
+    border: 2px solid var(--gg-ink); border-radius: 5px;
+    box-shadow: 2px 2px 0 var(--gg-ink);
     transition: scale 0.2s var(--gg-ease-back);
   }
-  .choice:hover b { scale: 1.12; }
-  /* a tried answer steps back but stays readable (≈4.9:1 at 0.7; at 0.45
-     it fell to 2.5:1) — the dashed edge does the rest of the telling */
-  .choice.tried { opacity: 0.7; border-style: dashed; }
+  .choice:hover b { scale: 1.1; }
+  /* a tried answer sits pressed in and steps back, but stays readable
+     (≈4.9:1 at 0.7) — the dashed edge does the rest of the telling */
+  .choice.tried {
+    opacity: 0.7; border-style: dashed; box-shadow: none; translate: 4px 4px;
+  }
+  .choice.tried:hover { background: var(--gg-paper); translate: 4px 4px; box-shadow: none; }
   .choice.shake { animation: choice-no 380ms ease; }
   @keyframes choice-no {
-    0%, 100% { translate: 0 0; }
-    25% { translate: -6px 0; }
-    50% { translate: 5px 0; }
-    75% { translate: -3px 0; }
+    0%, 100% { translate: 4px 4px; }
+    25% { translate: -2px 4px; }
+    50% { translate: 9px 4px; }
+    75% { translate: 1px 4px; }
   }
-  .choice.is-grit { border-color: var(--gg-gold); background: #FFFDF4; }
-  .choice.is-grit b { background: var(--gg-gold); color: var(--gg-ink); animation: badge-spin 600ms var(--gg-ease-bouncy); }
+  .choice.is-grit {
+    background: color-mix(in srgb, var(--gg-px-gold) 18%, var(--gg-card));
+    box-shadow: 4px 4px 0 var(--gg-gold-ink);
+  }
+  .choice.is-grit b {
+    background: var(--gg-px-gold); color: var(--gg-ink);
+    animation: badge-spin 600ms var(--gg-ease-bouncy);
+  }
   @keyframes badge-spin { from { scale: 0.4; rotate: -120deg; } to { scale: 1; rotate: 0deg; } }
   .solved .choice { cursor: default; }
-  .solved .choice:hover { transform: none; }
-  .nudge { color: var(--gg-ink-soft); font-style: italic; }
+  .solved .choice:hover { translate: 0 0; box-shadow: 4px 4px 0 var(--gg-ink); background: var(--gg-paper); }
+  .solved .choice.is-grit:hover { box-shadow: 4px 4px 0 var(--gg-gold-ink); background: color-mix(in srgb, var(--gg-px-gold) 18%, var(--gg-card)); }
+  .solved .choice.tried:hover { translate: 4px 4px; box-shadow: none; }
+  .solved .choice::before { display: none; }
+  .nudge {
+    padding: 10px 16px;
+    background: var(--gg-paper); border: 3px solid var(--gg-ink);
+    border-radius: 8px; box-shadow: 4px 4px 0 var(--gg-ink);
+    color: var(--gg-ink); font-style: italic;
+  }
 
   /* — Ask Gritty for an idea — */
   .ask { display: grid; gap: 12px; justify-items: start; }
   .ask-btn {
     display: inline-flex; align-items: center; gap: 10px;
-    min-height: var(--gg-tap); padding: 8px 20px 8px 8px;
-    background: #fff; color: var(--gg-blue);
-    border: 2.5px solid var(--gg-blue); border-radius: 999px;
+    min-height: var(--gg-tap); padding: 6px 18px 6px 6px;
+    background: var(--gg-card); color: var(--gg-blue);
+    border: 3px solid var(--gg-ink); border-radius: 10px;
+    box-shadow: 4px 4px 0 var(--gg-ink);
     font-family: var(--gg-display); font-weight: 600; font-size: 1rem;
-    cursor: pointer; transition: background 0.15s ease, transform 0.15s ease;
+    cursor: pointer; transition: translate 0.12s ease, box-shadow 0.12s ease;
   }
-  .ask-btn img { border-radius: 50%; background: var(--gg-sky); }
-  .ask-btn:hover { background: color-mix(in srgb, var(--gg-sky) 40%, #fff); transform: translateY(-1px); }
+  .ask-btn img {
+    width: 34px; height: 34px; border-radius: 6px;
+    background: var(--gg-sky); border: 2px solid var(--gg-ink);
+  }
+  .ask-btn:hover { translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink); }
+  .ask-btn:active { translate: 3px 3px; box-shadow: 1px 1px 0 var(--gg-ink); }
   /* after a miss, the idea button raises its hand */
   @media (prefers-reduced-motion: no-preference) {
     .ask-btn.beckon { animation: beckon 1.5s ease-in-out infinite; }
   }
-  .ask-btn.beckon { border-color: var(--gg-gold); }
+  .ask-btn.beckon { background: var(--gg-px-gold); color: var(--gg-ink); }
   @keyframes beckon {
     0%, 100% { translate: 0 0; }
     12% { translate: 0 -4px; }
     24% { translate: 0 0; }
   }
+  /* what Gritty says: his handwriting, in an ink-framed box */
   .ask-said {
     font-family: var(--gg-hand); font-size: 1.3rem; line-height: 1.35;
     color: var(--gg-blue-deep);
-    background: color-mix(in srgb, var(--gg-sky) 30%, #fff);
-    border: 3px solid var(--gg-sky);
-    border-radius: var(--gg-radius-small); padding: 12px 18px;
+    background: var(--gg-card); border: 3px solid var(--gg-ink);
+    border-radius: 8px; box-shadow: 4px 4px 0 var(--gg-ink);
+    padding: 12px 18px;
   }
 
+  /* — the cheer: STAR GET —
+     Gold-edged, with the coin the map keeps, so the reward on this screen
+     is visibly the one that lands on the trail */
   .cheer {
-    display: grid; gap: 6px;
-    background: #FFFDF4; border: 3px solid var(--gg-gold);
-    border-radius: var(--gg-radius-small); padding: 16px 18px;
+    display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; align-items: center;
+    padding: 16px 18px;
+    background: color-mix(in srgb, var(--gg-px-gold) 18%, var(--gg-card));
+    border: 3px solid var(--gg-ink); border-radius: 8px;
+    box-shadow: 4px 4px 0 var(--gg-gold-ink);
   }
+  .cheer-coin { grid-row: 1 / span 2; width: 72px; height: 72px; }
+  .cheer-why, .cheer-what { grid-column: 1 / -1; }
   /* the payoff arrives in small waves — follow-through, not a slab */
   .cheer:not([hidden]) > * { animation: cheer-rise 460ms var(--gg-ease-back) both; }
+  .cheer:not([hidden]) > .cheer-coin { animation: coin-land 600ms var(--gg-ease-bouncy) both; }
   .cheer:not([hidden]) > :nth-child(2) { animation-delay: 80ms; }
   .cheer:not([hidden]) > :nth-child(3) { animation-delay: 160ms; }
   .cheer:not([hidden]) > :nth-child(4) { animation-delay: 240ms; }
+  .cheer:not([hidden]) > :nth-child(5) { animation-delay: 320ms; }
   @keyframes cheer-rise {
     from { opacity: 0; translate: 0 10px; scale: 0.97; }
     to { opacity: 1; translate: 0 0; scale: 1; }
   }
+  @keyframes coin-land { from { scale: 0; rotate: -40deg; } to { scale: 1; rotate: 0deg; } }
   .cheer-title {
     font-family: var(--gg-display); font-weight: 600; font-size: 1.3rem;
-    color: var(--gg-gold-ink);
+    color: var(--gg-gold-ink); line-height: 1.2;
   }
   .cheer-motto {
     font-family: var(--gg-hand); font-size: 1.5rem; line-height: 1.3;
     color: var(--gg-gold-ink);
   }
-  .cheer-why { color: var(--gg-ink); }
+  .cheer-why { color: var(--gg-ink); margin-top: 6px; }
   .cheer-what {
     font-size: var(--gg-text-small); color: var(--gg-ink-soft);
-    border-top: 1.5px dashed color-mix(in srgb, var(--gg-gold) 55%, transparent);
+    border-top: 2px dashed color-mix(in srgb, var(--gg-gold-ink) 45%, transparent);
     padding-top: 10px; margin-top: 4px;
   }
-  .scenario .btn { justify-self: start; }
-  .finale {
-    padding: 40px 32px; margin-top: 22px; display: grid; gap: 12px;
-    justify-items: center; text-align: center;
-    max-width: 620px; margin-inline: auto;
-  }
+
+  /* — the summit — */
+  .finale-screen { justify-items: center; text-align: center; padding-top: 26px; }
   .finale:focus { outline: none; }
-  .finale-emoji { display: grid; place-items: center; line-height: 0; }
+  .finale-flag { width: 110px; height: 110px; image-rendering: pixelated; }
+  /* the drawn summit fills the screen edge to edge, the words under it */
+  .finale-screen.has-summit { padding: 0 0 22px; gap: 0; background: var(--gg-px-sky); }
+  .finale-art { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+  .has-summit .finale-say { margin: 16px 18px 0; }
+  .finale-say { display: grid; grid-template-columns: 1fr; gap: 10px; justify-items: center; padding: 18px 22px; }
+  .finale-say p { max-width: 42ch; }
   .finale-motto { font-family: var(--gg-hand); font-size: 1.6rem; color: var(--gg-blue); }
 
   /* — the YET machine — */
@@ -1029,11 +1295,6 @@ const summitPt = pct(SX, SY);
   .yet-list {
     list-style: none; display: grid; gap: 10px; max-width: 640px;
     margin-inline: auto; font-family: var(--gg-hand); font-size: 1.5rem;
-  }
-  .yet-machine {
-    padding: 26px 26px 32px; width: min(100%, 620px); margin-inline: auto;
-    display: grid; gap: 18px; justify-items: center; text-align: center;
-    border: 3px solid rgba(44, 95, 138, 0.25);
   }
   .yet-machine.rumble { animation: rumble 480ms ease; }
   @keyframes rumble {
@@ -1044,17 +1305,15 @@ const summitPt = pct(SX, SY);
   }
   /* the screen: deep meadow-night blue, so the gold word can really shine */
   .yet-screen {
-    width: 100%; min-height: 170px;
-    display: grid; place-content: center; gap: 10px; padding: 22px 20px;
-    background: var(--gg-blue-deep);
-    border-radius: var(--gg-radius-small);
-    box-shadow: inset 0 4px 14px rgba(0, 0, 0, 0.35);
+    width: 100%; min-height: 190px;
+    display: grid; place-content: center; gap: 10px; padding: 26px 20px;
+    text-align: center; background: var(--gg-ink);
   }
   .yet-line {
     font-family: var(--gg-hand); font-size: clamp(1.7rem, 4.5vw, 2.3rem);
     line-height: 1.3; color: #fff; max-width: 22ch;
   }
-  .yet-screen .yet-gold { color: var(--gg-gold); }
+  .yet-screen .yet-gold { color: var(--gg-px-gold); }
   .yet-word { display: inline-block; font-family: var(--gg-display); }
   .yet-word.pop { animation: yet-pop 700ms var(--gg-ease-bouncy); }
   @keyframes yet-pop {
@@ -1064,22 +1323,22 @@ const summitPt = pct(SX, SY);
   .yet-cheer { color: var(--gg-sun-core); font-weight: 700; font-size: 1.02rem; }
   .yet-tip {
     font-family: var(--gg-hand); font-size: 1.3rem; line-height: 1.35;
-    color: var(--gg-blue-deep);
-    background: color-mix(in srgb, var(--gg-sky) 30%, #fff);
-    border: 3px solid var(--gg-sky);
-    border-radius: var(--gg-radius-small); padding: 12px 18px;
+    color: var(--gg-blue-deep); text-align: center;
+    background: var(--gg-card); border: 3px solid var(--gg-ink);
+    border-radius: 8px; box-shadow: 4px 4px 0 var(--gg-ink);
+    padding: 12px 18px; margin-inline: auto;
   }
   .yet-tip-static {
     display: block; font-family: var(--gg-body); font-size: var(--gg-text-small);
     color: var(--gg-ink-soft);
   }
-  .yet-buttons { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; align-items: center; }
+  .yet-buttons { padding-block: 10px 8px; }
   /* a real arcade button: it has depth, and pressing it presses it */
   .yet-press {
     width: 104px; height: 104px; border-radius: 50%;
     background: var(--gg-gold); color: var(--gg-ink); /* white on gold is ≈2.2:1 */
-    border: 3px solid color-mix(in srgb, var(--gg-gold-ink) 55%, var(--gg-gold));
-    box-shadow: 0 9px 0 var(--gg-gold-ink), 0 16px 22px -10px rgba(138, 100, 20, 0.55);
+    border: 3px solid var(--gg-ink);
+    box-shadow: 0 9px 0 var(--gg-gold-ink), 0 9px 0 3px var(--gg-ink);
     font-family: var(--gg-display); font-weight: 700; font-size: 1.5rem;
     cursor: pointer;
     transition: translate 0.1s ease, box-shadow 0.1s ease, scale 0.15s ease;
@@ -1087,7 +1346,7 @@ const summitPt = pct(SX, SY);
   .yet-press:hover { scale: 1.05; }
   .yet-press:active {
     translate: 0 7px;
-    box-shadow: 0 2px 0 var(--gg-gold-ink), 0 6px 12px -8px rgba(138, 100, 20, 0.55);
+    box-shadow: 0 2px 0 var(--gg-gold-ink), 0 2px 0 3px var(--gg-ink);
   }
 
   /* — My Grit Day: badges you tap into being — */
@@ -1107,9 +1366,9 @@ const summitPt = pct(SX, SY);
     position: relative;
     width: 96px; height: 96px; border-radius: 50%;
     display: grid; place-items: center;
-    background: var(--gg-card); border: 3px solid rgba(44, 95, 138, 0.25);
-    box-shadow: var(--gg-shadow);
-    transition: border-color 0.2s ease, background 0.2s ease,
+    background: var(--gg-card); border: 3px solid var(--gg-ink);
+    box-shadow: 4px 4px 0 var(--gg-ink);
+    transition: background 0.2s ease, translate 0.12s ease, box-shadow 0.12s ease,
                 rotate 0.3s var(--gg-ease-back), scale 0.2s ease;
   }
   .chip-emoji { display: grid; place-items: center; line-height: 0; }
@@ -1117,10 +1376,11 @@ const summitPt = pct(SX, SY);
     font-family: var(--gg-display); font-weight: 600; font-size: 0.95rem;
     color: var(--gg-blue); text-align: center; max-width: 12ch;
   }
-  .check-chip:hover .coin { border-color: var(--gg-blue); scale: 1.06; }
+  .check-chip:hover .coin { translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink); }
   .check-chip:active .coin { scale: 0.94; }
   .check-chip:has(input:checked) .coin {
-    border-color: var(--gg-gold); background: #FFFDF4; rotate: -5deg;
+    background: var(--gg-px-gold); rotate: -5deg;
+    box-shadow: 4px 4px 0 var(--gg-gold-ink);
     animation: coin-pop 550ms var(--gg-ease-bouncy);
   }
   @keyframes coin-pop {
@@ -1131,10 +1391,10 @@ const summitPt = pct(SX, SY);
   /* an earned badge wears a check — the state in a mark, not only in a
      colour, so it reads for colour-blind kids and in high-contrast mode */
   .check-chip:has(input:checked) .coin::after {
-    content: '✓'; position: absolute; right: -4px; bottom: -4px;
-    width: 30px; height: 30px; border-radius: 50%;
+    content: '✓'; position: absolute; right: -6px; bottom: -6px;
+    width: 30px; height: 30px; border-radius: 6px;
     display: grid; place-items: center;
-    background: var(--gg-gold-ink); color: #fff; border: 2px solid #fff;
+    background: var(--gg-gold-ink); color: #fff; border: 2px solid var(--gg-ink);
     font-family: var(--gg-body); font-weight: 800; font-size: 1.05rem; line-height: 1;
   }
   .check-chip:has(input:checked) .coin-label { color: var(--gg-gold-ink); }
@@ -1148,6 +1408,18 @@ const summitPt = pct(SX, SY);
   .privacy {
     font-size: var(--gg-text-small); color: var(--gg-ink-soft);
     text-align: center; margin-top: 12px;
+  }
+
+  /* phones: a thinner shell, a shorter shadow, and the cursor's gutter
+     goes back to the words */
+  @media (max-width: 520px) {
+    .cab { padding: 7px; gap: 8px; box-shadow: 5px 5px 0 var(--gg-ink); }
+    .stage { padding: 12px 12px 26px; }
+    .say { padding: 10px 12px 10px 10px; gap: 12px; }
+    .situation { font-size: 1.15rem; }
+    .choice::before { display: none; }
+    .cheer { grid-template-columns: 1fr; }
+    .cheer-coin { grid-row: auto; width: 56px; height: 56px; }
   }
 
   .next-up {

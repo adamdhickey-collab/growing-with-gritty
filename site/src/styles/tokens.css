@@ -41,6 +41,15 @@
   --gg-hill-mid:  #97BA80;  /* middle hill                              */
   --gg-meadow:    #6E9A5C;  /* the front grass Gritty stands in         */
 
+  /* the arcade — the Grit Trail's 16-bit palette, sampled from its pixel
+     art (PIXEL-PROMPTS.md, block A), so the game's chrome can wear the
+     colours its drawings wear. Chrome and decoration only: none of these
+     carry text, and the sky one sits under ink-framed boxes, not words. */
+  --gg-px-sky:    #7CC4F0;  /* the overworld sky, between dither bands   */
+  --gg-px-grass:  #8FD05A;  /* the bright grass the trail crosses        */
+  --gg-px-gold:   #F2C744;  /* the coin gold, one step up from Gold Star */
+  --gg-px-rock:   #9AA5B1;  /* the stepping stones ahead                 */
+
   /* type */
   --gg-display: 'Fredoka Variable', 'Fredoka', 'Comic Sans MS', sans-serif;
   --gg-body: 'Nunito Variable', 'Nunito', 'Trebuchet MS', sans-serif;
