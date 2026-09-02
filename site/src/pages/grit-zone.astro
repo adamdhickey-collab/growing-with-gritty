@@ -120,13 +120,23 @@ const summitPt = pct(SX, SY);
 const landed = (file: string) =>
   fs.existsSync(path.resolve(process.cwd(), 'public/images/grit-zone', file));
 const art = (file: string) => (landed(file) ? u(`/images/grit-zone/${file}`) : null);
-/* Gritty's portrait in the dialog box, one face per beat of a challenge */
-const faces = {
-  think: art('face-think.webp') ?? u('/images/grit-zone/walker.webp'),
-  idea: art('face-idea.webp') ?? u('/images/grit-zone/walker.webp'),
-  oops: art('face-oops.webp') ?? u('/images/grit-zone/walker.webp'),
-  cheer: art('face-cheer.webp') ?? u('/images/grit-zone/walker.webp'),
-};
+/* Gritty's portrait in the dialog box.
+
+   The four drawn expressions (face-think / idea / oops / cheer) did not
+   hold up beside the walker tile — the raised hoof and the props read as
+   smudges at 64 pixels — so the tile does every beat, as it does on the
+   map. The files are still in public/images/grit-zone/ and the swap
+   below is one flag away: set FACE_SWAP to true to bring them back. */
+const FACE_SWAP = false;
+const tile = u('/images/grit-zone/walker.webp');
+const faces = FACE_SWAP
+  ? {
+      think: art('face-think.webp') ?? tile,
+      idea: art('face-idea.webp') ?? tile,
+      oops: art('face-oops.webp') ?? tile,
+      cheer: art('face-cheer.webp') ?? tile,
+    }
+  : { think: tile, idea: tile, oops: tile, cheer: tile };
 const stageBg = art('stage-bg.webp');   /* sky and meadow behind the dialog boxes */
 const cursor = art('cursor.webp');      /* the menu cursor beside a choice */
 const summit = art('summit.webp');      /* Gritty on the peak, for the finale */

@@ -87,7 +87,7 @@ Every file lands in `site/public/images/grit-zone/`.
 
 | # | File | What it is | Ask ChatGPT for | Transparent? | Shown at | Stand-in until it lands |
 |---|---|---|---|---|---|---|
-| 1 | `face-think.webp` | Gritty's portrait while the question is open | 1024 × 1024, fill the square | no | 64px tile in the dialog box | `walker.webp` |
+| 1 | `face-think.webp` *(drawn, not in use — see below)* | Gritty's portrait while the question is open | 1024 × 1024, fill the square | no | 64px tile in the dialog box | `walker.webp` |
 | 2 | `face-idea.webp` | his portrait after "Ask Gritty for an idea" | 1024 × 1024, fill the square | no | 64px tile | `walker.webp` |
 | 3 | `face-oops.webp` | his portrait after a wrong pick | 1024 × 1024, fill the square | no | 64px tile | `walker.webp` |
 | 4 | `face-cheer.webp` | his portrait after the grit choice | 1024 × 1024, fill the square | no | 64px tile | `walker.webp` |
@@ -451,6 +451,15 @@ looks chunkier or simpler than the bushes and flowers, he is wrong.
 on-model, facing right, at the meadow's own resolution, with a proper
 backpack and legs. The trailhead-as-model-sheet trick is the reason —
 remember it for any future full-body Gritty.
+
+**The four faces are drawn but switched off (2 Sep 2026).** Beside the
+walker tile they did not hold up at 64 pixels — the raised hoof and the
+little props (lightbulb, sweat drop) read as smudges — so the portrait
+tile does every beat of a challenge, as it does on the map. The files
+stay in `public/images/grit-zone/`; `FACE_SWAP` in `grit-zone.astro`
+turns them back on in one line. A redo would need bigger, simpler
+shapes and no props: the expression has to live in the eyes and mouth
+alone.
 
 **One thing the whole set needed afterwards.** Every sprite on the page
 is shown far smaller than its file (a 512px face in a 64px tile), and by
