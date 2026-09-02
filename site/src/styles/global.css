@@ -45,6 +45,12 @@ a:hover { color: var(--gg-blue-deep); }
    far enough from both to read as its own room, and it's the rose the
    Calming Corner already owns in the scene art. */
 .band-blush { background: color-mix(in srgb, var(--gg-pink) 34%, var(--gg-paper)); }
+/* Lime Wash — the Mistake Maker's ground, for the closing strip that hands
+   a reader over to it. The strip used to sit on plain paper directly under
+   a band that fades to paper, so the seam vanished and the two read as one
+   long section. A door is easier to see when it wears the colour of the
+   room behind it. */
+.band-lime { background: color-mix(in srgb, var(--gg-door-lime) 30%, var(--gg-paper)); }
 
 /* Hero grounds — straight from the backdrops in Kim's card art rather than
    mixed down from the washes, so a page and the door that leads to it read
@@ -75,7 +81,9 @@ a:hover { color: var(--gg-blue-deep); }
    ends on its own coloured ground meets the footer edge to edge — the
    air would show as a tan sliver of body between two coloured blocks. */
 main > :last-child { margin-bottom: 72px; }
-main > .band-deep:last-child { margin-bottom: 0; }
+main > .band-deep:last-child,
+main > .band-lime:last-child,
+main > .band-blush:last-child { margin-bottom: 0; }
 
 /* eyebrow label */
 .eyebrow {
