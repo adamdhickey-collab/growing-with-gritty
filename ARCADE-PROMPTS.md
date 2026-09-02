@@ -1,8 +1,9 @@
 # The Grit Trail's cabinet — the art that finishes it (ChatGPT prompts)
 
-> **Status: the cabinet shipped in code on 2 Sep 2026; the drawings below
-> are still to be made.** The Grit Trail's map, every challenge, the cheer,
-> and the summit now sit on one game machine: a deep-blue shell with an
+> **Status: all ten drawings landed on 2 Sep 2026**, the same day the
+> cabinet shipped in code. Every slot below is filled; the prompts stay
+> for the record and for any redo. Kept as written: the cabinet The Grit Trail's map, every challenge, the cheer,
+> and the summit sit on one game machine: a deep-blue shell with an
 > ink edge and a hard shadow, a HUD strip on top, the screen inset behind
 > its own bezel, and the buttons on a control bar underneath. Pressing
 > Play changes what's on the screen, not where you are.
