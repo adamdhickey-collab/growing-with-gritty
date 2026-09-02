@@ -51,6 +51,10 @@ a:hover { color: var(--gg-blue-deep); }
    long section. A door is easier to see when it wears the colour of the
    room behind it. */
 .band-lime { background: color-mix(in srgb, var(--gg-door-lime) 30%, var(--gg-paper)); }
+/* Play Wash — the Grit Zone's ground, for the strip that hands a reader
+   over to it. Door blue is brighter and more cyan than Sky Wash, so the
+   two read apart on a page that uses both. */
+.band-blue { background: color-mix(in srgb, var(--gg-door-blue) 24%, var(--gg-paper)); }
 
 /* Hero grounds — straight from the backdrops in Kim's card art rather than
    mixed down from the washes, so a page and the door that leads to it read
@@ -83,7 +87,8 @@ a:hover { color: var(--gg-blue-deep); }
 main > :last-child { margin-bottom: 72px; }
 main > .band-deep:last-child,
 main > .band-lime:last-child,
-main > .band-blush:last-child { margin-bottom: 0; }
+main > .band-blush:last-child,
+main > .band-blue:last-child { margin-bottom: 0; }
 
 /* eyebrow label */
 .eyebrow {
