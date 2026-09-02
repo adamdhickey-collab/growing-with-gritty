@@ -1,5 +1,17 @@
 # "Breathe with Gritty" — a full-width backdrop, drawn by ChatGPT
 
+> **Status: landed, 2 Sep 2026.** ChatGPT returned it in one round, close to
+> the brief — flower and seeds left, candle in a jar right, ripple rings dead
+> centre, the middle kept pale. It came back 2172 × 724 (3:1) rather than
+> 1536 × 1024, which is better for this band. Shipped as
+> `site/public/images/scenery/breathe-pond.webp` (210 KB) behind
+> `.band-pond`. One departure from section 6 below: the band uses `cover`,
+> not a full-width strip. Laying the art in at full width left a phone with
+> 80% flat sky above it and a visible join along the top of the paint; `cover`
+> fills the band at every size, keeps both the flower and the candle down to
+> about 1024px, and gives a narrow screen the quiet middle — water and rings
+> under the circle. Kept below for the record and for any redo.
+
 The Calming Corner's last band (`.band-deep`, `calming-corner.astro:99`) is
 flat paper-deep `#F3EBD9` behind the breathing circle. It's the one place on
 the site where a child is asked to *stop* and stay for fifty seconds, and it

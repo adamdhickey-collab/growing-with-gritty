@@ -274,7 +274,7 @@ const feelings = [
 
   /* — breathing — */
   /* — the still pond —
-     Kim's brief drawn out: the dandelion at the left, the candle at the
+     The brief drawn out: the dandelion at the left, the candle at the
      right, ripple rings dead centre under the breathing circle. The painting
      is 3:1 and the band is never that wide, so it fills the band and takes
      its cropping from the bottom edge up: the near bank and the flowers stay
@@ -288,6 +288,12 @@ const feelings = [
   .band-pond {
     background: var(--gg-sky) var(--pond-art) center bottom / cover no-repeat;
   }
+  /* The band re-inks itself the way the hero grounds do. The words sit on
+     the painting's palest stretch, but on a narrow screen that stretch can
+     be the deeper sky (#74BBF6), where --gg-blue reaches only 3.3:1 and
+     --gg-ink-soft 3.1:1. So the heading and the breath cue take
+     --gg-blue-deep (4.8:1 there, 8.9:1 over the pale centre) and the note
+     takes --gg-ink (6.3:1) — AA everywhere the band can crop to. */
   .band-pond h2, .band-pond .breath-cue { color: var(--gg-blue-deep); }
   .band-pond .note { color: var(--gg-ink); }
 
