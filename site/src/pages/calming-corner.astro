@@ -51,12 +51,14 @@ const feelings = [
         ))}
       </div>
       <div class="feel-answer">
-        <img
-          class="feel-gritty"
-          src={u("/images/characters/gritty-standing.webp")}
-          alt="" aria-hidden="true"
-          width="878" height="1097" loading="lazy"
-        />
+        <span class="stand">
+          <img
+            class="feel-gritty"
+            src={u("/images/characters/gritty-standing.webp")}
+            alt="" aria-hidden="true"
+            width="878" height="1097" loading="lazy"
+          />
+        </span>
         <Bubble>
           <span data-feel-response role="status">Every feeling is okay to
           have. Pick the face that matches yours — or head straight to a
@@ -186,34 +188,56 @@ const feelings = [
 <style>
   .note { color: var(--gg-ink-soft); margin-top: 6px; }
 
-  /* A small Gritty stands to the left of the answer and the bubble keeps its
-     tail, so the words read as him talking to the child. The drawing faces
-     left, so it's mirrored here to put his head (not his tail) beside the
-     bubble, and the tail dots are raised from the bubble's default line to
-     meet his mouth, which sits at about 46% of the drawing's height when
-     the two are centred on each other. */
+  /* A small Gritty and his answer sit together, centred under the faces,
+     and the bubble keeps its tail so the words read as him talking to the
+     child. The drawing faces left, so his stand is mirrored to put his head
+     (not his tail) beside the bubble — the stand rather than the picture,
+     so the shadow measured off the drawing flips with him. The tail dots
+     are raised from the bubble's default line to meet his mouth, which
+     sits at about 46% of the drawing's height when the two are centred
+     on each other. */
   .feel-answer {
     display: grid; grid-template-columns: auto auto;
-    gap: 48px; align-items: center;
+    gap: 48px; align-items: center; justify-content: center;
+    justify-self: stretch;
   }
-  .feel-gritty { width: 100%; max-width: 132px; height: auto; transform: scaleX(-1); }
+  .stand { position: relative; display: block; width: 132px; transform: scaleX(-1); }
+  .feel-gritty { position: relative; z-index: 1; display: block; width: 100%; height: auto; }
+  /* The same pool of shade Gritty stands in on the hero grounds — see
+     GrittyHero.astro for the geometry. */
+  .stand::before {
+    content: ''; position: absolute; z-index: 0;
+    left: 10%; right: -2%; bottom: -1%; height: 10%;
+    background:
+      radial-gradient(40% 48% at 58% 58%, rgba(40, 48, 54, 0.52) 0%,
+        rgba(40, 48, 54, 0.36) 45%, rgba(40, 48, 54, 0) 78%),
+      radial-gradient(58% 62% at 54% 52%, rgba(40, 48, 54, 0.26) 0%,
+        rgba(40, 48, 54, 0.14) 52%, rgba(40, 48, 54, 0) 82%);
+    mix-blend-mode: multiply;
+  }
   .feel-answer :global(.bubble)::before { top: 44%; }
   .feel-answer :global(.bubble)::after { top: 38%; }
   /* Narrow phones: he steps above his words rather than squeezing them, and
      the bubble drops its tail — there's no goat beside it now. */
   @media (max-width: 560px) {
-    .feel-answer { grid-template-columns: 1fr; gap: 12px; justify-items: start; }
-    .feel-gritty { max-width: 96px; }
+    .feel-answer { grid-template-columns: 1fr; gap: 12px; justify-items: center; }
+    .stand { width: 96px; }
     .feel-answer :global(.bubble)::before,
     .feel-answer :global(.bubble)::after { display: none; }
   }
 
   /* — feelings — */
-  .feel-wrap { display: grid; gap: 22px; justify-items: start; }
-  .feelings { display: flex; flex-wrap: wrap; gap: 12px; }
+  .feel-wrap { display: grid; gap: 22px; }
+  /* Six faces share the full width of the container, one column each;
+     once a column would squeeze below the tap floor they fall to two rows
+     of three. */
+  .feelings { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 640px) {
+    .feelings { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
   .feeling {
     display: grid; gap: 4px; justify-items: center;
-    min-width: 96px; min-height: var(--gg-tap); padding: 14px 16px;
+    min-width: 0; min-height: var(--gg-tap); padding: 14px 12px;
     font-family: var(--gg-display); font-weight: 500; font-size: 0.98rem;
     color: var(--gg-blue); background: var(--gg-card);
     border: 2.5px solid rgba(44, 95, 138, 0.25);
