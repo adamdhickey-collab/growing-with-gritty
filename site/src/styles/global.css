@@ -46,19 +46,26 @@ a:hover { color: var(--gg-blue-deep); }
    Calming Corner already owns in the scene art. */
 .band-blush { background: color-mix(in srgb, var(--gg-pink) 34%, var(--gg-paper)); }
 
-/* Hero grounds — one accent per page, so each of Gritty's rooms announces
-   itself the moment you land. Mixed over card white, not paper: white
-   starts brighter, so the same accent travels further before the eyebrow
-   stops clearing AA. Gold-ink at 0.82rem is the palette's tightest text
-   (4.86:1 on bare paper), and it sets every ceiling below — each figure
-   sits a notch inside that accent's measured limit, putting gold-ink at
-   4.5:1 with a little room and the blue headings at 5.6:1. Deepen one and
-   the eyebrow drops under the bar — Meet Gritty has no eyebrow today, but
-   hero-sky is priced as though it did, so any page can wear any of them. */
-.hero-meadow { background: color-mix(in srgb, var(--gg-green) 18%, var(--gg-card)); }
-.hero-sun    { background: color-mix(in srgb, var(--gg-sun)   44%, var(--gg-card)); }
-.hero-rose   { background: color-mix(in srgb, var(--gg-pink)  34%, var(--gg-card)); }
-.hero-sky    { background: color-mix(in srgb, var(--gg-sky)   44%, var(--gg-card)); }
+/* Hero grounds — one accent per page, near full strength, so a page says
+   where you are before you read a word. These are as bold as the palette
+   goes: the door-card art on the home page is bolder still, but those are
+   colours inside illustrations, not tokens, and the tile is the law here.
+
+   At this depth the default hero text stops clearing AA — gold-ink falls
+   to 2.5:1 on the gold and Gritty Blue to 3.1:1 — so a bold hero re-inks
+   itself: the eyebrow takes --gg-ink and the heading --gg-blue-deep. The
+   percentages are then the deepest mix those two survive with room over
+   4.5:1 (eyebrow 6.0-7.9:1, heading 4.8-6.0:1); gold and green need the
+   white, sky-high and pink hold up neat. */
+.hero-sky    { background: var(--gg-sky-high); }
+.hero-gold   { background: color-mix(in srgb, var(--gg-gold)  90%, var(--gg-card)); }
+.hero-meadow { background: color-mix(in srgb, var(--gg-green) 75%, var(--gg-card)); }
+.hero-rose   { background: var(--gg-pink); }
+
+.hero-sky, .hero-gold, .hero-meadow, .hero-rose { color: var(--gg-ink); }
+.hero-sky h1, .hero-gold h1, .hero-meadow h1, .hero-rose h1 { color: var(--gg-blue-deep); }
+.hero-sky .eyebrow, .hero-gold .eyebrow,
+.hero-meadow .eyebrow, .hero-rose .eyebrow { color: var(--gg-ink); }
 
 /* A page that ends on paper leaves air before the footer. A page that
    ends on its own coloured ground meets the footer edge to edge — the
