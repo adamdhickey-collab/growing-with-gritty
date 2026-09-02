@@ -27,8 +27,6 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
   <section class="band band-sky" aria-labelledby="machine-h">
     <div class="wrap machine-wrap">
       <h2 id="machine-h">Ready for a silly one?</h2>
-      <p class="note">Press the button to hear one of Gritty's mistakes —
-      then flip it into something he learned.</p>
 
       {/* Without JavaScript, the whole collection reads as a friendly list —
           each oops with its lesson right underneath. */}
@@ -46,6 +44,14 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
       </div>
 
       <div class="machine card" data-machine hidden>
+        {/* The invitation lives inside the machine, not above it. Two
+            reasons: the card is full width now, and at rest it held one
+            small button in a very large empty field — the words give it
+            something to be. And this line says "press the button", which
+            was being shown to no-JS readers who never get one; inside the
+            machine it is only ever seen by someone who has one. */}
+        <p class="note machine-note">Press the button to hear one of Gritty's
+        mistakes — then flip it into something he learned.</p>
         <button type="button" class="btn btn-primary big-btn" data-make>
           <Icon name="feeling-silly-oops" /> Oops! I made a mistake!
         </button>
@@ -157,6 +163,9 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
     margin-top: 24px; padding: 40px 32px; width: 100%;
     display: grid; gap: 20px; justify-items: center; text-align: center;
   }
+  /* centred with the rest of the machine, and held to a readable measure
+     so the full-width card doesn't stretch it into a single thin line */
+  .machine-note { margin-top: 0; max-width: 52ch; }
   /* A class's display beats [hidden]'s, so every element this page hides
      has to say so itself — otherwise the no-JS list, the stage, and the
      "Another mistake" button all sit on screen from the first paint. */

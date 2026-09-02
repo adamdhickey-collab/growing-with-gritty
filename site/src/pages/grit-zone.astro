@@ -867,7 +867,10 @@ const tabArt = {                        /* pixel sprites for the three game tabs
   }
   .intro-copy { display: grid; gap: 18px; justify-items: start; }
   @media (min-width: 860px) {
-    .intro { grid-template-columns: minmax(0, 1fr) minmax(300px, 460px); }
+    /* The painting was boxed at 460px beside a column of mostly empty
+       blue — the best drawing on the page as the least of it. The words
+       need about 46ch and no more, so the rest goes to the art. */
+    .intro { grid-template-columns: minmax(0, 0.85fr) minmax(340px, 580px); }
   }
   .note { color: var(--gg-ink-soft); margin-top: 6px; }
 

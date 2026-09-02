@@ -69,15 +69,22 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
         <a class="world-card card" href={u("/calming-corner")}>
           <img src={u("/images/scenes/gritty-calm.webp")}
                alt="" width="600" height="600" loading="lazy" />
-          <h3>Calming Corner</h3>
+          <h3>Breathe</h3>
           <p>Pick a feeling, find a calm-down idea, and breathe with
           Gritty.</p>
         </a>
       </div>
-      <p class="world-more">
-        Made a mistake today? Lucky you —
-        <a href={u("/mistake-maker")}>visit the Mistake Maker</a> <Icon name="action-brain-grows" />
-      </p>
+      {/* Not a footnote. The Mistake Maker is one of the five things this
+          site is for, and it was a grey sentence under four illustrated
+          doors. It takes the strip every other room uses to hand a reader
+          on — its own weight, without making the four-door grid a
+          five-door one. */}
+      <div class="world-more card">
+        <p>Made a mistake today? Lucky you — mistakes are how brains grow.</p>
+        <a class="btn btn-primary" href={u("/mistake-maker")}>
+          <Icon name="action-brain-grows" /> Visit the Mistake Maker
+        </a>
+      </div>
     </div>
   </section>
 
@@ -178,7 +185,19 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
   .world-card h3 { margin-top: 18px; }
   .world-card p { color: var(--gg-ink-soft); }
 
-  .world-more { margin-top: 26px; color: var(--gg-ink-soft); }
+  .world-more {
+    margin-top: 26px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px;
+    padding: 28px 36px;
+  }
+  .world-more p { flex: 1; min-width: 240px; }
+  /* The closing strips elsewhere ARE the .wrap, so they get its full width;
+     this one is nested inside a .wrap and so has 48px less to work with —
+     enough that a `flex: none` button ran 2px off a 320px screen. It is
+     allowed to shrink and wrap its label instead; the 48px tap floor comes
+     from min-height, so a two-line button is still a legal target. */
+  .world-more .btn { flex: 0 1 auto; }
+  @media (max-width: 420px) { .world-more { padding: 22px 20px; } }
 
   /* ── the grown-ups band: the page's third ground. Sky belongs to the
      books above and gold to the welcome, and another sheet of paper-deep

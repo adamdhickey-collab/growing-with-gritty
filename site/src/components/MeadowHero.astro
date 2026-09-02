@@ -259,9 +259,20 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     display: flex; justify-content: flex-end;
     padding-inline: 16px; margin-bottom: -8px;
   }
-  /* wide enough that the title never wraps under it, the switch shares
-     the title's row and the title keeps its place */
-  @media (min-width: 900px) { .meadow-tools { margin-bottom: -38px; } }
+  /* The switch used to be pulled up into the headline's row (-38px), where
+     it flanked the h1 and read as the second-loudest thing in the hero — an
+     accommodation outranking the brand moment.
+
+     It could not be quietened by colour instead: its white fill is only
+     1.61:1 against the meadow sky, so the blue border is what says "this is
+     a button" (3.95:1 against the sky, 6.37:1 against its own fill), and
+     softening that border to 70% drops the outer edge to 2.05:1, under the
+     3:1 WCAG 1.4.11 asks of a control boundary. It is already at the type
+     floor and the tap floor too. There was nothing to turn down.
+
+     So it keeps every pixel of its legibility and simply stops sharing the
+     headline's line. Same place, same size, its own row. */
+  @media (min-width: 900px) { .meadow-tools { margin-bottom: -8px; } }
 
   /* ── the words: the title carries the hero, the motto whispers ── */
   .hero-copy {
