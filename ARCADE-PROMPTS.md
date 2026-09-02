@@ -379,7 +379,72 @@ more homes worth trying once it exists: the Play card on the home page
 certificate printable. Both are a separate change; ask when the logo is
 in hand.
 
-## 7. Landing the art
+## 7. Round three — the summit, once more
+
+The second summit fixed the meadow but not Gritty: he is drawn on a much
+coarser grid than the landscape behind him, the three-quarter BACK view
+turns his head into a lump, the backpack is a plain brown square, and his
+legs are stubby white sticks. A band of sky dither at the horizon on the
+left also reads as ocean.
+
+The fix is a different reference and a different pose. **`trailhead.webp`
+already contains a full-body pixel Gritty with his backpack, on-model and
+at the right resolution** — that drawing is the model sheet for this one,
+not the walker tile alone. And he turns around: a three-quarter FRONT view
+looking out to the right shows the face a child recognises, and is far
+easier to draw well than a back view.
+
+### Prompt 14 · `summit.webp` redo, round three — *attach `trailhead-meadow.png`, `summit-current.png`, `walker-tile.png`, `face-cheer-tile.png`, `map-backdrop.png`*
+
+```
+[Block A] [Block B]
+
+REDRAW the attached summit scene (summit-current). Landscape 3:2,
+1536×1024, no transparency.
+
+KEEP, almost exactly as they are: the whole right two-thirds of the
+picture — the green meadow seen from high above, its bushes, flowers,
+rocks, the winding sandy path with its fence and signpost, the little
+blue pond, the clouds sitting below the peak, and the smiling sun at the
+top right. That half is good. Keep the rocky grey peak at the lower left
+and the red flag on its pole.
+
+FIX THE SKY: the top third is plain blue with two dither bands. Make the
+dither fade smoothly downward — a dense band high up, thinning as it
+nears the horizon, the way the attached map backdrop does it. Remove the
+flat blue-grey band at the far left horizon; it reads as ocean. The
+horizon behind the hills is sky, not sea.
+
+REDRAW GRITTY COMPLETELY. He is the problem: right now he is built from
+much bigger pixels than everything around him, his head is a shapeless
+lump, his backpack is a plain square and his legs are stubs.
+
+Use the goat in the attached trailhead picture as the model sheet — that
+is Gritty drawn correctly at this resolution, with his backpack. Copy
+that drawing's pixel size, line weight, proportions, colours and the way
+the backpack's straps and buckle are drawn. His head and face must match
+the attached portrait tiles: big round head, large black oval eyes with a
+white highlight, black button nose, closed happy smile, two floppy brown
+ears with pink insides, two short striped cream horns, shaggy brown chest
+tuft, brown hooves.
+
+NEW POSE: he stands on the snowy peak at the lower left, in three-quarter
+view FACING RIGHT and slightly toward us, so we see his whole face — both
+eyes, the nose, the smile. His front left hoof is raised to his brow,
+shading his eyes as he looks out over the meadow. His back legs are
+planted, his tail up. Proud, happy, taking in the view. He stands beside
+the flag, roughly a third of the frame's height, and every one of his
+pixels is the same size as the pixels in the meadow behind him. If he
+looks chunkier or simpler than the bushes and flowers, he is wrong.
+```
+
+**How to judge the result before landing it.** Put the new picture beside
+the trailhead drawing. If Gritty looks like the same goat drawn by the
+same hand, it is right. If he looks like a bigger, blockier cousin, ask
+for another pass with the same prompt and the line *"his pixels are still
+larger than the meadow's — draw him at the trailhead goat's resolution."*
+
+## 8. Landing the art
 
 The image chute converts to `.webp` and keeps alpha. From the repo root:
 
@@ -404,6 +469,13 @@ cd site
 npm run add-image -- grit-zone/summit    ~/Downloads/summit.png    --replace
 npm run add-image -- grit-zone/stage-bg  ~/Downloads/stage-bg.png  --replace
 npm run add-image -- grit-zone/logo      ~/Downloads/logo.png      --width 960
+```
+
+Round three — the summit again:
+
+```
+cd site
+npm run add-image -- grit-zone/summit ~/Downloads/summit.png --replace
 ```
 
 Then `npm run build` (or just push — the review build does it). Each slot
