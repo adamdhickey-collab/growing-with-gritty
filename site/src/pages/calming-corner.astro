@@ -59,7 +59,13 @@ const feelings = [
         ))}
       </div>
       <div class="feel-answer">
-        <Bubble tail={false}>
+        <img
+          class="feel-gritty"
+          src={u("/images/characters/gritty-standing.webp")}
+          alt="" aria-hidden="true"
+          width="878" height="1097" loading="lazy"
+        />
+        <Bubble>
           <span data-feel-response role="status">Every feeling is okay to
           have. Pick the face that matches yours — or head straight to a
           calm-down idea below.</span>
@@ -201,6 +207,22 @@ const feelings = [
     .intro :global(.bubble)::after { display: none; }
   }
   .note { color: var(--gg-ink-soft); margin-top: 6px; }
+
+  /* A small Gritty stands to the left of the answer and the bubble keeps its
+     tail, so the words read as him talking to the child. */
+  .feel-answer {
+    display: grid; grid-template-columns: auto auto;
+    gap: 48px; align-items: center;
+  }
+  .feel-gritty { width: 100%; max-width: 132px; height: auto; }
+  /* Narrow phones: he steps above his words rather than squeezing them, and
+     the bubble drops its tail — there's no goat beside it now. */
+  @media (max-width: 560px) {
+    .feel-answer { grid-template-columns: 1fr; gap: 12px; justify-items: start; }
+    .feel-gritty { max-width: 96px; }
+    .feel-answer :global(.bubble)::before,
+    .feel-answer :global(.bubble)::after { display: none; }
+  }
 
   /* — feelings — */
   .feel-wrap { display: grid; gap: 22px; justify-items: start; }
