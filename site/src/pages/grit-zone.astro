@@ -130,6 +130,7 @@ const faces = {
 const stageBg = art('stage-bg.webp');   /* sky and meadow behind the dialog boxes */
 const cursor = art('cursor.webp');      /* the menu cursor beside a choice */
 const summit = art('summit.webp');      /* Gritty on the peak, for the finale */
+const logo = art('logo.webp');          /* the game's title, on the cabinet's marquee */
 const tabArt = {                        /* pixel sprites for the three game tabs */
   trail: art('tab-trail.webp'),
   yet: art('tab-yet.webp'),
@@ -226,8 +227,12 @@ const tabArt = {                        /* pixel sprites for the three game tabs
             a start button goes. The challenge and the summit wear the same
             shell, so tapping Play never feels like leaving the game. */}
         <div class="trail cab" data-trail data-sx={summitPt.x} data-sy={summitPt.y} hidden>
+          {/* the marquee: an arcade machine names its game above the
+              screen. Empty until logo.webp lands; the HUD carries the
+              words until then. */}
+          {logo && <div class="cab-marquee"><img src={logo} alt="The Grit Trail" width="480" height="160" /></div>}
           <div class="cab-hud">
-            <span class="hud-title"><Icon name="action-mountain-streak" size="1.35em" /> The Grit Trail</span>
+            <span class="hud-title"><Icon name="action-mountain-streak" size="1.35em" />{!logo && ' The Grit Trail'}</span>
             <span class="tile hud-tile" data-hud-stop aria-hidden="true"></span>
           </div>
           <div class="trail-scene cab-screen"
@@ -282,6 +287,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
         <div class="quiz" data-quiz>
           {scenarios.map((s, i) => (
             <article class="scenario cab" data-scenario data-id={s.id} data-answer={s.data.answer}>
+              {logo && <div class="cab-marquee small"><img src={logo} alt="The Grit Trail" width="480" height="160" /></div>}
               <div class="cab-hud">
                 <button type="button" class="flee" data-flee><Icon name="ui-back" /> Back to the trail</button>
                 <span class="tile hud-tile" aria-hidden="true">Stop {i + 1}</span>
@@ -346,6 +352,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
         </div>
 
         <div class="finale cab" data-finale tabindex="-1" hidden>
+          {logo && <div class="cab-marquee small"><img src={logo} alt="The Grit Trail" width="480" height="160" /></div>}
           <div class="cab-hud">
             <span class="hud-title"><Icon name="badge-star-burst" size="1.35em" /> The summit</span>
           </div>
@@ -930,6 +937,15 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     border: 3px solid var(--gg-ink); border-radius: 8px;
     background: var(--gg-px-sky);
   }
+  /* the marquee: the title art sits centred on the shell above the HUD,
+     the way a cabinet's lit header sits above its screen. The drawing
+     carries transparent padding, so it is boxed by height and contained. */
+  .cab-marquee { display: grid; place-items: center; padding: 4px 8px 0; }
+  .cab-marquee img {
+    display: block; height: 92px; width: auto; max-width: 100%;
+    object-fit: contain; image-rendering: pixelated;
+  }
+  .cab-marquee.small img { height: 64px; }
   .cab-hud {
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
     min-height: 36px; padding-inline: 2px;

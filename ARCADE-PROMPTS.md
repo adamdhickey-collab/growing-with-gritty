@@ -273,7 +273,113 @@ OBJECT — see below.
   half and one white pixel highlight at the upper left, matching the
   attached coin's gold and outline weight.`
 
-## 6. Landing the art
+## 6. Round two — the summit redo, the sky redo, and a logo
+
+Adam's notes after the first set landed (2 Sep, evening): the summit's
+Gritty is drawn on a coarser grid than the walker tile and reads rough
+beside it; the challenge sky's meadow strip is scattered single pixels
+rather than drawn grass; and the game wants a title logo. The slot for
+the logo is already in the code: `logo.webp` lands on a **marquee** above
+the HUD on the map, every challenge, and the summit — the way an arcade
+cabinet names its game above the screen. Until it lands the HUD carries
+the words.
+
+More reference files were added to `reference/chatgpt-refs/` for these:
+`summit-current.png`, `stage-bg-current.png` (the drawings being redone),
+`face-cheer-tile.png` (a second look at the tile grid), `tab-trail-icon.png`.
+
+| # | File | Ask ChatGPT for | Transparent? | Shown at |
+|---|---|---|---|---|
+| 11 | `summit.webp` (replace) | 1536 × 1024 (3:2) | no | the whole summit screen, ≈626px wide |
+| 12 | `stage-bg.webp` (replace) | 1536 × 1024 (3:2) | no | the challenge screen, ≈626px wide, cropped to fit |
+| 13 | `logo.webp` (new) | 1536 × 1024 (3:2) | **yes** | 92px tall on the map's marquee, 64px on the others, over the deep-blue shell |
+
+### Prompt 11 · `summit.webp` redo — *attach `summit-current.png`, `walker-tile.png`, `face-cheer-tile.png`, `flag-sprite.png`, `map-backdrop.png`*
+
+```
+[Block A] [Block B]
+
+REDRAW the attached summit scene. Landscape 3:2, 1536×1024, no
+transparency. Keep its composition exactly: Gritty on the snowy peak at
+the lower left beside the red flag, seen from behind and a little to the
+side, one hoof raised to shade his eyes, looking out and down to the
+right over the meadow far below — the hills, the winding path, the pond,
+the fence and the tiny signpost, clouds below the peak, the sun top
+right. Keep all of that.
+
+What changes is GRITTY. Redraw him to match the two attached portrait
+tiles exactly: the same pixel grid and line weight, the same big round
+head, the same large black oval eyes with a white highlight, the same
+floppy brown ears with pink insides, the same short striped cream horns,
+the same shaggy brown chest tuft, the same brown hooves, the same small
+brown backpack. He is the tile character standing up, turned away from
+us three-quarters, so we see one ear, one horn, the back of his head,
+his backpack, and the edge of his smile. He is about a third of the
+frame's height and drawn at the tiles' level of detail — no chunkier
+pixels than the mountains around him, no simplified blob head. If in
+doubt, make him look more like the tiles, not less.
+```
+
+### Prompt 12 · `stage-bg.webp` redo — *attach `stage-bg-current.png`, `map-backdrop.png`, `page-now.png`*
+
+```
+[Block A]
+
+REDRAW the attached backdrop. Landscape 3:2, 1536×1024, no transparency.
+Keep its layout exactly: bright blue sky over the top 80% with the same
+horizontal dither bands, the same three chunky white clouds high up, the
+smiling sun at the top right, the horizon at the same height, and the
+middle 70% of the frame EMPTY sky (the website prints dialog boxes there
+— see the screenshot). No path, no characters, no signs, no text.
+
+What changes is the MEADOW STRIP along the bottom. Right now it is
+scattered single dark pixels. Redraw it the way the grass is drawn on the
+attached map backdrop: flat bright green (#8FD05A) with a darker green
+band along the horizon edge, round outlined bushes in small clusters of
+two and three, a handful of outlined flowers (pink and white with yellow
+centres, the same flowers as the map), two grey outlined rocks, a few
+short grass tufts, and a short brown wooden fence at the right edge.
+Every mark is an outlined shape with a flat fill — nothing is a lone
+pixel. Keep the strip calm and low: nothing taller than the fence, so a
+dialog box sitting on the horizon never covers anything important.
+```
+
+### Prompt 13 · `logo.webp` — the game's title — *attach `page-now.png`, `tab-trail-icon.png`, `flag-sprite.png`, `star-coin.png`*
+
+```
+[Block A]
+
+A GAME TITLE LOGO on a TRANSPARENT background, 1536×1024 PNG. This is
+the lit marquee above an arcade cabinet's screen (see the screenshot:
+it sits on the deep-blue shell above the map), so it must read from
+across the room.
+
+The words are exactly: THE GRIT TRAIL — spell them exactly, no other
+text. "THE" small, centred, on top; "GRIT TRAIL" big beneath it on one
+line, filling the frame's width, in chunky 16-bit game-title lettering
+like a SNES title screen: fat rounded capitals, gold (#F2C744) faces with
+a darker gold (#D9A93F) bevel on the bottom and right of every letter, a
+2-pixel ink (#2A3238) outline around all of it, and a white pixel
+highlight at the upper left of each letter. Let the baseline bounce a
+little — the letters can sit on a gentle upward arc, playful but still
+easy to read.
+
+Behind the lettering: a small green mountain with a grey rocky top and a
+snowy peak (matching the attached mountain icon) rising up behind the
+middle of "TRAIL", with the attached red flag planted on the peak and
+poking above the letters. Two small gold four-point sparkles float near
+the top corners. Everything crisp, flat, outlined, no gradients, no
+glow, no drop shadow. Transparent everywhere except the logo.
+```
+
+**Where it goes.** The marquee, on all three Grit Trail cabinets (map,
+challenge, summit) — nothing to place by hand, the slot is wired. Two
+more homes worth trying once it exists: the Play card on the home page
+(over the climbing scene, bottom left), and across the top of the
+certificate printable. Both are a separate change; ask when the logo is
+in hand.
+
+## 7. Landing the art
 
 The image chute converts to `.webp` and keeps alpha. From the repo root:
 
@@ -289,6 +395,15 @@ npm run add-image -- grit-zone/summit      ~/Downloads/summit.png
 npm run add-image -- grit-zone/tab-trail   ~/Downloads/tab-trail.png   --width 256
 npm run add-image -- grit-zone/tab-yet     ~/Downloads/tab-yet.png     --width 256
 npm run add-image -- grit-zone/tab-day     ~/Downloads/tab-day.png     --width 256
+```
+
+Round two — the two redos overwrite on purpose, the logo is new:
+
+```
+cd site
+npm run add-image -- grit-zone/summit    ~/Downloads/summit.png    --replace
+npm run add-image -- grit-zone/stage-bg  ~/Downloads/stage-bg.png  --replace
+npm run add-image -- grit-zone/logo      ~/Downloads/logo.png      --width 960
 ```
 
 Then `npm run build` (or just push — the review build does it). Each slot
