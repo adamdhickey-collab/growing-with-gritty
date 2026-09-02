@@ -108,8 +108,8 @@ const feelings = [
       <p class="note">Five slow breaths, together. Smell the flower… blow
       out the candle.</p>
       <div class="breath-circle" data-circle aria-hidden="true">
-        <img src={u("/images/characters/gritty-standing.webp")} alt=""
-             width="878" height="1097" />
+        <img src={u("/images/characters/gritty-sitting.webp")} alt=""
+             width="705" height="1083" />
       </div>
       <p class="breath-cue" data-cue role="status">Ready when you are.</p>
       <button type="button" class="btn btn-primary" data-breathe-btn>
@@ -274,24 +274,20 @@ const feelings = [
 
   /* — breathing — */
   /* — the still pond —
-     The backdrop is a 3:1 painting drawn edge to edge: the dandelion at the
-     left, the candle at the right, and the ripple rings dead centre, under
-     the breathing circle. So it is laid in at full width along the bottom of
-     the band rather than cropped to cover — cover zooms past both edges on a
-     phone and throws the flower and the candle away, which is most of what
-     the picture is saying. Above it, --gg-pond-sky continues the paint's own
-     top row. */
+     Kim's brief drawn out: the dandelion at the left, the candle at the
+     right, ripple rings dead centre under the breathing circle. The painting
+     is 3:1 and the band is never that wide, so it fills the band and takes
+     its cropping from the bottom edge up: the near bank and the flowers stay
+     put at every size, and it's sky that goes. Sideways it crops toward the
+     middle as the screen narrows — the flower and the candle both survive to
+     about 1024px, and below that a phone gets the quiet middle of the
+     picture, water and rings under the circle, which is the part that
+     matters while a child is counting breaths. --gg-sky is what shows for
+     the moment before the painting arrives.
+     */
   .band-pond {
-    background-image: var(--pond-art), var(--gg-pond-sky);
-    background-repeat: no-repeat;
-    background-position: center bottom;
-    background-size: 100% auto, cover;
+    background: var(--gg-sky) var(--pond-art) center bottom / cover no-repeat;
   }
-  /* The band re-inks itself the way the hero grounds do. On a narrow screen
-     the words sit on the deep end of that sky (#74BBF6), where --gg-blue
-     reaches only 3.3:1 and --gg-ink-soft 3.1:1 — so the heading and the
-     breath cue take --gg-blue-deep (4.8:1 there, 8.9:1 over the pale centre)
-     and the note takes --gg-ink (6.3:1). */
   .band-pond h2, .band-pond .breath-cue { color: var(--gg-blue-deep); }
   .band-pond .note { color: var(--gg-ink); }
 
