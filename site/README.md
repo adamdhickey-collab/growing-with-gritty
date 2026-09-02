@@ -16,7 +16,10 @@ npm run build    # → dist/
 
 - **Design system** — `src/styles/tokens.css` (source of truth: the approved
   style tile), `global.css`, and the `Bubble` / `Stamp` / `BookCard`
-  components.
+  components. **`/style-guide`** is the brand written down for Kim — the
+  colours, lettering, Gritty's rules and the pieces — rendered by the real
+  components, with every hex read out of `tokens.css` at build time so it
+  can't drift. Unlinked from the nav; share the URL.
 - **Pages** — home, `/meet-gritty`, `/books` + four book pages, `/about`,
   `/grown-ups`, and Gritty's World: `/grit-zone` (scenario quiz, the Power
   of YET, the private "how did YOU have grit today?" check-in),

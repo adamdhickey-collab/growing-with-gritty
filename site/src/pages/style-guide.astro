@@ -1,0 +1,775 @@
+---
+/* The style guide — the brand, written down for Kim.
+
+   One page that says how Growing with Gritty looks and sounds, so a
+   poster, a social post, a classroom handout or a book launch can wear
+   the same clothes as the site. Everything on it is rendered by the real
+   components and the real tokens: the swatches read their hex values
+   out of tokens.css at build time, the buttons are the site's buttons,
+   the bubble is Gritty's bubble. If the site changes, the guide changes
+   with it — a guide that could drift from the thing it describes would
+   be worse than none. Unlinked from the nav; it's a reference, not a
+   destination for a child. */
+import fs from 'node:fs';
+import path from 'node:path';
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Bubble from '../components/Bubble.astro';
+import Stamp from '../components/Stamp.astro';
+import Icon from '../components/Icon.astro';
+import BookCard from '../components/BookCard.astro';
+import { u } from '../lib/url';
+
+/* The hex codes come from the token file itself, never retyped here. */
+const tokensCss = fs.readFileSync(
+  path.resolve(process.cwd(), 'src/styles/tokens.css'), 'utf8');
+const hex: Record<string, string> = {};
+for (const m of tokensCss.matchAll(/--gg-([\w-]+):\s*(#[0-9A-Fa-f]{6})\b/g)) {
+  hex[m[1]] = m[2].toUpperCase();
+}
+const swatch = (token: string, name: string, use: string, dark = false) =>
+  ({ token, name, use, dark, hex: hex[token] ?? '?' });
+
+const brandColours = [
+  swatch('blue', 'Gritty Blue', 'Headings, the nav, buttons, links. The brand’s main colour.', true),
+  swatch('blue-deep', 'Deep Gritty Blue', 'Gritty Blue pressed or hovered. Headings on the bold hero grounds.', true),
+  swatch('green', 'Meadow Green', 'Growth accents and banners. A background colour, not a text colour.'),
+  swatch('green-ink', 'Meadow Ink', 'Meadow Green dark enough to write with.', true),
+  swatch('gold', 'Gold Star', 'Achievement only — stars, the buy button, a certificate. Not decoration.'),
+  swatch('gold-ink', 'Gold Ink', 'Gold dark enough for small words. Eyebrow labels and the motto.', true),
+  swatch('pink', 'Blush Pink', 'Gabby, and the Calming Corner’s soft wash.'),
+  swatch('sky', 'Sky Wash', 'Soft section bands and gentle highlights.'),
+];
+const paperAndInk = [
+  swatch('paper', 'Paper Cream', 'The ground of every page. Warm, like watercolour paper — never stark white.'),
+  swatch('paper-deep', 'Deep Paper', 'A second sheet of paper, for inset boxes.'),
+  swatch('card', 'Card White', 'Raised cards, bubbles and buttons that sit on the paper.'),
+  swatch('ink', 'Ink', 'Reading text.', true),
+  swatch('ink-soft', 'Soft Ink', 'Captions and second-string text.', true),
+];
+const doorGrounds = [
+  swatch('door-gold', 'Read Gold', 'The gold behind the book on the Read door.'),
+  swatch('door-blue', 'Play Blue', 'The sky over the Grit Trail.'),
+  swatch('door-lime', 'Make Lime', 'The wall of Gritty’s craft room.'),
+  swatch('door-rose', 'Calming Rose', 'The Calming Corner’s sunset wash.'),
+];
+const meadow = [
+  swatch('sky-high', 'High Sky', 'The top of the hero sky.'),
+  swatch('sky-low', 'Low Sky', 'Where the sky melts into the hills.'),
+  swatch('sun', 'Meadow Sun', 'The sun, and celebration sparks.'),
+  swatch('hill-back', 'Far Hill', 'The farthest hill.'),
+  swatch('hill-mid', 'Middle Hill', 'The middle hill.'),
+  swatch('meadow', 'Front Grass', 'The grass Gritty stands in.'),
+];
+
+const characters = (await getCollection('characters')).sort((a, b) => a.data.order - b.data.order);
+const books = (await getCollection('books')).sort((a, b) => a.data.order - b.data.order);
+const firstBook = books[0];
+
+const moods = [
+  { file: 'gritty-backpack-1', label: 'Ready' },
+  { file: 'gritty-backpack-laugh-1', label: 'Laughing' },
+  { file: 'gritty-backpack-proud-1', label: 'Proud' },
+  { file: 'gritty-backpack-surprised-1', label: 'Surprised' },
+  { file: 'gritty-backpack-thinking-1', label: 'Thinking' },
+];
+---
+
+<Base
+  title="Style Guide — Growing with Gritty"
+  description="How Growing with Gritty looks and sounds: the colours, the lettering, Gritty's rules, and the pieces the site is built from."
+>
+  <article class="guide">
+    {/* ——— the opening ——— */}
+    <section class="band band-sky">
+      <div class="wrap opening">
+        <div class="opening-words">
+          <p class="eyebrow">The brand, written down</p>
+          <h1>The Growing with Gritty style guide</h1>
+          <p class="lede">How the site looks and sounds, so that a poster,
+          a post, a handout or a book launch can wear the same clothes.
+          Everything on this page is the real thing: the colours are read
+          straight from the site, and the buttons and bubbles are the
+          site’s own.</p>
+          <nav class="contents" aria-label="On this page">
+            <a href="#voice">Voice</a>
+            <a href="#colour">Colour</a>
+            <a href="#lettering">Lettering</a>
+            <a href="#gritty">Gritty</a>
+            <a href="#herd">The herd</a>
+            <a href="#pieces">The pieces</a>
+            <a href="#pictures">Pictures</a>
+            <a href="#rules">The rules</a>
+            <a href="#quick">Quick reference</a>
+          </nav>
+        </div>
+        <div class="opening-stage">
+          <Bubble side="right">This is how I look and sound — everywhere
+          I go.</Bubble>
+          <span class="stand">
+            <img src={u('/images/gritty-talking/gritty-standing.webp')}
+                 alt="Gritty the Goat, hand-drawn by Kim Rekowski"
+                 width="878" height="1097" />
+          </span>
+        </div>
+      </div>
+    </section>
+
+    {/* ——— voice ——— */}
+    <section class="band" id="voice">
+      <div class="wrap">
+        <p class="eyebrow">How it sounds</p>
+        <h2>Three lines carry the whole brand</h2>
+        <div class="lines">
+          <blockquote class="motto">“I have grit! I don’t quit!”
+            <footer>The motto. Grandpa Goat’s words, given to Gritty on his
+            first day of school. It closes every page.</footer></blockquote>
+          <p class="tagline-demo">Build Grit. Grow Strong. Never Quit!
+            <span class="line-note">The tagline. It rides under the name in the
+            header.</span></p>
+          <p class="signoff-demo">Keep growing. Keep learning. Keep trying.
+            <span class="line-note">The sign-off. Kim’s own closing line, in
+            her voice.</span></p>
+        </div>
+
+        <div class="two-up">
+          <div class="voice-card card">
+            <h3>When Gritty talks</h3>
+            <ul class="flow">
+              <li><b>First person, out loud.</b> He says it the way a small
+              goat would: short sentences, an exclamation mark or two, and
+              quotation marks around everything.</li>
+              <li><b>Every feeling is okay.</b> He names the feeling first,
+              then offers one next step. <i>“It’s okay to feel worried.
+              Worries get smaller after a slow breath. Want to try one
+              together?”</i></li>
+              <li><b>Mistakes are lucky.</b> Never shame, never “wrong”.
+              A mistake is how the brain grows, and trying again is the
+              whole point.</li>
+              <li><b>He never says what he can’t do.</b> He says
+              <b>yet</b>. “I can’t do it” becomes “I can’t do it
+              yet.”</li>
+            </ul>
+          </div>
+          <div class="voice-card card">
+            <h3>When Kim talks</h3>
+            <ul class="flow">
+              <li><b>A teacher, not a brand.</b> Warm, plain and direct, to
+              parents and teachers as one grown-up to another.</li>
+              <li><b>Say what it’s for.</b> “Conversation starters and
+              classroom ideas for talking about grit, mistakes, and big
+              feelings.” Concrete beats clever.</li>
+              <li><b>Kids first, always.</b> The audience is four-year-olds
+              and grandparents. Big words, big buttons, nothing to sign up
+              for, nothing collected.</li>
+              <li><b>The reader is “you”.</b> Never “users”,
+              never “customers”. Kids, families, friends.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* ——— colour ——— */}
+    <section class="band band-deep" id="colour">
+      <div class="wrap">
+        <p class="eyebrow">Colour</p>
+        <h2>Paper, then five colours</h2>
+        <p class="section-lede">Everything sits on warm paper, like a page
+        from one of the books. Gritty Blue does the talking, Meadow Green is
+        for growing, Gold Star is for the moment something is achieved, and
+        Blush and Sky are soft washes behind it all. The names are the ones
+        the site uses; the codes are read from the site itself.</p>
+
+        <h3>Paper and ink</h3>
+        <div class="swatches">
+          {paperAndInk.map((s) => (
+            <div class:list={['swatch', { dark: s.dark }]} style={`--sw: var(--gg-${s.token})`}>
+              <div class="chip-colour"><code>{s.hex}</code></div>
+              <b>{s.name}</b>
+              <p>{s.use}</p>
+            </div>
+          ))}
+        </div>
+
+        <h3>The brand colours</h3>
+        <div class="swatches">
+          {brandColours.map((s) => (
+            <div class:list={['swatch', { dark: s.dark }]} style={`--sw: var(--gg-${s.token})`}>
+              <div class="chip-colour"><code>{s.hex}</code></div>
+              <b>{s.name}</b>
+              <p>{s.use}</p>
+            </div>
+          ))}
+        </div>
+
+        <div class="two-up colour-rules">
+          <div class="rule-box">
+            <h3>Safe for small writing</h3>
+            <p>On paper or white, these are dark enough for any size of
+            text:</p>
+            <p class="ink-list">
+              <span style="color: var(--gg-ink)">Ink</span>
+              <span style="color: var(--gg-ink-soft)">Soft Ink</span>
+              <span style="color: var(--gg-blue)">Gritty Blue</span>
+              <span style="color: var(--gg-blue-deep)">Deep Gritty Blue</span>
+              <span style="color: var(--gg-green-ink)">Meadow Ink</span>
+              <span style="color: var(--gg-gold-ink)">Gold Ink</span>
+            </p>
+          </div>
+          <div class="rule-box">
+            <h3>Backgrounds only</h3>
+            <p>Meadow Green, Gold Star, Blush Pink, Sky Wash and the door
+            colours are too light to write with. Put Ink or Deep Gritty Blue
+            on top of them, never white and never the soft inks.</p>
+            <p class="ink-list">
+              <span class="on" style="background: var(--gg-gold); color: var(--gg-ink)">Ink on gold</span>
+              <span class="on" style="background: var(--gg-green); color: var(--gg-ink)">Ink on green</span>
+              <span class="on" style="background: var(--gg-sky); color: var(--gg-blue-deep)">Blue on sky</span>
+            </p>
+          </div>
+        </div>
+
+        <h3>The door grounds</h3>
+        <p class="section-lede">Bolder than the washes, sampled from the
+        backdrops of Kim’s own card art. Each of Gritty’s World’s rooms
+        opens on the colour of the door that leads to it.</p>
+        <div class="swatches">
+          {doorGrounds.map((s) => (
+            <div class="swatch" style={`--sw: var(--gg-${s.token})`}>
+              <div class="chip-colour"><code>{s.hex}</code></div>
+              <b>{s.name}</b>
+              <p>{s.use}</p>
+            </div>
+          ))}
+        </div>
+
+        <h3>The meadow</h3>
+        <p class="section-lede">The home page’s hero scene, sky to grass.
+        The hills change colour with the season on their own.</p>
+        <div class="swatches meadow-swatches">
+          {meadow.map((s) => (
+            <div class="swatch" style={`--sw: var(--gg-${s.token})`}>
+              <div class="chip-colour"><code>{s.hex}</code></div>
+              <b>{s.name}</b>
+              <p>{s.use}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* ——— lettering ——— */}
+    <section class="band" id="lettering">
+      <div class="wrap">
+        <p class="eyebrow">Lettering</p>
+        <h2>Three typefaces, three jobs</h2>
+        <p class="section-lede">All three are free from Google Fonts, so
+        they work in Canva, Word, and print as well as on the site.</p>
+
+        <div class="faces">
+          <div class="face card">
+            <p class="face-sample display">Keep trying, little goat</p>
+            <h3>Fredoka</h3>
+            <p class="face-role">The rounded one. Headings, buttons, the nav
+            and the name.</p>
+            <p class="face-note">Weight 600 for headings. It’s friendly at
+            any size, so it never needs to shout.</p>
+          </div>
+          <div class="face card">
+            <p class="face-sample body">Kim’s books are designed to be
+            fun, engaging, and meaningful for children, while giving parents
+            and teachers a way in.</p>
+            <h3>Nunito</h3>
+            <p class="face-role">The reading one. Every paragraph, caption
+            and label.</p>
+            <p class="face-note">Generous line spacing. Lines no longer than
+            about 65 characters.</p>
+          </div>
+          <div class="face card">
+            <p class="face-sample hand">“I don’t always get things right
+            the first time. But that’s okay!”</p>
+            <h3>Patrick Hand</h3>
+            <p class="face-role">Gritty’s handwriting. Speech bubbles and
+            the motto — nothing else.</p>
+            <p class="face-note">One font, one job. If it’s in this
+            lettering, Gritty is saying it.</p>
+          </div>
+        </div>
+
+        <div class="scale card">
+          <p class="scale-h1">A big heading (h1)</p>
+          <p class="scale-h2">A section heading (h2)</p>
+          <p class="scale-h3">A small heading (h3)</p>
+          <p class="scale-body">Reading text is set a step larger than most
+          websites, because the readers are four and seventy-four.</p>
+          <p class="scale-small">The smallest anything informational is
+          allowed to be. Captions and labels stop here — never smaller.</p>
+          <p class="scale-eyebrow eyebrow">An eyebrow label sits above a heading</p>
+        </div>
+      </div>
+    </section>
+
+    {/* ——— gritty ——— */}
+    <section class="band band-blush" id="gritty">
+      <div class="wrap">
+        <p class="eyebrow">Gritty</p>
+        <h2>How Gritty appears</h2>
+        <div class="gritty-demo">
+          <div class="gritty-stage">
+            <span class="stand">
+              <img src={u('/images/characters/gritty-standing-right.webp')}
+                   alt="Gritty standing, facing his speech bubble"
+                   width="878" height="1097" />
+            </span>
+            <Bubble>“Hi, friend! I’m Gritty. I keep trying, learn from my
+            mistakes, and never give up.”</Bubble>
+          </div>
+          <ul class="flow gritty-rules">
+            <li><b>Only Kim’s drawings.</b> There is no other Gritty. No
+            traced, generated or redrawn version, ever. If a pose doesn’t
+            exist yet, wait for the drawing.</li>
+            <li><b>He looks at his words.</b> His head is the side nearest
+            the bubble and his eyes glance toward it. He never talks with
+            his back to what he’s saying.</li>
+            <li><b>His words are handwritten.</b> A white bubble with an
+            ink outline, Patrick Hand lettering, and a trail of two thought
+            dots that leads to his mouth.</li>
+            <li><b>He stands on the ground.</b> A soft pool of shade under
+            his hooves. A floating goat is a sticker; a standing goat is a
+            character.</li>
+            <li><b>He’s the guide, not the logo.</b> Gritty introduces,
+            encourages and celebrates. The name in Fredoka is the logo.</li>
+          </ul>
+        </div>
+
+        <h3>His moods</h3>
+        <p class="section-lede">On the home page he acts these out when a
+        child taps him. They’re Kim’s drawings, one per mood.</p>
+        <div class="moods">
+          {moods.map((m) => (
+            <figure class="mood">
+              <img src={u(`/images/gritty-talking/${m.file}.webp`)} alt=""
+                   width="640" height="777" loading="lazy" />
+              <figcaption>{m.label}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* ——— the herd ——— */}
+    <section class="band" id="herd">
+      <div class="wrap">
+        <p class="eyebrow">The herd</p>
+        <h2>Who’s who</h2>
+        <div class="herd">
+          {characters.map((c) => (
+            <figure class="goat">
+              <img src={u(c.data.portrait)} alt="" width="300" height="340" loading="lazy" />
+              <figcaption><b>{c.data.name}</b><span>{c.data.role}</span></figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* ——— the pieces ——— */}
+    <section class="band band-deep" id="pieces">
+      <div class="wrap">
+        <p class="eyebrow">The pieces</p>
+        <h2>What the site is built from</h2>
+
+        <h3>Buttons</h3>
+        <p class="section-lede">Always a pill, always Fredoka, always at
+        least 48 pixels tall — little fingers and grandparents’ too.</p>
+        <div class="demo-row">
+          <span class="btn btn-primary">Meet Gritty</span>
+          <span class="btn btn-gold"><Icon name="ui-buy-cart" size="1.45em" />Buy the book</span>
+          <span class="btn btn-ghost"><Icon name="ui-look-inside" size="1.45em" />Take a look inside</span>
+        </div>
+        <ul class="flow key">
+          <li><b>Gritty Blue</b> is the main action on a page. One per
+          moment.</li>
+          <li><b>Gold</b> means achievement or the shop — buying a book,
+          finishing a challenge. Lettered in ink, never white.</li>
+          <li><b>Paper</b> is the quieter second choice beside a blue or gold
+          one.</li>
+        </ul>
+
+        <h3>Cards, chips and stamps</h3>
+        <div class="pieces-grid">
+          <div class="piece">
+            {firstBook && <BookCard book={firstBook} />}
+            <p class="piece-note">A card: white, rounded corners
+            (22 px), a soft blue-tinted shadow, and a small lift on
+            hover.</p>
+          </div>
+          <div class="piece">
+            <div class="demo-col">
+              <div class="demo-row">
+                <span class="chip-demo">Try again!</span>
+                <span class="chip-demo">Ask for help</span>
+              </div>
+              <p class="piece-note">Reply chips: what a child says back to
+              Gritty. White, a Gritty Blue outline, and a pill shape.</p>
+            </div>
+            <div class="demo-col">
+              <div class="demo-row stamps">
+                <Stamp icon="action-try-again" label="Try Again" tone="blue" tilt={-3} />
+                <Stamp icon="action-idea" label="Learn From It" tone="gold" tilt={2} />
+                <Stamp icon="action-ask-for-help" label="Ask for Help" tone="green" tilt={-2} />
+              </div>
+              <p class="piece-note">Value stamps: a dashed disc, slightly
+              tilted like a hand-stamped one, in blue, gold or green.</p>
+            </div>
+          </div>
+        </div>
+
+        <h3>Bands</h3>
+        <p class="section-lede">Pages are built in horizontal bands, each a
+        room with its own ground. Bands alternate so sections read as
+        separate without any lines.</p>
+        <div class="bands-demo">
+          <div class="band-swatch" style="background: var(--gg-paper)"><span>Paper</span></div>
+          <div class="band-swatch" style="background: var(--gg-paper-deep)"><span>Deep paper</span></div>
+          <div class="band-swatch band-sky"><span>Sky wash</span></div>
+          <div class="band-swatch band-blush"><span>Blush wash</span></div>
+          <div class="band-swatch hero-gold"><span>Read gold</span></div>
+          <div class="band-swatch hero-blue"><span>Play blue</span></div>
+          <div class="band-swatch hero-lime"><span>Make lime</span></div>
+          <div class="band-swatch hero-rose"><span>Calming rose</span></div>
+        </div>
+
+        <h3>Icons</h3>
+        <p class="section-lede">Two kinds, never mixed up. The header nav
+        uses Kim’s own crayon drawings. Everything smaller uses a flat,
+        full-colour emoji set (Microsoft’s Fluent Emoji, free to use) so
+        feelings, actions and calm-down ideas each have a face.</p>
+        <div class="icon-row">
+          {['meet-gritty', 'books', 'grit-zone', 'mistake-maker', 'calming-corner', 'grown-ups', 'about-kim'].map((n) => (
+            <img src={u(`/images/nav/${n}.webp`)} alt="" width="64" height="64" loading="lazy" />
+          ))}
+        </div>
+        <div class="icon-row small">
+          {['feeling-worried', 'feeling-frustrated', 'action-try-again', 'action-idea',
+            'action-ask-for-help', 'action-calm-break', 'badge-star', 'heart-kind',
+            'calm-breathe', 'calm-flower-candle', 'printable-coloring-page', 'action-celebrate'
+          ].map((n) => <Icon name={n} size="44px" />)}
+        </div>
+      </div>
+    </section>
+
+    {/* ——— pictures ——— */}
+    <section class="band" id="pictures">
+      <div class="wrap">
+        <p class="eyebrow">Pictures</p>
+        <h2>Kim’s scenes, and real goats</h2>
+        <p class="section-lede">Every drawing on the site is Kim’s. Scenes
+        are square, one moment each, with a clear bright backdrop so four
+        of them in a row are tellable apart. Photographs are real, warm,
+        and full of goats.</p>
+        <div class="scenes">
+          {[['gritty-reading', 'Read'], ['gritty-climbing', 'Play'],
+            ['gritty-coloring', 'Make'], ['gritty-calm', 'Calming Corner']].map(([f, l]) => (
+            <figure class="scene">
+              <img src={u(`/images/scenes/${f}.webp`)} alt="" width="600" height="600" loading="lazy" />
+              <figcaption>{l}</figcaption>
+            </figure>
+          ))}
+        </div>
+        <div class="photo-row">
+          <figure class="photo">
+            <img src={u('/images/photos/kim-reading-with-goats.webp')}
+                 alt="Kim Rekowski reading one of her books to a group of goats"
+                 width="683" height="856" loading="lazy" />
+            <figcaption>Reading Gritty Grows a Garden to very interested listeners.</figcaption>
+          </figure>
+          <div class="photo-notes flow">
+            <p><b>Photos are for the grown-up pages.</b> The author page,
+            and anything about Kim herself. Gritty’s own pages stay
+            drawn.</p>
+            <p><b>Frame them like a print.</b> On a white card, a gentle
+            tilt, a handwritten caption underneath.</p>
+            <p><b>Captions are short.</b> One line that says what’s
+            happening, with the joke left in.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* ——— the rules ——— */}
+    <section class="band band-sky" id="rules">
+      <div class="wrap">
+        <p class="eyebrow">The rules</p>
+        <h2>Things that are always true</h2>
+        <div class="two-up">
+          <div class="rule-list card">
+            <h3><Icon name="heart-kind" /> Always</h3>
+            <ul class="flow">
+              <li>Kim’s hand-drawn art is the only Gritty.</li>
+              <li>Warm paper, never stark white.</li>
+              <li>Gritty looks at his speech bubble.</li>
+              <li>Speech bubbles are handwritten; nothing else is.</li>
+              <li>Every feeling is okay, and mistakes are lucky.</li>
+              <li>Text is big, buttons are big, and anything that moves can be
+              paused.</li>
+              <li>Colours on top of colours are checked for contrast — ink or
+              deep blue on the bright grounds.</li>
+            </ul>
+          </div>
+          <div class="rule-list card">
+            <h3><Icon name="feeling-worried" /> Never</h3>
+            <ul class="flow">
+              <li>Never generated, traced or “in the style of” character
+              art.</li>
+              <li>Never collect anything from a child: no forms, no sign-ups,
+              no cookies.</li>
+              <li>Never gold for decoration — it means something was
+              achieved.</li>
+              <li>Never white lettering on gold, green, pink or sky.</li>
+              <li>Never informational text smaller than the floor.</li>
+              <li>Never shame. No “wrong”, no red X, no sad trombone.</li>
+              <li>Never flip a drawing in software to face the other way —
+              it flips his eyes too.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* ——— quick reference ——— */}
+    <section class="band" id="quick">
+      <div class="wrap">
+        <p class="eyebrow">Quick reference</p>
+        <h2>For Canva, print and social</h2>
+        <div class="quick-grid">
+          <div class="quick card">
+            <h3>Colours</h3>
+            <table class="quick-table">
+              {[...paperAndInk, ...brandColours].map((s) => (
+                <tr>
+                  <td><span class="dot" style={`background: var(--gg-${s.token})`}></span></td>
+                  <td>{s.name}</td>
+                  <td><code>{s.hex}</code></td>
+                </tr>
+              ))}
+            </table>
+          </div>
+          <div class="quick card">
+            <h3>Fonts</h3>
+            <table class="quick-table">
+              <tr><td class="display">Fredoka</td><td>Headings, buttons, the name. Weight 600.</td></tr>
+              <tr><td class="body">Nunito</td><td>Everything you read. Weight 400, bold 700–800.</td></tr>
+              <tr><td class="hand">Patrick Hand</td><td>Gritty’s speech bubbles only.</td></tr>
+            </table>
+            <p class="quick-note">All three are on
+            <a href="https://fonts.google.com" rel="noopener">Google Fonts</a>,
+            free for print and web.</p>
+            <h3>Shapes</h3>
+            <table class="quick-table">
+              <tr><td>Cards</td><td>Corners 22 px, soft blue shadow</td></tr>
+              <tr><td>Small cards</td><td>Corners 14 px</td></tr>
+              <tr><td>Buttons and chips</td><td>Full pill, at least 48 px tall</td></tr>
+              <tr><td>Bubbles</td><td>White, 3 px ink outline, hand-drawn corners</td></tr>
+            </table>
+            <p class="quick-note">Every picture the site uses, with its
+            file, is in the
+            <a href="https://adamdhickey-collab.github.io/growing-with-gritty/library/" rel="noopener">image library</a>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </article>
+</Base>
+
+<style>
+  .guide h2 { margin-bottom: 14px; }
+  .guide h3 { margin-top: 36px; margin-bottom: 12px; }
+  .eyebrow + h1, .eyebrow + h2 { margin-top: 8px; }
+  .section-lede { color: var(--gg-ink-soft); max-width: 62ch; margin-bottom: 20px; }
+  .two-up { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; margin-top: 26px; }
+  .card { padding: 26px 28px; }
+  .card h3 { margin-top: 0; }
+  ul.flow { padding-left: 1.2em; }
+
+  /* ——— the opening ——— */
+  .opening { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 32px 48px; align-items: center; }
+  .opening-words { display: grid; gap: 14px; justify-items: start; }
+  .lede { font-size: 1.15rem; max-width: 52ch; }
+  .contents { display: flex; flex-wrap: wrap; gap: 6px 8px; margin-top: 6px; }
+  .contents a {
+    font-family: var(--gg-display); font-weight: 600; font-size: var(--gg-text-small);
+    text-decoration: none; padding: 8px 14px; min-height: 40px; display: inline-flex; align-items: center;
+    background: var(--gg-card); border-radius: 999px; box-shadow: var(--gg-shadow);
+  }
+  .contents a:hover { background: color-mix(in srgb, var(--gg-sky) 45%, #fff); }
+  /* Gritty on the right, talking to his left — same geometry as the hero */
+  .opening-stage {
+    display: grid; grid-template-columns: minmax(0, auto) auto;
+    align-items: center; justify-content: center; column-gap: 56px;
+  }
+  .opening-stage :global(.bubble) { justify-self: end; font-size: 1.3rem; }
+  .opening-stage :global(.bubble)::before { top: calc(50% - 16px); }
+  .opening-stage :global(.bubble)::after { top: calc(50% - 22px); }
+  .stand { position: relative; display: block; }
+  .stand img { position: relative; z-index: 1; display: block; width: clamp(150px, 16vw, 210px); height: auto; }
+  .stand::before {
+    content: ''; position: absolute; z-index: 0;
+    left: 10%; right: -2%; bottom: -1%; height: 10%;
+    background:
+      radial-gradient(40% 48% at 58% 58%, rgba(40, 48, 54, 0.52) 0%, rgba(40, 48, 54, 0.36) 45%, rgba(40, 48, 54, 0) 78%),
+      radial-gradient(58% 62% at 54% 52%, rgba(40, 48, 54, 0.26) 0%, rgba(40, 48, 54, 0.14) 52%, rgba(40, 48, 54, 0) 82%);
+    mix-blend-mode: multiply;
+  }
+
+  /* ——— voice ——— */
+  .lines { display: grid; gap: 18px; margin-top: 20px; max-width: 64ch; }
+  .motto {
+    font-family: var(--gg-hand); font-size: clamp(1.8rem, 4vw, 2.4rem); line-height: 1.2;
+    color: var(--gg-gold-ink); padding: 22px 28px;
+    background: var(--gg-card); border: 3px solid var(--gg-gold);
+    border-radius: 8px 26px 8px 26px; box-shadow: var(--gg-shadow); rotate: -0.8deg;
+  }
+  .motto footer, .line-note {
+    display: block; margin-top: 8px; font-family: var(--gg-body); font-size: var(--gg-text-small);
+    color: var(--gg-ink-soft); line-height: 1.5; rotate: 0deg;
+  }
+  .tagline-demo { font-family: var(--gg-display); font-weight: 600; font-size: 1.4rem; color: var(--gg-blue-deep); }
+  .signoff-demo { font-family: var(--gg-display); font-weight: 500; font-size: 1.2rem; color: var(--gg-green-ink); }
+  .voice-card li + li { margin-top: 0.7em; }
+
+  /* ——— colour ——— */
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+  .swatch b { display: block; margin-top: 10px; font-family: var(--gg-display); font-weight: 600; color: var(--gg-blue-deep); }
+  .swatch p { font-size: var(--gg-text-small); color: var(--gg-ink-soft); line-height: 1.45; margin-top: 2px; }
+  .chip-colour {
+    height: 88px; border-radius: var(--gg-radius-small); background: var(--sw);
+    border: 1px solid rgba(42, 50, 56, 0.1); display: flex; align-items: flex-end; padding: 8px 10px;
+  }
+  .chip-colour code {
+    font-family: var(--gg-body); font-weight: 800; font-size: 0.8rem; letter-spacing: 0.04em;
+    color: var(--gg-ink); background: rgba(255, 255, 255, 0.82); padding: 2px 7px; border-radius: 6px;
+  }
+  .swatch.dark .chip-colour code { color: #fff; background: rgba(0, 0, 0, 0.28); }
+  .colour-rules { margin-top: 30px; }
+  .rule-box { background: var(--gg-card); border-radius: var(--gg-radius); padding: 22px 26px; box-shadow: var(--gg-shadow); }
+  .rule-box h3 { margin-top: 0; }
+  .ink-list { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 12px; font-family: var(--gg-display); font-weight: 600; }
+  .ink-list .on { padding: 6px 12px; border-radius: 999px; }
+
+  /* ——— lettering ——— */
+  .faces { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; }
+  .face-sample { color: var(--gg-blue-deep); margin-bottom: 18px; }
+  .face-sample.display { font-family: var(--gg-display); font-weight: 600; font-size: 2rem; line-height: 1.1; }
+  .face-sample.body { font-family: var(--gg-body); font-size: 1.06rem; line-height: 1.65; color: var(--gg-ink); }
+  .face-sample.hand { font-family: var(--gg-hand); font-size: 1.6rem; line-height: 1.3; color: var(--gg-ink); }
+  .face-role { color: var(--gg-ink); }
+  .face-note { font-size: var(--gg-text-small); color: var(--gg-ink-soft); margin-top: 8px; }
+  .scale { margin-top: 24px; display: grid; gap: 14px; }
+  .scale p { font-family: var(--gg-display); color: var(--gg-blue); font-weight: 600; line-height: 1.15; }
+  .scale-h1 { font-size: var(--gg-text-h1); }
+  .scale-h2 { font-size: var(--gg-text-h2); }
+  .scale-h3 { font-size: var(--gg-text-h3); }
+  .scale .scale-body { font-family: var(--gg-body); font-weight: 400; font-size: var(--gg-text-body); color: var(--gg-ink); line-height: 1.65; }
+  .scale .scale-small { font-family: var(--gg-body); font-weight: 400; font-size: var(--gg-text-small); color: var(--gg-ink-soft); line-height: 1.5; }
+  .scale .scale-eyebrow { font-family: var(--gg-body); }
+
+  /* ——— gritty ——— */
+  .gritty-demo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 48px; align-items: center; margin-top: 10px; }
+  /* Gritty on the left talking to his right — the Calming Corner geometry */
+  .gritty-stage { display: grid; grid-template-columns: auto minmax(0, auto); align-items: center; justify-content: center; column-gap: 48px; }
+  .gritty-stage .stand img { width: 150px; }
+  .gritty-stage .stand::before {
+    left: -2%; right: 10%;
+    background:
+      radial-gradient(40% 48% at 42% 58%, rgba(40, 48, 54, 0.52) 0%, rgba(40, 48, 54, 0.36) 45%, rgba(40, 48, 54, 0) 78%),
+      radial-gradient(58% 62% at 46% 52%, rgba(40, 48, 54, 0.26) 0%, rgba(40, 48, 54, 0.14) 52%, rgba(40, 48, 54, 0) 82%);
+  }
+  .gritty-stage :global(.bubble) { font-size: 1.3rem; }
+  .gritty-stage :global(.bubble)::before { top: calc(50% - 13px); }
+  .gritty-stage :global(.bubble)::after { top: calc(50% - 17px); }
+  .gritty-rules li + li { margin-top: 0.7em; }
+  .moods { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; }
+  .mood { text-align: center; }
+  .mood img { width: 100%; max-width: 150px; height: auto; }
+  .mood figcaption { font-family: var(--gg-display); font-weight: 600; color: var(--gg-blue-deep); margin-top: 6px; }
+
+  /* ——— the herd ——— */
+  .herd { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; }
+  .goat { text-align: center; background: var(--gg-card); border-radius: var(--gg-radius); padding: 18px 14px; box-shadow: var(--gg-shadow); }
+  .goat img { width: 100%; max-width: 150px; height: auto; aspect-ratio: 300 / 340; object-fit: contain; }
+  .goat figcaption { display: grid; gap: 2px; margin-top: 10px; }
+  .goat b { font-family: var(--gg-display); font-weight: 600; color: var(--gg-blue-deep); }
+  .goat span { font-size: var(--gg-text-small); color: var(--gg-ink-soft); line-height: 1.4; }
+
+  /* ——— the pieces ——— */
+  .demo-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .demo-row.stamps { gap: 6px; }
+  .key { margin-top: 16px; max-width: 60ch; }
+  .key li + li { margin-top: 0.5em; }
+  .pieces-grid { display: grid; grid-template-columns: minmax(240px, 300px) minmax(0, 1fr); gap: 28px; align-items: start; }
+  .piece-note { font-size: var(--gg-text-small); color: var(--gg-ink-soft); margin-top: 12px; max-width: 46ch; }
+  .demo-col + .demo-col { margin-top: 26px; }
+  .chip-demo {
+    display: inline-flex; align-items: center; min-height: var(--gg-tap); padding: 0.5em 1.2em;
+    background: #fff; color: var(--gg-blue); border: 3px solid var(--gg-blue); border-radius: 999px;
+    font-family: var(--gg-display); font-weight: 600; font-size: 1rem;
+  }
+  .bands-demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+  .band-swatch {
+    height: 74px; border-radius: var(--gg-radius-small); display: flex; align-items: flex-end; padding: 8px 12px;
+    font-family: var(--gg-display); font-weight: 600; font-size: var(--gg-text-small); color: var(--gg-blue-deep);
+    border: 1px solid rgba(42, 50, 56, 0.08);
+  }
+  .icon-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-bottom: 14px; }
+  .icon-row img { width: 56px; height: 56px; object-fit: contain; }
+
+  /* ——— pictures ——— */
+  .scenes { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
+  .scene img { width: 100%; height: auto; border-radius: var(--gg-radius-small); }
+  .scene figcaption { font-family: var(--gg-display); font-weight: 600; color: var(--gg-blue-deep); margin-top: 6px; text-align: center; }
+  .photo-row { display: grid; grid-template-columns: minmax(200px, 300px) minmax(0, 1fr); gap: 32px; align-items: center; margin-top: 30px; }
+  .photo {
+    margin: 0; padding: 12px 12px 8px; background: var(--gg-card); border-radius: var(--gg-radius);
+    box-shadow: var(--gg-shadow-lift); rotate: 1.4deg;
+  }
+  .photo img { display: block; width: 100%; height: auto; border-radius: var(--gg-radius-small); }
+  .photo figcaption { padding: 10px 4px 2px; text-align: center; font-family: var(--gg-hand); font-size: 1.05rem; line-height: 1.3; color: var(--gg-ink-soft); }
+  .photo-notes { max-width: 50ch; }
+
+  /* ——— the rules ——— */
+  .rule-list h3 { display: flex; align-items: center; gap: 0.4em; }
+  .rule-list li + li { margin-top: 0.5em; }
+
+  /* ——— quick reference ——— */
+  .quick-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; }
+  .quick-table { border-collapse: collapse; width: 100%; }
+  .quick-table td { padding: 7px 8px 7px 0; border-bottom: 1px solid rgba(42, 50, 56, 0.08); vertical-align: middle; font-size: var(--gg-text-small); }
+  .quick-table td:first-child { width: 2em; padding-right: 4px; }
+  .quick-table code { font-family: var(--gg-body); font-weight: 800; letter-spacing: 0.04em; }
+  .dot { display: inline-block; width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(42, 50, 56, 0.12); }
+  .quick-table td.display { font-family: var(--gg-display); font-weight: 600; font-size: 1.1rem; width: auto; }
+  .quick-table td.body { font-family: var(--gg-body); font-weight: 700; font-size: 1.05rem; width: auto; }
+  .quick-table td.hand { font-family: var(--gg-hand); font-size: 1.25rem; width: auto; }
+  .quick-note { font-size: var(--gg-text-small); color: var(--gg-ink-soft); margin-top: 12px; }
+  .quick h3 + .quick-table { margin-top: 0; }
+
+  @media (max-width: 860px) {
+    .opening, .gritty-demo, .pieces-grid, .photo-row { grid-template-columns: 1fr; }
+    .opening-stage { grid-template-columns: 1fr; row-gap: 40px; justify-items: center; }
+    .opening-stage .stand { order: -1; }
+    .opening-stage :global(.bubble) { justify-self: center; }
+    .opening-stage :global(.bubble)::before { right: auto; left: calc(50% - 10px); top: -24px; }
+    .opening-stage :global(.bubble)::after { right: auto; left: calc(50% - 30px); top: -40px; }
+    .pieces-grid { grid-template-columns: minmax(0, 1fr); }
+    .pieces-grid > .piece:first-child { max-width: 320px; }
+  }
+  @media (max-width: 560px) {
+    .gritty-stage { grid-template-columns: 1fr; row-gap: 12px; justify-items: center; }
+    .gritty-stage :global(.bubble)::before, .gritty-stage :global(.bubble)::after { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .motto, .photo { rotate: none; }
+  }
+</style>
