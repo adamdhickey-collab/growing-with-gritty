@@ -29,7 +29,9 @@ and B are repeated here so this file is paste-ready on its own.
 - **One prompt per message.** Paste block A (style lock) at the top of every
   message. Add block B (Gritty's model sheet) whenever Gritty appears.
   Then the asset prompt.
-- **Attach the reference images the prompt names.** They are all in this
+- **Attach the reference images the prompt names.** PNG copies of all of
+  them, named by what they are, sit in `reference/chatgpt-refs/` — one
+  folder to drag from. They also live at their original paths in this
   repo. The two that matter most: `site/public/images/grit-zone/walker.webp`
   (the portrait tile Gritty already wears on the map — every face must match
   it) and `reference/arcade-grit-zone.png` (the page as it looks now, so
