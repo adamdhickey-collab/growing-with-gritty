@@ -54,15 +54,8 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
           <p>Look inside all four books, then find your favorite.</p>
         </a>
         <a class="world-card card" href={u("/grit-zone")}>
-          {/* the one card whose door opens on a game, so it wears the
-              game's title the way a cabinet does — stamped across the
-              bottom of Kim's scene, over its quiet strip of grass */}
-          <span class="world-art">
-            <img src={u("/images/scenes/gritty-climbing.webp")}
-                 alt="" width="600" height="600" loading="lazy" />
-            <img class="world-logo" src={u("/images/grit-zone/logo.webp")}
-                 alt="The Grit Trail" width="960" height="320" loading="lazy" />
-          </span>
+          <img src={u("/images/scenes/gritty-climbing.webp")}
+               alt="" width="600" height="600" loading="lazy" />
           <h3>Play</h3>
           <p>Help Gritty choose what grit looks like — then feel the Power
           of YET!</p>
@@ -182,27 +175,6 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
     padding: 0; width: 100%; height: auto; aspect-ratio: 1 / 1;
     object-fit: cover; display: block; background: var(--gg-sky);
   }
-  /* the art spot for a card that carries a logo: the picture keeps its
-     square, the logo sits on it */
-  /* The card is a grid with justify-items: start, so a plain block child
-     shrinks to fit — and its only child asks for 100% of it, which
-     resolves to nothing. The wrapper takes the full column itself, and
-     two classes so it beats `.world-card > *`'s inline padding. */
-  .world-card .world-art {
-    padding: 0; width: 100%; position: relative; display: block; line-height: 0;
-  }
-  /* two classes, because `.world-card img` above is more specific than a
-     lone class would be and would otherwise stretch the logo to fill the
-     square the way a scene does */
-  .world-card .world-logo {
-    position: absolute; left: 50%; bottom: 4%; translate: -50% 0;
-    width: 88%; height: auto; aspect-ratio: auto; object-fit: contain;
-    background: none; image-rendering: pixelated;
-    filter: drop-shadow(0 3px 0 rgba(42, 50, 56, 0.35));
-    transition: translate 0.15s ease;
-  }
-  .world-card:hover .world-logo { translate: -50% -4px; }
-
   .world-card h3 { margin-top: 18px; }
   .world-card p { color: var(--gg-ink-soft); }
 

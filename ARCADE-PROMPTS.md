@@ -382,11 +382,11 @@ version was generated the same evening and not used; it is in Downloads
 if the wide one ever needs replacing.
 
 **Where it goes.** The marquee, on all three Grit Trail cabinets (map,
-challenge, summit) — nothing to place by hand, the slot is wired. Two
-more homes worth trying once it exists: the Play card on the home page
-(over the climbing scene, bottom left), and across the top of the
-certificate printable. Both are a separate change; ask when the logo is
-in hand.
+challenge, summit) — nothing to place by hand, the slot is wired. It was
+also tried on the home page's Play card, stamped across the bottom of
+Kim's climbing scene, and taken back off the same day: the four doors
+read best as one set of Kim's scenes, and a logo on one of them breaks
+the row. The remaining idea is the top of the certificate printable.
 
 ## 7. Round three — the summit, once more
 
