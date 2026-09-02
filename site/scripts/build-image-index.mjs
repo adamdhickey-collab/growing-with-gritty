@@ -42,7 +42,7 @@ const DYNAMIC = [
   { test: /^gritty\/gritty-backpack-(happy|laugh|surprised|proud|thinking)-\d\.webp$/,
     why: 'The meadow hero — Gritty wears this face, backpack and all, when a reply has that mood.' },
   { test: /^gritty\/gritty-(happy|laugh|surprised|proud|thinking)-\d\.webp$/,
-    why: 'Kim\'s expression drawings without the pack. The backpack versions are composed from these, and Gritty\'s face on the Ask Gritty button and the site logo are cut from them.' },
+    why: 'Kim\'s expression drawings without the pack. The backpack versions are AI image edits of her backpack pose wearing these faces, and Gritty\'s face on the Ask Gritty button and the site logo are cut from them.' },
 ];
 
 /* ── every image, and every source file that might name one ── */

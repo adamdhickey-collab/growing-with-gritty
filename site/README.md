@@ -104,8 +104,11 @@ npm run build    # → dist/
 
 ## Hard rules
 
-- **Kim's hand-drawn art is the only Gritty.** No generated character art,
-  ever. Missing portraits show a "coming soon" frame, never a stand-in.
+- **Every Gritty starts from Kim's drawing.** Production art (new poses,
+  backdrops, the pixel trail) is made from her originals with image tools,
+  AI included, and checked against them; `/style-guide#provenance` says
+  which file is which. Never a Gritty invented from a description. Missing
+  portraits show a "coming soon" frame, never a stand-in.
 - **No data collection from kids.** No forms children can submit, no
   cookies, no third-party scripts or embeds (fonts are self-hosted).
   Future interactive features keep state in `localStorage` only.

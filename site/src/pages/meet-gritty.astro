@@ -58,7 +58,7 @@ const gritIs: { icon: string; label: string }[] = [
         {rendered.map(({ c, Content }) => (
           <article class="char-card card">
             {c.data.scene ? (
-              <img class="scene" src={u(c.data.scene)} alt={`${c.data.name}, hand-drawn by Kim Rekowski`} width="600" height="600" loading="lazy" />
+              <img class="scene" src={u(c.data.scene)} alt={`${c.data.name}, from Kim Rekowski’s drawing`} width="600" height="600" loading="lazy" />
             ) : c.data.portrait ? (
               <img class="portrait" src={u(c.data.portrait)} alt={`${c.data.name}, hand-drawn by Kim Rekowski`} width="320" height="416" loading="lazy" />
             ) : (

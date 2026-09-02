@@ -50,5 +50,6 @@ cd site && npm install && npm run dev
 ```
 
 Hard rules (details in [site/README.md](site/README.md) and PLAN.md §4):
-Kim's hand-drawn art is the only Gritty — never generated art; and the site
+every Gritty starts from Kim's drawing — production art is made from her
+originals and checked against them, never invented from a description; and the site
 collects nothing from kids — no forms, no cookies, no third-party requests.
