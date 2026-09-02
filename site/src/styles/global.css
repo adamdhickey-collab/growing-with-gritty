@@ -40,6 +40,11 @@ a:hover { color: var(--gg-blue-deep); }
 .band { padding-block: 56px; }
 .band-sky { background: linear-gradient(180deg, color-mix(in srgb, var(--gg-sky) 42%, var(--gg-paper)), var(--gg-paper)); }
 .band-deep { background: var(--gg-paper-deep); }
+/* Blush Wash — the Calming Corner's own ground. Paper and paper-deep sit a
+   half-step apart, so a section boxed in between them disappears; blush is
+   far enough from both to read as its own room, and it's the rose the
+   Calming Corner already owns in the scene art. */
+.band-blush { background: color-mix(in srgb, var(--gg-pink) 34%, var(--gg-paper)); }
 
 /* A page that ends on paper leaves air before the footer. A page that
    ends on its own coloured ground meets the footer edge to edge — the

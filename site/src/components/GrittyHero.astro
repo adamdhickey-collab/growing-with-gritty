@@ -1,0 +1,68 @@
+---
+/* The hero that opens Meet Gritty and both Gritty's World pages.
+   The title sits in a narrow left column; Gritty does the talking in the
+   wider right one. His bubble is centred on him, which puts its tail level
+   with his mouth (the drawing's mouth sits at about 46% of its height, and
+   the tail leaves the bubble at about the same line), so the trail of dots
+   reads as speech rather than as decoration. */
+import Bubble from './Bubble.astro';
+import { u } from '../lib/url';
+
+interface Props { eyebrow?: string }
+const { eyebrow } = Astro.props;
+---
+
+<div class="wrap hero">
+  <div class="hero-copy">
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h1><slot name="title" /></h1>
+  </div>
+
+  <div class="hero-stage">
+    <Bubble side="right"><slot name="quote" /></Bubble>
+    <img
+      class="hero-art"
+      src={u('/images/characters/gritty-standing.webp')}
+      alt="Gritty the Goat, hand-drawn by Kim Rekowski"
+      width="878" height="1097"
+    />
+  </div>
+</div>
+
+<style>
+  /* One third for the words, two for Gritty — both centred on the same
+     middle line, so a one-line title and a four-line quote still balance. */
+  .hero {
+    display: grid; grid-template-columns: 1fr 2fr;
+    gap: 32px 40px; align-items: center;
+  }
+  .hero-copy { display: grid; gap: 14px; align-content: center; }
+
+  /* The bubble and Gritty are one unit, centred in their column. The gap
+     is wide enough for the two tail dots (which reach 44px past the
+     bubble) to travel toward his mouth without touching his ear. */
+  .hero-stage {
+    display: grid; grid-template-columns: minmax(0, auto) auto;
+    align-items: center; justify-content: center; column-gap: 60px;
+  }
+  .hero-stage :global(.bubble) { justify-self: end; }
+  .hero-art { width: clamp(210px, 24vw, 300px); height: auto; }
+
+  /* Phones: one column, Gritty above his words, and the tail swings from
+     the bubble's right edge to its top so it still points back at him. */
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; justify-items: center; gap: 24px; }
+    .hero-copy { justify-items: center; text-align: center; }
+    .hero-stage { grid-template-columns: 1fr; row-gap: 44px; justify-items: center; }
+    .hero-art { order: -1; width: min(62vw, 260px); }
+    .hero-stage :global(.bubble) { justify-self: center; }
+    /* His mouth sits left of the drawing's centre, so the trail leans that
+       way as it climbs — big dot nearest the words, small one nearest him. */
+    .hero-stage :global(.bubble)::before {
+      right: auto; left: calc(50% - 10px); top: -24px;
+    }
+    .hero-stage :global(.bubble)::after {
+      right: auto; left: calc(50% - 30px); top: -40px;
+    }
+  }
+</style>

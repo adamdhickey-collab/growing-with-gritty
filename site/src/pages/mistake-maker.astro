@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import Bubble from '../components/Bubble.astro';
+import GrittyHero from '../components/GrittyHero.astro';
 import Stamp from '../components/Stamp.astro';
 import Icon from '../components/Icon.astro';
 import { u } from '../lib/url';
@@ -15,22 +15,13 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
   description="Press the button for one of Gritty the Goat's funny mistakes — then turn his OOPS into I LEARNED! Mistakes are how brains grow."
 >
   <section class="band">
-    <div class="wrap intro-grid">
-      <div class="intro">
-        <p class="eyebrow">Gritty's World</p>
-        <h1>The Mistake Maker <Icon name="action-brain-grows" size="1.1em" /></h1>
-        <Bubble side="right">
-          "Everyone makes mistakes — even me! Mistakes don't mean I'm bad at
-          something. Mistakes help my brain learn!"
-        </Bubble>
-      </div>
-      <img
-        class="intro-art"
-        src={u("/images/characters/gritty-standing.webp")}
-        alt="Gritty the Goat, hand-drawn by Kim Rekowski"
-        width="878" height="1097"
-      />
-    </div>
+    <GrittyHero eyebrow="Gritty's World">
+      <Fragment slot="title">The Mistake Maker <Icon name="action-brain-grows" size="1.1em" /></Fragment>
+      <Fragment slot="quote">
+        "Everyone makes mistakes — even me! Mistakes don't mean I'm bad at
+        something. Mistakes help my brain learn!"
+      </Fragment>
+    </GrittyHero>
   </section>
 
   <section class="band band-sky" aria-labelledby="machine-h">
@@ -156,24 +147,6 @@ const FALLBACK_LEARNED = 'Mistakes help my brain learn!';
 </script>
 
 <style>
-  .intro { display: grid; gap: 18px; justify-items: start; }
-  /* Gritty stands to the right of his words, so the bubble's tail climbs
-     off the upper-right corner toward his mouth — the same hero shape as
-     Meet Gritty. */
-  .intro-grid {
-    display: grid; grid-template-columns: auto minmax(220px, 320px);
-    gap: 24px 48px; align-items: center; justify-content: start;
-  }
-  .intro-art { width: 100%; max-width: 320px; height: auto; }
-  /* Phones: Gritty moves above the words rather than squeezing them into a
-     sliver, and the bubble drops its tail — there's no goat beside it now. */
-  @media (max-width: 820px) {
-    .intro-grid { grid-template-columns: 1fr; justify-items: center; gap: 20px; }
-    .intro-art { max-width: 240px; order: -1; }
-    .intro { justify-items: center; text-align: center; }
-    .intro :global(.bubble)::before,
-    .intro :global(.bubble)::after { display: none; }
-  }
   .note { color: var(--gg-ink-soft); margin-top: 6px; }
 
   .machine-wrap { display: grid; justify-items: start; }

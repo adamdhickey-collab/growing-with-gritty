@@ -3,7 +3,9 @@
    variant="cheer" is the gold celebration voice.
    tail=false for bubbles that sit away from a Gritty drawing.
    side="right" for a bubble whose Gritty stands to its right — the tail
-   climbs off the upper-right corner toward his mouth. */
+   leaves the right edge just above centre and travels level toward his
+   mouth, which sits at about the same height when the two are centred
+   on each other. */
 interface Props { variant?: 'talk' | 'cheer'; tail?: boolean; side?: 'left' | 'right' }
 const { variant = 'talk', tail = true, side = 'left' } = Astro.props;
 ---
@@ -34,7 +36,7 @@ const { variant = 'talk', tail = true, side = 'left' } = Astro.props;
   .cheer { border-color: var(--gg-gold-ink); color: var(--gg-gold-ink); background: #FFFDF4; }
   .cheer::before, .cheer::after { border-color: var(--gg-gold-ink); background: #FFFDF4; }
   .tail-right::before, .tail-right::after { left: auto; }
-  .tail-right::before { right: -26px; top: 16%; }
-  .tail-right::after { right: -42px; top: 4%; }
+  .tail-right::before { right: -26px; top: 40%; }
+  .tail-right::after { right: -44px; top: 33%; }
   .no-tail::before, .no-tail::after { display: none; }
 </style>

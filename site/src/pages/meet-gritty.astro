@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import Bubble from '../components/Bubble.astro';
+import GrittyHero from '../components/GrittyHero.astro';
 import Icon from '../components/Icon.astro';
 import { u } from '../lib/url';
 
@@ -23,21 +23,13 @@ const gritIs: { icon: string; label: string }[] = [
   description="Meet Gritty the Goat and his family: Grandpa Goat, Gabby, Grandma Goat, and Gibby — the characters of Kim Rekowski's book series."
 >
   <section class="band">
-    <div class="wrap intro-grid">
-      <div class="intro-copy">
-        <h1>Hi! I'm Gritty!</h1>
-        <Bubble side="right">
-          "I don't always get things right the first time. But that's okay!
-          I keep trying, learn from my mistakes, and never give up."
-        </Bubble>
-      </div>
-      <img
-        class="intro-art"
-        src={u("/images/characters/gritty-standing.webp")}
-        alt="Gritty the Goat, hand-drawn by Kim Rekowski"
-        width="878" height="1097"
-      />
-    </div>
+    <GrittyHero>
+      <Fragment slot="title">Hi! I'm Gritty!</Fragment>
+      <Fragment slot="quote">
+        "I don't always get things right the first time. But that's okay!
+        I keep trying, learn from my mistakes, and never give up."
+      </Fragment>
+    </GrittyHero>
   </section>
 
   <section class="band band-sky">
@@ -86,25 +78,6 @@ const gritIs: { icon: string; label: string }[] = [
 </Base>
 
 <style>
-  /* The words come first and Gritty stands to their right, so the bubble's
-     tail rises toward his mouth (his face is on the left of the drawing). */
-  .intro-grid {
-    display: grid; grid-template-columns: auto minmax(220px, 320px);
-    gap: 24px 48px; align-items: center; justify-content: start;
-  }
-  .intro-art { width: 100%; max-width: 320px; height: auto; }
-  .intro-copy { display: grid; gap: 20px; justify-items: start; }
-  /* Phones: the drawing sits above the words instead of squeezing them into
-     a sliver beside it, and the bubble drops its tail, since there's no
-     longer a goat to its left. Same breakpoint as About. */
-  @media (max-width: 820px) {
-    .intro-grid { grid-template-columns: 1fr; justify-items: center; gap: 20px; }
-    .intro-art { max-width: 240px; order: -1; }
-    .intro-copy { justify-items: center; text-align: center; }
-    .intro-copy :global(.bubble)::before,
-    .intro-copy :global(.bubble)::after { display: none; }
-  }
-
   .note { color: var(--gg-ink-soft); margin-top: 6px; }
   .grit-grid {
     list-style: none; margin-top: 24px;
