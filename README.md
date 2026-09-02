@@ -13,6 +13,7 @@ edits everything through simple web forms.
 | 📊 [deck/](deck/) | The presentation for Kim — 11 slides with speaker notes |
 | 🎨 [style-tile/](style-tile/) | The approved look, served at **[adamdhickey-collab.github.io/growing-with-gritty/style-tile](https://adamdhickey-collab.github.io/growing-with-gritty/style-tile/)** |
 | 🌱 [site/](site/) | The Astro site (Phases 1–2 built) — see [site/README.md](site/README.md) |
+| 🙋 [ASK-KIM.md](ASK-KIM.md) | **What we need from Kim** — the printables gap, six feeling faces, one teaching question |
 | ✍️ [copy/](copy/) | Kim's finished prose + seed content for the interactive sections |
 | 🖼 [reference/](reference/) | Kim's art, book covers, photos, the approved-feel mockup |
 
