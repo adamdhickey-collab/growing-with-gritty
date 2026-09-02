@@ -97,6 +97,13 @@ Bonus, whenever you feel like drawing: if you draw Gritty **laughing**,
 actually change to your drawing when that mood plays. Until then he acts
 moods out with his whole body, using only your original drawing.
 
+One thing to know about the site: Gritty always looks *at* his speech
+bubble. On the home page the bubble is on his left, so his eyes are
+nudged to glance that way; on the other pages he stands on the left and
+talks to his right, so the whole drawing is turned round with his eyes
+left as you drew them. If you'd rather draw him facing the other way
+yourself, that drawing can replace the turned-round one straight away.
+
 ## Editing the home page or About page
 
 Click **Home page** or **About the Author** in the sidebar — one form each.

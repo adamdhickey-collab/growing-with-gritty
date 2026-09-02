@@ -1,10 +1,13 @@
 ---
 /* The hero that opens Meet Gritty and both Gritty's World pages.
    The title sits in a narrow left column; Gritty does the talking in the
-   wider right one. His bubble is centred on him, which puts its tail level
-   with his mouth (the drawing's mouth sits at about 46% of its height, and
-   the tail leaves the bubble at about the same line), so the trail of dots
-   reads as speech rather than as decoration. */
+   wider right one. He uses the right-facing drawing
+   (gritty-standing-right.webp: Kim's standing Gritty mirrored, with his
+   eyes left as drawn so he still glances toward the bubble), standing at
+   the left of his words with his head beside them. His bubble is centred
+   on him, and its tail is raised to his mouth line (the drawing's mouth
+   sits at about 46% of its height), so the trail of dots reads as speech
+   rather than as decoration. */
 import Bubble from './Bubble.astro';
 import { u } from '../lib/url';
 
@@ -19,15 +22,15 @@ const { eyebrow } = Astro.props;
   </div>
 
   <div class="hero-stage">
-    <Bubble side="right"><slot name="quote" /></Bubble>
     <span class="stand">
       <img
         class="hero-art"
-        src={u('/images/characters/gritty-standing.webp')}
+        src={u('/images/characters/gritty-standing-right.webp')}
         alt="Gritty the Goat, hand-drawn by Kim Rekowski"
         width="878" height="1097"
       />
     </span>
+    <Bubble><slot name="quote" /></Bubble>
   </div>
 </div>
 
@@ -40,55 +43,62 @@ const { eyebrow } = Astro.props;
   }
   .hero-copy { display: grid; gap: 14px; align-content: center; }
 
-  /* The bubble and Gritty are one unit, centred in their column. The gap
-     is wide enough for the two tail dots (which reach 44px past the
+  /* Gritty and the bubble are one unit, centred in their column. The gap
+     is wide enough for the two tail dots (which reach 42px past the
      bubble) to travel toward his mouth without touching his ear. */
   .hero-stage {
-    display: grid; grid-template-columns: minmax(0, auto) auto;
+    display: grid; grid-template-columns: auto minmax(0, auto);
     align-items: center; justify-content: center; column-gap: 60px;
   }
-  .hero-stage :global(.bubble) { justify-self: end; }
+  .hero-stage :global(.bubble) { justify-self: start; }
+  /* The two are centred on each other, so his mouth (46% down the
+     drawing, i.e. 4% above its middle: 10-15px at the sizes the art
+     clamps to) sits just above the bubble's midline whatever the quote's
+     length. The dots are placed off that midline, not off the bubble's
+     height, so a two-line and a five-line quote both speak from his mouth. */
+  .hero-stage :global(.bubble)::before { top: calc(50% - 16px); }
+  .hero-stage :global(.bubble)::after { top: calc(50% - 22px); }
   .hero-art { position: relative; z-index: 1; display: block;
               width: clamp(210px, 24vw, 300px); height: auto; }
 
   /* Gritty stands ON the hero ground instead of hovering over it: a pool
      of shade under his whole stance with a darker core where the hooves
-     meet it. The geometry is measured off the drawing — his four hooves
+     meet it. The geometry is measured off Kim's drawing — his four hooves
      span 26%-92% of its width and bottom out at about 97% of its height —
-     so the ellipse sits under him at every size the art clamps to.
+     and mirrored left-to-right for the right-facing version, so the
+     ellipse sits under him at every size the art clamps to.
      Multiply, not a fixed grey, because the same shadow has to sit on
      three different hero grounds (sky, meadow, rose) and a grey wash
      would only ever suit one of them. */
   .stand { position: relative; display: block; }
   .stand::before {
     content: ''; position: absolute; z-index: 0;
-    left: 10%; right: -2%; bottom: -1%; height: 10%;
+    left: -2%; right: 10%; bottom: -1%; height: 10%;
     background:
       /* the contact core, right where the hooves press */
-      radial-gradient(40% 48% at 58% 58%, rgba(40, 48, 54, 0.52) 0%,
+      radial-gradient(40% 48% at 42% 58%, rgba(40, 48, 54, 0.52) 0%,
         rgba(40, 48, 54, 0.36) 45%, rgba(40, 48, 54, 0) 78%),
       /* and the wider, softer pool around it */
-      radial-gradient(58% 62% at 54% 52%, rgba(40, 48, 54, 0.26) 0%,
+      radial-gradient(58% 62% at 46% 52%, rgba(40, 48, 54, 0.26) 0%,
         rgba(40, 48, 54, 0.14) 52%, rgba(40, 48, 54, 0) 82%);
     mix-blend-mode: multiply;
   }
 
   /* Phones: one column, Gritty above his words, and the tail swings from
-     the bubble's right edge to its top so it still points back at him. */
+     the bubble's left edge to its top so it still points back at him. */
   @media (max-width: 860px) {
     .hero { grid-template-columns: 1fr; justify-items: center; gap: 24px; }
     .hero-copy { justify-items: center; text-align: center; }
     .hero-stage { grid-template-columns: 1fr; row-gap: 44px; justify-items: center; }
-    .stand { order: -1; }
     .hero-art { width: min(62vw, 260px); }
     .hero-stage :global(.bubble) { justify-self: center; }
-    /* His mouth sits left of the drawing's centre, so the trail leans that
+    /* His mouth sits right of the drawing's centre, so the trail leans that
        way as it climbs — big dot nearest the words, small one nearest him. */
     .hero-stage :global(.bubble)::before {
-      right: auto; left: calc(50% - 10px); top: -24px;
+      left: calc(50% - 6px); top: -24px;
     }
     .hero-stage :global(.bubble)::after {
-      right: auto; left: calc(50% - 30px); top: -40px;
+      left: calc(50% + 21px); top: -40px;
     }
   }
 </style>

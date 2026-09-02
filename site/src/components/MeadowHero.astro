@@ -42,19 +42,24 @@ const chats = (await getCollection('meadow-chats'))
   }));
 
 /* Gritty's base pose ships with the site; extra moods appear the moment
-   their frames exist. cwd is site/ for both `npm run dev` and CI builds. */
-const GRITTY_DIR = path.resolve(process.cwd(), 'public/images/gritty');
+   their frames exist. cwd is site/ for both `npm run dev` and CI builds.
+   The frames come from gritty-talking/, not gritty/: Kim's drawings
+   glance to the viewer's right, and here his bubble is on his left, so
+   these are her frames with only the eye region flopped — his eyes look
+   at his words (a hard rule, see README). New moods Kim draws go in
+   gritty/ first and get the same treatment. */
+const GRITTY_DIR = path.resolve(process.cwd(), 'public/images/gritty-talking');
 let files: string[] = [];
 try { files = fs.readdirSync(GRITTY_DIR); } catch { /* no art yet */ }
 
-const BASE_POSE = u('/images/gritty/gritty-backpack-1.webp');
+const BASE_POSE = u('/images/gritty-talking/gritty-backpack-1.webp');
 
 /* Only moods drawn wearing the pack — anything else would blink it out for
    the length of a reaction. */
 const moodFrames: Record<string, string[]> = {};
 for (const f of files) {
   const m = f.match(/^gritty-backpack-([a-z]+)-[0-9]\.webp$/);
-  if (m) (moodFrames[m[1]] ??= []).push(u(`/images/gritty/${f}`));
+  if (m) (moodFrames[m[1]] ??= []).push(u(`/images/gritty-talking/${f}`));
 }
 for (const k in moodFrames) moodFrames[k].sort();
 

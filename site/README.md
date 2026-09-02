@@ -108,6 +108,14 @@ npm run build    # → dist/
   Future interactive features keep state in `localStorage` only.
 - Small text floor and AA contrast per the tokens — the audience is
   4-year-olds and grandparents.
+- **Gritty's eyes look at his speech bubble.** Wherever a Gritty drawing
+  stands beside a bubble, his head is the side nearest it and his pupils
+  glance toward it. Kim's drawings glance to the viewer's right, so a
+  Gritty who talks to his right uses the flopped drawing with the eye
+  region kept as drawn (`gritty-standing-right.webp`), and a Gritty who
+  talks to his left uses the drawing as-is with only the eye region
+  flopped (`public/images/gritty-talking/`). Never a CSS mirror — that
+  turns his gaze away from the words.
 
 ## Deploying (not yet done)
 

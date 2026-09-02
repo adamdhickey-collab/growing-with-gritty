@@ -194,8 +194,9 @@ const feelings = [
      Kim's standing Gritty mirrored, with his eyes left as drawn so he
      still glances toward the bubble) to put his head, not his tail, beside
      his words. The tail dots are raised from the bubble's default line to
-     meet his mouth, which sits at about 46% of the drawing's height when
-     the two are centred on each other. */
+     meet his mouth, which sits at about 46% of the drawing's height — a
+     few pixels above the shared midline, since the two are centred on
+     each other — so they hold that line however long the answer runs. */
   .feel-answer {
     display: grid; grid-template-columns: auto auto;
     gap: 48px; align-items: center; justify-content: center;
@@ -216,8 +217,8 @@ const feelings = [
         rgba(40, 48, 54, 0.14) 52%, rgba(40, 48, 54, 0) 82%);
     mix-blend-mode: multiply;
   }
-  .feel-answer :global(.bubble)::before { top: 44%; }
-  .feel-answer :global(.bubble)::after { top: 38%; }
+  .feel-answer :global(.bubble)::before { top: calc(50% - 13px); }
+  .feel-answer :global(.bubble)::after { top: calc(50% - 17px); }
   /* Narrow phones: he steps above his words rather than squeezing them, and
      the bubble drops its tail — there's no goat beside it now. */
   @media (max-width: 560px) {
