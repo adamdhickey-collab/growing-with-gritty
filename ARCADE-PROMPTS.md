@@ -14,9 +14,9 @@
 > **No code changes.** Until then each slot shows a stand-in (the walker
 > tile, a CSS sky, the flag).
 
-The climb itself is now nine stops (three switchbacks of three) rather
+The climb itself is now six stops (two switchbacks of three) rather
 than every scenario Kim has written: a five-year-old reaches the summit
-in one sitting, and each new climb rotates the next nine scenarios onto
+in one sitting, and each new climb rotates the next six scenarios onto
 the trail, so nothing she writes is left off. That's code, not art —
 `TRAIL_LEN` in `grit-zone.astro`.
 

@@ -31,13 +31,13 @@ const checkin: { icon: string; label: string }[] = [
    there is no "3 of 15" counter anywhere (V3-CRAFT: the map shows the
    journey, numbers read as a contract).
 
-   A climb is TRAIL_LEN stops — nine, three switchbacks of three: long
+   A climb is TRAIL_LEN stops — six, two switchbacks of three: long
    enough to feel like a mountain, short enough that a five-year-old sees
    the summit in one sitting. Kim can write as many scenarios as she likes:
    each climb takes the next TRAIL_LEN of them in order, wrapping round, so
    "Start a new climb" brings new challenges and nothing she wrote is ever
    left off the trail (the rotation lives in the script below). */
-const TRAIL_LEN = 9;
+const TRAIL_LEN = 6;
 const PER_ROW = 3;
 const N = Math.min(scenarios.length, TRAIL_LEN);
 const rows = Math.ceil(N / PER_ROW);
@@ -570,7 +570,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
 
     /* Which challenges are on the mountain this climb: the stops are fixed
        (the trail is drawn at build time), the scenarios rotate through them.
-       Climb 0 is the first nine Kim wrote, climb 1 the next nine, wrapping
+       Climb 0 is the first six Kim wrote, climb 1 the next six, wrapping
        round — so every scenario gets its turn on the trail. */
     const cardIds = cards.map((c) => c.dataset.id!);
     const cardAt = (stop: number) => (climb * stops.length + stop) % cards.length;
