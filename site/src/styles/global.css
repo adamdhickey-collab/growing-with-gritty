@@ -46,26 +46,30 @@ a:hover { color: var(--gg-blue-deep); }
    Calming Corner already owns in the scene art. */
 .band-blush { background: color-mix(in srgb, var(--gg-pink) 34%, var(--gg-paper)); }
 
-/* Hero grounds — one accent per page, near full strength, so a page says
-   where you are before you read a word. These are as bold as the palette
-   goes: the door-card art on the home page is bolder still, but those are
-   colours inside illustrations, not tokens, and the tile is the law here.
+/* Hero grounds — straight from the backdrops in Kim's card art rather than
+   mixed down from the washes, so a page and the door that leads to it read
+   as the same room: the Calming Corner opens on its own door's rose, and
+   the Grit Zone on the blue of the Play door that reaches it. Meet Gritty
+   and the Mistake Maker have no door on the home page, so they take the
+   two colours left.
 
-   At this depth the default hero text stops clearing AA — gold-ink falls
-   to 2.5:1 on the gold and Gritty Blue to 3.1:1 — so a bold hero re-inks
-   itself: the eyebrow takes --gg-ink and the heading --gg-blue-deep. The
-   percentages are then the deepest mix those two survive with room over
-   4.5:1 (eyebrow 6.0-7.9:1, heading 4.8-6.0:1); gold and green need the
-   white, sky-high and pink hold up neat. */
-.hero-sky    { background: var(--gg-sky-high); }
-.hero-gold   { background: color-mix(in srgb, var(--gg-gold)  90%, var(--gg-card)); }
-.hero-meadow { background: color-mix(in srgb, var(--gg-green) 75%, var(--gg-card)); }
-.hero-rose   { background: var(--gg-pink); }
+   At this depth the everyday hero text stops clearing AA — gold-ink drops
+   to 3.5:1 on the gold, Gritty Blue to 2.9:1 on the blue — so a hero
+   re-inks itself: the eyebrow takes --gg-ink and the heading takes
+   --gg-blue-deep. Three of the four then hold at full strength (eyebrow
+   6.9-8.6:1, heading 5.2-6.5:1). Door blue is the one that can't: neat, it
+   leaves the heading at 4.2:1, so it keeps a fifth of card white and lands
+   on 4.9:1. Every heading here is large enough to need only 3:1; they all
+   clear the small-text bar anyway. */
+.hero-gold { background: var(--gg-door-gold); }
+.hero-lime { background: var(--gg-door-lime); }
+.hero-rose { background: var(--gg-door-rose); }
+.hero-blue { background: color-mix(in srgb, var(--gg-door-blue) 80%, var(--gg-card)); }
 
-.hero-sky, .hero-gold, .hero-meadow, .hero-rose { color: var(--gg-ink); }
-.hero-sky h1, .hero-gold h1, .hero-meadow h1, .hero-rose h1 { color: var(--gg-blue-deep); }
-.hero-sky .eyebrow, .hero-gold .eyebrow,
-.hero-meadow .eyebrow, .hero-rose .eyebrow { color: var(--gg-ink); }
+.hero-gold, .hero-lime, .hero-rose, .hero-blue { color: var(--gg-ink); }
+.hero-gold h1, .hero-lime h1, .hero-rose h1, .hero-blue h1 { color: var(--gg-blue-deep); }
+.hero-gold .eyebrow, .hero-lime .eyebrow,
+.hero-rose .eyebrow, .hero-blue .eyebrow { color: var(--gg-ink); }
 
 /* A page that ends on paper leaves air before the footer. A page that
    ends on its own coloured ground meets the footer edge to edge — the

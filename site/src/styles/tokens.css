@@ -21,6 +21,17 @@
   --gg-ink:        #2A3238;  /* reading text                             */
   --gg-ink-soft:   #55606A;  /* captions, secondary text (AA on paper)   */
 
+  /* the door grounds — sampled from the backdrops in Kim's own card art,
+     so a page's hero can wear the colour its door wears on the home page.
+     Far bolder than the washes above, and they carry only heavy or large
+     text: --gg-ink and --gg-blue-deep clear AA on all four, the softer
+     inks do not. Door blue is the deepest of them and is mixed back
+     toward card white where it grounds a heading. */
+  --gg-door-gold:  #FBCC2C;  /* Read — the gold behind the book          */
+  --gg-door-blue:  #13B3FB;  /* Play — the sky over the Grit Trail        */
+  --gg-door-lime:  #B2D66A;  /* Make — the wall of Gritty's craft room    */
+  --gg-door-rose:  #FCA5A9;  /* Calming Corner — its sunset-rose wash     */
+
   /* the meadow — hero scene palette, from style tile V3 "Alive" */
   --gg-sky-high:  #A7CBE3;  /* top of the hero sky                      */
   --gg-sky-low:   #DCE9E4;  /* where sky melts into the hills           */
