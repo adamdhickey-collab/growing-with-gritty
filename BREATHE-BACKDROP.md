@@ -1,16 +1,20 @@
 # "Breathe with Gritty" — a full-width backdrop, drawn by ChatGPT
 
-> **Status: landed, 2 Sep 2026.** ChatGPT returned it in one round, close to
-> the brief — flower and seeds left, candle in a jar right, ripple rings dead
-> centre, the middle kept pale. It came back 2172 × 724 (3:1) rather than
-> 1536 × 1024, which is better for this band. Shipped as
-> `site/public/images/scenery/breathe-pond.webp` (210 KB) behind
-> `.band-pond`. One departure from section 6 below: the band uses `cover`,
-> not a full-width strip. Laying the art in at full width left a phone with
-> 80% flat sky above it and a visible join along the top of the paint; `cover`
-> fills the band at every size, keeps both the flower and the candle down to
-> about 1024px, and gives a narrow screen the quiet middle — water and rings
-> under the circle. Kept below for the record and for any redo.
+> **Status: landed, 2 Sep 2026 — second round.** ChatGPT hit the brief on the
+> first try (crayon-weight line, 2172 x 724) and again on the second, softer
+> and more watercolour; Adam picked the second. Shipped as
+> `site/public/images/scenery/breathe-pond.webp` behind `.band-pond`, with
+> the sitting Gritty in the breathing circle.
+>
+> Two departures from section 6 below. The band uses `cover`, not a
+> full-width strip: laying the art in at full width left a phone with 80%
+> flat sky and a visible join along the top of the paint. And the shipped
+> file is **2172 x 1640, not 724 tall** — the painting's top 200 rows are
+> dissolved into flat `#7BB8E4` and the canvas extended upward, so what
+> `cover` crops is that manufactured sky rather than the flower and the
+> candle, which in this round sit much closer to the edges (x 3–8% and
+> 89–91%) than in the first. Whole painting down to 768px; below that a
+> phone gets the quiet middle. Kept below for the record and for any redo.
 
 The Calming Corner's last band (`.band-deep`, `calming-corner.astro:99`) is
 flat paper-deep `#F3EBD9` behind the breathing circle. It's the one place on

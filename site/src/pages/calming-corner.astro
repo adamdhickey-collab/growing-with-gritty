@@ -275,26 +275,25 @@ const feelings = [
 
   /* — breathing — */
   /* — the still pond —
-     The brief drawn out: the dandelion at the left, the candle at the
-     right, ripple rings dead centre under the breathing circle. The painting
-     is 3:1 and the band is never that wide, so it fills the band and takes
-     its cropping from the bottom edge up: the near bank and the flowers stay
-     put at every size, and it's sky that goes. Sideways it crops toward the
-     middle as the screen narrows — the flower and the candle both survive to
-     about 1024px, and below that a phone gets the quiet middle of the
-     picture, water and rings under the circle, which is the part that
-     matters while a child is counting breaths. --gg-sky is what shows for
-     the moment before the painting arrives.
-     */
+     The brief drawn out: the dandelion at the left, the candle at the right,
+     ripple rings dead centre under the breathing circle. The painting is 3:1
+     and the band never is, so the file carries its own sky: the paint's top
+     200 rows dissolve into flat #7BB8E4 and the canvas runs on up to
+     2172x1640. That is what `cover` eats first. A laptop and a tablet get
+     the whole painting, flower and candle both; a wide screen loses only
+     sky off the top; a phone, where nothing could hold a 3:1 picture, gets
+     the quiet middle — water and rings under the circle, which is the part
+     that matters while a child is counting breaths. --gg-sky stands in for
+     the moment before the painting arrives. */
   .band-pond {
     background: var(--gg-sky) var(--pond-art) center bottom / cover no-repeat;
   }
-  /* The band re-inks itself the way the hero grounds do. The words sit on
-     the painting's palest stretch, but on a narrow screen that stretch can
-     be the deeper sky (#74BBF6), where --gg-blue reaches only 3.3:1 and
-     --gg-ink-soft 3.1:1. So the heading and the breath cue take
-     --gg-blue-deep (4.8:1 there, 8.9:1 over the pale centre) and the note
-     takes --gg-ink (6.3:1) — AA everywhere the band can crop to. */
+  /* The band re-inks itself the way the hero grounds do. The words sit on the
+     painting's palest stretch, but on a phone that stretch is the flat sky
+     (#7BB8E4), where --gg-blue reaches only 3.2:1 and --gg-ink-soft 3.0:1.
+     So the heading and the breath cue take --gg-blue-deep (4.6:1 there, 7.2:1
+     over the pale centre) and the note takes --gg-ink (6.1:1) — AA at every
+     width the band can crop to. */
   .band-pond h2, .band-pond .breath-cue { color: var(--gg-blue-deep); }
   .band-pond .note { color: var(--gg-ink); }
 
