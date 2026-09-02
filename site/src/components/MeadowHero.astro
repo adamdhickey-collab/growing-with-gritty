@@ -409,30 +409,40 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
      dots drift toward him instead of down, and with the words out of his
      column Gritty gets to be the size a hero deserves. */
   @media (min-width: 760px) {
+    /* Gritty is the tallest thing here and spans both rows, so they are
+       two equal halves of his height: the bubble sits on the foot of the
+       top half and the reply chips hang from the top of the bottom half.
+       That keeps the bubble's bottom edge on his midline whether or not
+       the chips are showing — and his mouth sits just above that line
+       (about 41% down the drawing), which is where the thought dots leave
+       the bubble. Centre the bubble in a row of its own and it floats up
+       to his ear the moment the chips take a row beneath it. */
     .stage {
       grid-template-columns: minmax(0, 46ch) auto;
+      grid-template-rows: 1fr 1fr;
       justify-content: center; align-items: center;
       column-gap: 40px; margin-top: 4px;
     }
     .say, .chips { grid-column: 1; justify-self: end; }
-    .say { justify-items: end; }
-    .chips { justify-content: flex-end; }
+    .say { grid-row: 1; justify-items: end; align-self: end; align-content: end; }
+    .chips { grid-row: 2; align-self: start; justify-content: flex-end; }
     .bubble { text-align: left; }
-    .gritty { grid-column: 2; grid-row: 1 / 4; width: min(280px, 26vw); }
+    .gritty { grid-column: 2; grid-row: 1 / 3; width: min(280px, 26vw); }
     /* the hint shares his cell and floats up beside his head, the arrow
        diving toward him */
     .tap-hint {
-      grid-column: 2; grid-row: 1 / 4;
+      grid-column: 2; grid-row: 1 / 3;
       align-self: start; justify-self: end;
       translate: 36% 18px;
     }
-    /* the thought dots walk toward Gritty */
+    /* the thought dots walk toward Gritty along his mouth line, which
+       runs a hair under the bubble's bottom edge */
     .bubble::before {
-      left: auto; right: -21px; bottom: 18px; margin-left: 0;
+      left: auto; right: -21px; bottom: 0; margin-left: 0;
       width: 14px; height: 11px;
     }
     .bubble::after {
-      left: auto; right: -33px; bottom: 8px; margin-left: 0;
+      left: auto; right: -33px; bottom: -10px; margin-left: 0;
     }
   }
 
