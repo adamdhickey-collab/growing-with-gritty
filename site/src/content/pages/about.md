@@ -2,7 +2,7 @@
 title: About the Author
 headshot: /images/photos/kim-headshot.webp
 photo: /images/photos/kim-reading-with-goats.webp
-photoCaption: Kim reading Gritty Grows a Garden to some very interested listeners.
+photoCaption: Reading Gritty Grows a Garden to very interested listeners.
 ---
 Kim Rekowski is a dedicated elementary teacher, children's book author, and
 illustrator who is passionate about helping children build confidence,
