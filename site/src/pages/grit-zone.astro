@@ -232,7 +232,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
               words until then. */}
           {logo && <div class="cab-marquee"><img src={logo} alt="The Grit Trail" width="480" height="160" /></div>}
           <div class="cab-hud">
-            <span class="hud-title"><Icon name="action-mountain-streak" size="1.35em" />{!logo && ' The Grit Trail'}</span>
+            {!logo && <span class="hud-title"><Icon name="action-mountain-streak" size="1.35em" /> The Grit Trail</span>}
             <span class="tile hud-tile" data-hud-stop aria-hidden="true"></span>
           </div>
           <div class="trail-scene cab-screen"
@@ -940,12 +940,17 @@ const tabArt = {                        /* pixel sprites for the three game tabs
   /* the marquee: the title art sits centred on the shell above the HUD,
      the way a cabinet's lit header sits above its screen. The drawing
      carries transparent padding, so it is boxed by height and contained. */
-  .cab-marquee { display: grid; place-items: center; padding: 4px 8px 0; }
+  .cab-marquee { display: grid; place-items: center; padding: 6px 8px 0; }
+  /* the title art is a wide banner, so it is sized by WIDTH — a height cap
+     alone left it stranded in the middle of the shell. The max-height keeps
+     a squarer drawing from towering over the screen. */
   .cab-marquee img {
-    display: block; height: 92px; width: auto; max-width: 100%;
+    display: block; width: min(100%, 460px); height: auto; max-height: 150px;
     object-fit: contain; image-rendering: pixelated;
   }
-  .cab-marquee.small img { height: 64px; }
+  .cab-marquee.small img { width: min(100%, 340px); max-height: 110px; }
+  /* a HUD with only its tile pushes it to the right, where it belongs */
+  .cab-hud:has(> :only-child) { justify-content: flex-end; }
   .cab-hud {
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
     min-height: 36px; padding-inline: 2px;

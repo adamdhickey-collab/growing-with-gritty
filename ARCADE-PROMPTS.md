@@ -372,6 +372,15 @@ the top corners. Everything crisp, flat, outlined, no gradients, no
 glow, no drop shadow. Transparent everywhere except the logo.
 ```
 
+**Landed 2 Sep 2026.** The wide banner version — Gritty's head over the
+sign, the mountain, the sun, the star coin, a fence and a grass base —
+sits on the marquee, sized by width (460px on the map, 340px on the
+challenge and summit screens) because a height cap alone left it
+stranded in the middle of the shell. With the logo present the HUD drops
+its "The Grit Trail" label and keeps only the stop tile. A taller 3:2
+version was generated the same evening and not used; it is in Downloads
+if the wide one ever needs replacing.
+
 **Where it goes.** The marquee, on all three Grit Trail cabinets (map,
 challenge, summit) — nothing to place by hand, the slot is wired. Two
 more homes worth trying once it exists: the Play card on the home page
