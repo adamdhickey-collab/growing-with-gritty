@@ -66,6 +66,11 @@ Maker, Calming Corner, and Books as the strong foundation.
   (`reference/gritty-hand-drawn-master.png`). Rule: **Kim's hand-drawn art
   is the only Gritty.** No generated character art, ever — same spirit as
   the Door County logo rule.
+  *Rewritten 2026-09-02:* the rule is now **every Gritty starts from Kim's
+  drawing.** Production art (poses, backdrops, the pixel trail) is made from
+  her originals with image tools, AI included, checked against them, and
+  never labelled hand-drawn. `/style-guide#provenance` lists which file is
+  which. Never a Gritty invented from a description.
 
 ## 4. Kids online: the safety decisions (settled up front)
 
@@ -260,7 +265,8 @@ From the approved mockup and the doc's own palette words:
   cream background, not white.
 - One handwritten font, scoped to one job.
 - Placeholder/stand-in imagery is dev-only and gitignored — nothing
-  generated ever ships as if it were Kim's art.
+  generated ever ships as if it were Kim's art. (Production art made *from*
+  her drawings does ship, labelled honestly — see §4, 2026-09-02 note.)
 - Editor uploads land in one predictable folder; brand assets live in
   organized `public/brand/` folders with per-folder READMEs.
 

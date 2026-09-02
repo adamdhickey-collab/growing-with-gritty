@@ -14,6 +14,9 @@ Carried over from PLAN.md no matter what the research says:
   can bounce, tilt, peek in from an edge) but no generated or redrawn
   character art. If a pattern needs new poses, that becomes an *ask to Kim*
   (e.g. "draw Gritty waving"), never something we fabricate.
+  *Superseded 2026-09-02:* new poses and backdrops are now made from her
+  drawings with image tools and checked against them; see PLAN.md §4 and
+  `/style-guide#provenance`. Kim still has the last word on his face.
 - **COPPA stance unchanged** — no accounts, no data collection, no
   third-party embeds. A "wow" that needs a YouTube embed or a sound CDN gets
   rebuilt self-hosted or dropped.
