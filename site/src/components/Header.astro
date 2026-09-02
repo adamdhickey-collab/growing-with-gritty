@@ -19,7 +19,13 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 <header>
   <div class="wrap bar">
     <a class="wordmark" href={u("/")} data-home>
-      <img src={u("/icon.png")} alt="" width="58" height="58" />
+      {/* His own file, not the favicon. icon.png is a square app icon that
+          browsers ask for at 32px; this spot draws him at 132 (96 on a
+          phone), so it takes a 264px WebP — @2x for the largest render —
+          and the favicon goes back to being only a favicon. The width and
+          height are the file's real pixels, so the attributes describe the
+          image rather than a size it never had. */}
+      <img src={u("/images/gritty-head.webp")} alt="" width="264" height="264" />
       <span class="wordmark-text">
         <span class="site-name">Growing<em>with</em>Gritty</span>
         <span class="site-motto">Build Grit. Grow Strong. Never Quit!</span>
