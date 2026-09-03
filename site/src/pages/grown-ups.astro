@@ -25,11 +25,16 @@ const kindLabels: Record<string, { icon?: string; label: string }> = {
   'classroom-activity': { icon: 'printable-classroom', label: 'Classroom activity' },
 };
 
+/* Each group carries its own ground, so four sections of downloads don't
+   stack into one long block. The ground belongs to the audience, not to
+   the position, so a group keeps its colour as printables arrive and empty
+   groups drop out — and any two of these four still read apart if the one
+   between them is missing. */
 const groups = [
-  { audience: 'kids', heading: 'For kids', blurb: 'Coloring pages and activities to print at home.' },
-  { audience: 'parents', heading: 'For parents', blurb: 'Conversation starters and at-home grit ideas.' },
-  { audience: 'teachers', heading: 'For teachers', blurb: 'Classroom activities and discussion guides from Kim’s own classroom.' },
-  { audience: 'everyone', heading: 'For everyone', blurb: 'Posters, certificates, and more.' },
+  { audience: 'kids', heading: 'For kids', ground: 'band-sky-flat', blurb: 'Coloring pages and activities to print at home.' },
+  { audience: 'parents', heading: 'For parents', ground: 'band-meadow', blurb: 'Conversation starters and at-home grit ideas.' },
+  { audience: 'teachers', heading: 'For teachers', ground: 'band-gold', blurb: 'Classroom activities and discussion guides from Kim’s own classroom.' },
+  { audience: 'everyone', heading: 'For everyone', ground: 'band-blush', blurb: 'Posters, certificates, and more.' },
 ].map((g) => ({ ...g, items: printables.filter((p) => p.data.audience === g.audience) }))
  .filter((g) => g.items.length > 0);
 ---
@@ -50,7 +55,7 @@ const groups = [
   </section>
 
   {groups.length === 0 ? (
-    <section class="band">
+    <section class="band band-sky-flat">
       <div class="wrap empty card">
         <span class="big" aria-hidden="true"><Icon name="printable-coloring-page" size="4.5rem" /></span>
         <h2>The first printables are on their way!</h2>
@@ -61,7 +66,7 @@ const groups = [
     </section>
   ) : (
     groups.map((g) => (
-      <section class="band">
+      <section class={`band ${g.ground}`}>
         <div class="wrap">
           <h2>{g.heading}</h2>
           <p class="blurb">{g.blurb}</p>
@@ -97,7 +102,7 @@ const groups = [
   </section>
 
   {buyableBooks.length > 0 && (
-    <section class="band" aria-labelledby="own-h">
+    <section class="band band-gold" aria-labelledby="own-h">
       <div class="wrap own card">
         <div class="own-copy">
           <p class="eyebrow"><Icon name="printable-book-guide" /> Bring Gritty home</p>
@@ -124,11 +129,11 @@ const groups = [
 
 <style>
   .lede { font-size: 1.12rem; color: var(--gg-ink-soft); }
-  /* The intro and whatever follows it both sit on plain paper, so their two
-     56px paddings stacked into a canyon under the lede. On one ground a
-     single band's worth of air is the whole gap. */
-  .intro { padding-block-end: 0; }
-  .intro + .band { padding-block-start: 32px; }
+  /* The intro used to give up its bottom padding, because it and the band
+     under it shared plain paper and their two 56px paddings read as a
+     canyon. Every band under it now has a ground of its own, so that air
+     is no longer one gap — it's the foot of one room and the head of the
+     next, and each keeps its own. */
   .empty {
     display: grid; gap: 12px; justify-items: center; text-align: center;
     padding: 48px 32px;

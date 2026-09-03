@@ -67,16 +67,20 @@ a:hover { color: var(--gg-blue-deep); }
 /* Meadow Wash — the green of the grass Gritty stands in, for the strip that
    introduces the characters themselves. It's the middle of the three
    grounds a book page ends on: cool sky, then green meadow, then warm gold,
-   so each seam is visible at a glance instead of guessed at. */
-.band-meadow { background: color-mix(in srgb, var(--gg-green) 32%, var(--gg-paper)); }
+   so each seam is visible at a glance instead of guessed at. Held at 28%:
+   the printable blurbs under it are --gg-ink-soft, which is the first thing
+   to fall under 4.5:1 as the green deepens. */
+.band-meadow { background: color-mix(in srgb, var(--gg-green) 28%, var(--gg-paper)); }
 
 /* Gold Wash — Gold Star mixed down far enough to carry text, for the grit
    challenge a family takes on together: gold is this site's achievement
    colour, and it's the colour of the Read door these pages live behind, so
    a book page finishes on it. Gold ink only reaches 4.1:1 on it, so the
-   eyebrow re-inks to --gg-ink (10:1) the way a hero's does. */
+   eyebrow re-inks to --gg-ink (10:1) the way a hero's does — but only an
+   eyebrow standing on the wash itself. One inside a card is on white, where
+   gold ink is the right colour and clears AA on its own. */
 .band-gold { background: color-mix(in srgb, var(--gg-gold) 28%, var(--gg-paper)); }
-.band-gold .eyebrow { color: var(--gg-ink); }
+.band-gold > .wrap > .eyebrow { color: var(--gg-ink); }
 
 /* Hero grounds — straight from the backdrops in Kim's card art rather than
    mixed down from the washes, so a page and the door that leads to it read
