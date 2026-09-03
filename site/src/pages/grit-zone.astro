@@ -593,7 +593,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
       panels[j].hidden = j !== n;
     });
     replay(panels[n], 'enter');
-    if (focus) tabs[n].focus();
+    if (focus) tabs[n].focus({ preventScroll: true });
   }
   tabs.forEach((t, n) => {
     t.addEventListener('click', () => selectTab(n));
@@ -874,14 +874,14 @@ const tabArt = {                        /* pixel sprites for the three game tabs
           pressBtn.hidden = true;
           nextBtn.hidden = false;
           announce(`${sentences[i].text} YET! ${words(cheerEl)}${tip ? ` Gritty says: ${tip}` : ''}`);
-          nextBtn.focus();
+          nextBtn.focus({ preventScroll: true });
         }, 110);
       });
 
       nextBtn.addEventListener('click', () => {
         i = (i + 1) % sentences.length;
         load(i);
-        (pressBtn as HTMLButtonElement).focus();
+        (pressBtn as HTMLButtonElement).focus({ preventScroll: true });
       });
 
       load(0);
@@ -1020,10 +1020,14 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     translate: 2px 2px; box-shadow: 2px 2px 0 var(--gg-ink);
   }
   .gz-panel { outline: none; }
-  .gz-panel.enter { animation: panel-in 380ms var(--gg-ease-back); }
+  /* A cartridge swap is a change of picture, not a change of place: the
+     panel used to slide up 14px on every tab press, which is a small lurch
+     at exactly the moment you are trying to read what you switched to. It
+     fades in and stays put. */
+  .gz-panel.enter { animation: panel-in 300ms ease; }
   @keyframes panel-in {
-    from { opacity: 0; translate: 0 14px; scale: 0.99; }
-    to { opacity: 1; translate: 0 0; scale: 1; }
+    from { opacity: 0; scale: 0.995; }
+    to { opacity: 1; scale: 1; }
   }
   .panel-head { max-width: 720px; margin: 0 auto 22px; text-align: center; }
   .panel-head .note { margin-inline: auto; }

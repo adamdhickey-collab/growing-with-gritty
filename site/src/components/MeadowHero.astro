@@ -290,13 +290,23 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     position: relative; z-index: 6;
     display: grid; justify-items: center; gap: 10px;
     margin-top: 14px; padding-inline: 16px;
+    /* The room three reply chips need when they stack: three tap targets
+       and the two gaps between them. Held open in the side-by-side layout
+       below, where Gritty is tall enough to pay for it out of height the
+       stage already had — so starting a conversation never moves him.
+       On a phone he is not, and holding it open there costs 176px of sky
+       and pushes him under the fold; that one is still open. */
+    --chips-row: calc(3 * var(--gg-tap) + 2 * 10px);
   }
 
   /* min-height reserves room so the chips don't jump when the bubble text
      changes; align-content keeps the bubble itself content-sized instead
-     of stretching into that reserve. */
+     of stretching into that reserve. 96px covered two lines, and Kim's
+     longest saying takes three on a phone — so the reserve is three lines
+     of the bubble plus its padding and border, and the idle rotation stops
+     nudging everything under it by a few pixels every six seconds. */
   .say { display: grid; justify-items: center; align-content: start;
-         gap: 6px; min-height: 96px; }
+         gap: 6px; min-height: 108px; }
   .bubble {
     position: relative; background: #fff; border: 3px solid var(--gg-ink);
     border-radius: 26px 30px 28px 26px / 28px 26px 30px 28px;
@@ -442,7 +452,9 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
        to his ear the moment the chips take a row beneath it. */
     .stage {
       grid-template-columns: minmax(0, 46ch) auto;
-      grid-template-rows: 1fr 1fr;
+      /* the chips' half of Gritty's height is never smaller than the row
+         they need, so the two halves stay equal whoever is talking */
+      grid-template-rows: minmax(0, 1fr) minmax(var(--chips-row), 1fr);
       justify-content: center; align-items: center;
       column-gap: 40px; margin-top: 4px;
     }
