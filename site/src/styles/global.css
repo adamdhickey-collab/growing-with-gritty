@@ -56,6 +56,28 @@ a:hover { color: var(--gg-blue-deep); }
    two read apart on a page that uses both. */
 .band-blue { background: color-mix(in srgb, var(--gg-door-blue) 24%, var(--gg-paper)); }
 
+/* Sky Flat — Sky Wash with both of its edges kept. .band-sky fades away to
+   paper on purpose, so a hero can melt into the page under it; a band in
+   the middle of a stack needs the opposite. This is the same 42% sky the
+   gradient starts on, held all the way down, so a section stops exactly
+   where its ground stops. The lesson line is Meadow Green ink, which holds
+   4.5:1 here — a deeper sky is what pushes it under the line. */
+.band-sky-flat { background: color-mix(in srgb, var(--gg-sky) 42%, var(--gg-paper)); }
+
+/* Meadow Wash — the green of the grass Gritty stands in, for the strip that
+   introduces the characters themselves. It's the middle of the three
+   grounds a book page ends on: cool sky, then green meadow, then warm gold,
+   so each seam is visible at a glance instead of guessed at. */
+.band-meadow { background: color-mix(in srgb, var(--gg-green) 32%, var(--gg-paper)); }
+
+/* Gold Wash — Gold Star mixed down far enough to carry text, for the grit
+   challenge a family takes on together: gold is this site's achievement
+   colour, and it's the colour of the Read door these pages live behind, so
+   a book page finishes on it. Gold ink only reaches 4.1:1 on it, so the
+   eyebrow re-inks to --gg-ink (10:1) the way a hero's does. */
+.band-gold { background: color-mix(in srgb, var(--gg-gold) 28%, var(--gg-paper)); }
+.band-gold .eyebrow { color: var(--gg-ink); }
+
 /* Hero grounds — straight from the backdrops in Kim's card art rather than
    mixed down from the washes, so a page and the door that leads to it read
    as the same room: the Calming Corner opens on its own door's rose, and
@@ -89,6 +111,14 @@ main > .band-deep:last-child,
 main > .band-lime:last-child,
 main > .band-blush:last-child,
 main > .band-blue:last-child { margin-bottom: 0; }
+main > .band-sky-flat:last-child,
+main > .band-meadow:last-child,
+main > .band-gold:last-child { margin-bottom: 0; }
+/* A book page stacks its bands inside an <article>, so the rules above
+   can't see which band ends the page — :has looks the one level down. */
+main > article:last-child:has(> .band-sky-flat:last-child),
+main > article:last-child:has(> .band-meadow:last-child),
+main > article:last-child:has(> .band-gold:last-child) { margin-bottom: 0; }
 
 /* eyebrow label */
 .eyebrow {

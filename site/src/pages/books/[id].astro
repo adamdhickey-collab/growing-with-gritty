@@ -92,8 +92,12 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
       </section>
     )}
 
+    {/* The three closing sections each get their own ground — sky, meadow,
+        gold. On one ground they ran together into a single long block and
+        a reader couldn't tell where the lesson ended and the challenge
+        began. Grounds, not rules, do the dividing: see global.css. */}
     {lesson && (
-      <section class="band band-sky">
+      <section class="band band-sky-flat">
         <div class="wrap">
           <h2>What did Gritty learn?</h2>
           <p class="lesson">{lesson}</p>
@@ -102,7 +106,7 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
     )}
 
     {characters.length > 0 && (
-      <section class="band">
+      <section class="band band-meadow">
         <div class="wrap">
           <h2>Who's in this story?</h2>
           <ul class="char-row" role="list">
@@ -122,7 +126,7 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
     )}
 
     {challenge && (
-      <section class="band">
+      <section class="band band-gold">
         <div class="wrap challenge">
           <h2 class="visually-hidden">Grit challenge</h2>
           <p class="eyebrow gritty-eyebrow">
