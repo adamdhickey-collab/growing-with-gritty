@@ -156,17 +156,40 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     nav a img { width: 38px; height: 38px; }
   }
 
-  /* Phones: seven destinations in two rows instead of three, so the page's
-     own heading starts on the first screen instead of below it. The labels
-     are the first words a new reader meets and hold the small-text floor,
-     so every pixel comes out of the cards' side padding and the drawings.
-     At 4px sides the four short labels fit one row and the three long ones
-     the next; the drawings stay the star at 34px, and the cards keep the
-     48px tap floor through min-height. */
+  /* Phones: the nav becomes a grid the child can see. Seven destinations
+     on eight tracks: four cells across the first row, three across the
+     second, the three starting one track in so they sit centered under
+     the four. Every cell is the same width — a quarter of the screen —
+     and the grid runs edge to edge, out past the page gutter, so the
+     whole width of the phone goes to the cells rather than to slack
+     between them. One hairline between cells — each cell's own 1px
+     shadow, which meets its neighbour's across the 1px gap — draws the
+     squares, and the half-tracks left empty at the ends of the second
+     row stay plain paper rather than showing a line colour through the
+     gap. Each drawing and its
+     word sit centered inside, with the room the cell has to give. The
+     labels hold the small-text floor and wrap to two lines where a cell
+     is narrower than the words, and grid-auto-rows keeps both rows the
+     same height so a wrapped label never makes one row taller. The
+     current page fills its whole square in blue. */
   @media (max-width: 620px) {
-    nav { gap: 2px 3px; }
-    nav a { padding: 6px 4px 6px; min-width: 0; }
-    nav a img { width: 34px; height: 34px; }
+    nav {
+      display: grid; grid-template-columns: repeat(8, 1fr); grid-auto-rows: 1fr;
+      gap: 1px; width: calc(100% + 48px); margin: 0 -24px -12px;
+    }
+    nav a {
+      grid-column: span 2; align-content: center;
+      padding: 10px 4px 9px; min-width: 0; border-radius: 0;
+      box-shadow: 0 0 0 1px rgba(42, 50, 56, 0.08);
+      text-wrap: balance;
+    }
+    nav a:nth-child(5) { grid-column: 2 / span 2; }
+    nav a img { width: 40px; height: 40px; }
+    /* the cells are one surface now: lift and tilt on hover would break
+       the grid lines, so the hover is colour only */
+    nav a:hover { translate: 0; }
+    nav a:hover img { rotate: 0deg; scale: 1; }
+    nav a:focus-visible { outline-offset: -3px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
