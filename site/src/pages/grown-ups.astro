@@ -38,7 +38,7 @@ const groups = [
   title="Grown-Up Grit Guide — Growing with Gritty"
   description="Free printables, conversation starters, and classroom ideas for parents and teachers, from teacher and author Kim Rekowski."
 >
-  <section class="band">
+  <section class="band intro">
     <div class="wrap flow">
       <p class="eyebrow">For parents &amp; teachers</p>
       <h1>The Grown-Up Grit Guide</h1>
@@ -124,6 +124,11 @@ const groups = [
 
 <style>
   .lede { font-size: 1.12rem; color: var(--gg-ink-soft); }
+  /* The intro and whatever follows it both sit on plain paper, so their two
+     56px paddings stacked into a canyon under the lede. On one ground a
+     single band's worth of air is the whole gap. */
+  .intro { padding-block-end: 0; }
+  .intro + .band { padding-block-start: 32px; }
   .empty {
     display: grid; gap: 12px; justify-items: center; text-align: center;
     padding: 48px 32px;
