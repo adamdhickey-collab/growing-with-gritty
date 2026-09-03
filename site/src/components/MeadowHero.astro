@@ -482,18 +482,35 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
   }
 
   @media (max-width: 600px) {
-    .meadow { padding-bottom: 78px; }
+    /* room under Gritty for the reply chips to stand in the meadow */
+    .meadow { padding-bottom: 96px; }
     .bubble { font-size: 1.15rem; }
-    /* the hint takes the row between the bubble and Gritty, its arrow
-       diving down at him */
+    /* On a phone your replies hang BELOW Gritty, not between him and his
+       bubble. Stacked above him, three chips appearing shoved him 164px
+       down the page and yanked him back when you answered — and holding
+       that room open instead costs 176px of sky and starts him under the
+       fold. Below him the room comes out of the meadow's own bottom, where
+       nothing anyone is looking at has to move, and the buttons land where
+       a thumb already is.
+
+       The chips stay ahead of Gritty in the source, because the side-by-side
+       layout reads bubble → replies → Gritty and that is the layout most
+       likely to be met with a keyboard. Here the two swap places visually;
+       the script hands focus straight to the first chip, so the tab from
+       Gritty down to them is a path almost nobody walks. */
     .say { grid-row: 1; }
-    .chips { grid-row: 2; }
     .tap-hint {
-      grid-row: 3; justify-self: end;
+      grid-row: 2; justify-self: end;
       margin-right: 4%; margin-bottom: -40px;
       font-size: 0.95rem;
     }
-    .gritty { grid-row: 4; }
+    .gritty { grid-row: 3; }
+    /* clear of the hooves he tucks into the grass with, and over the grass
+       border rather than under it */
+    .chips {
+      grid-row: 4; position: relative; z-index: 8;
+      margin-top: 56px;
+    }
     .tap-hint .hint-arrow { width: 62px; }
     .c2 { top: 300px; }
     /* the headline wraps to two full-width lines here, so the sun ducks
@@ -638,6 +655,16 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
       });
       chipBox.hidden = false;
       chips.find((c) => !c.hidden)?.focus({ preventScroll: true });
+      /* On a phone your replies stand below Gritty, and on a short window
+         that can leave them just off the bottom edge. This is the one place
+         on the page allowed to move, and it is a camera move rather than an
+         accident: the least scroll that shows the buttons, and never more
+         than would take the goat off the top. Nothing else here scrolls —
+         every focus() above says preventScroll for exactly that reason. */
+      const off = chipBox.getBoundingClientRect().bottom + 16 - innerHeight;
+      const room = Math.max(0, gritty.getBoundingClientRect().top);
+      const move = Math.min(off, room);
+      if (move > 0) window.scrollBy({ top: move, behavior: isCalm() ? 'auto' : 'smooth' });
     }
 
     function startChat(chat: (typeof data.chats)[0]) {

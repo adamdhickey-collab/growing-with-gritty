@@ -66,10 +66,15 @@ async function serve() {
   return { base, stop: () => proc.kill() };
 }
 
-/* ——— one run's findings ——— */
+/* ——— one run's findings ———
+   `reveal` marks the one move that is allowed to be a move: a camera
+   following something the child just summoned. Its Δscroll is reported and
+   not counted; its Δlayout still has to be zero, and the checks around it
+   prove both Gritty and the buttons ended up on screen. */
 const rows = [];
-const record = (vp, check, dScroll, dDoc, note, open) =>
-  rows.push({ vp, check, dScroll, dDoc, note, open });
+const record = (vp, check, dScroll, dDoc, note, open, reveal) =>
+  rows.push({ vp, check, dScroll: reveal ? 0 : dScroll, dDoc, note, open,
+              extra: reveal && dScroll ? `scrolled ${dScroll}px to reveal` : note });
 
 /* Where the thing that must not move is, in both frames at once.
    Walked up the offsetParent chain rather than read off a bounding box:
@@ -192,9 +197,30 @@ async function gritZone(page, base, vp) {
 
 /* ——————————————————— the meadow hero ——————————————————— */
 async function homepage(page, base, vp, phone) {
+  const HIM = '[data-gritty]';
+
+  /* First, the way a child actually meets him: the top of the page, one tap.
+     On a short phone the replies stand below the fold from here, so this is
+     where the reveal has to earn its keep. */
   await page.goto(`${base}/`, { waitUntil: 'networkidle' });
   await wait(page, 1000);
-  const HIM = '[data-gritty]';
+  const landed = await anchorOf(page, HIM);
+  await press(page, HIM); await wait(page, 1200);
+  const after = await anchorOf(page, HIM);
+  record(vp, 'first tap, from the top', after.y - landed.y, after.doc - landed.doc,
+         undefined, undefined, true);
+  const arrived = await page.evaluate(() => {
+    const g = document.querySelector('[data-gritty]').getBoundingClientRect();
+    const c = document.querySelector('[data-chips]').getBoundingClientRect();
+    const on = (r) => r.top >= -1 && r.bottom <= innerHeight + 1;
+    return { gritty: on(g), chips: on(c) };
+  });
+  if (!arrived.gritty) record(vp, 'first tap keeps Gritty on screen', 0, TOL + 1, 'scrolled off');
+  if (!arrived.chips) record(vp, 'first tap shows the replies', 0, TOL + 1, 'below the fold');
+
+  /* Then the same conversation with him already parked in the window. */
+  await page.goto(`${base}/`, { waitUntil: 'networkidle' });
+  await wait(page, 1000);
   await page.evaluate(() => {
     const g = document.querySelector('[data-gritty]');
     window.scrollTo({ top: Math.max(0, scrollY + g.getBoundingClientRect().top - 200), behavior: 'instant' });
@@ -209,20 +235,28 @@ async function homepage(page, base, vp, phone) {
   record(vp, 'the sayings rotate', b.y - a.y, b.doc - a.doc);
   a = b;
 
-  /* On a phone the reply chips still push him down the page: holding their
-     row open costs 176px of sky and puts Gritty under the fold, so what
-     that room is worth is a design call, not a bug to quietly paper over. */
-  const open = phone ? 'phone chip row: open design question' : undefined;
-
-  await press(page, HIM); await wait(page, 900);
+  /* On a phone the replies stand below Gritty, which on a short window can
+     leave them off the bottom — so this one tap is allowed to move the
+     camera. It may not move the layout, and it has to land with both the
+     goat and the buttons on screen. */
+  await press(page, HIM); await wait(page, 1100);
   b = await anchorOf(page, HIM);
-  record(vp, 'tap Gritty', b.y - a.y, b.doc - a.doc, undefined, open);
+  record(vp, 'tap Gritty', b.y - a.y, b.doc - a.doc, undefined, undefined, true);
   a = b;
+
+  const seen = await page.evaluate(() => {
+    const g = document.querySelector('[data-gritty]').getBoundingClientRect();
+    const c = document.querySelector('[data-chips]').getBoundingClientRect();
+    const on = (r) => r.top >= -1 && r.bottom <= innerHeight + 1;
+    return { gritty: on(g), chips: on(c) };
+  });
+  if (!seen.gritty) record(vp, 'Gritty stays on screen', 0, TOL + 1, 'scrolled off');
+  if (!seen.chips) record(vp, 'the replies land on screen', 0, TOL + 1, 'below the fold');
 
   await page.evaluate(() => document.querySelector('[data-chip]:not([hidden])').click());
   await wait(page, 1400);
   b = await anchorOf(page, HIM);
-  record(vp, 'answer him', b.y - a.y, b.doc - a.doc, undefined, open);
+  record(vp, 'answer him', b.y - a.y, b.doc - a.doc);
 }
 
 /* ——————————————————— run ——————————————————— */
@@ -256,7 +290,7 @@ if (VERBOSE || bad.length || known.length) {
   console.log(pad('viewport', 12) + pad('check', 30) + pad('Δscroll', 9) + pad('Δlayout', 9) + 'note');
   for (const r of (VERBOSE ? rows : [...bad, ...known])) {
     console.log(pad(r.vp, 12) + pad(r.check, 30) + pad(r.dScroll, 9) + pad(r.dDoc, 9)
-      + (r.note ?? '') + (r.open ? `  (${r.open})` : ''));
+      + (r.extra ?? '') + (r.open ? `  (${r.open})` : ''));
   }
   console.log('');
 }
