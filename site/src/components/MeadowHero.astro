@@ -299,18 +299,32 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     --chips-row: calc(3 * var(--gg-tap) + 2 * 10px);
   }
 
-  /* min-height reserves room so the chips don't jump when the bubble text
-     changes; align-content keeps the bubble itself content-sized instead
-     of stretching into that reserve. 96px covered two lines, and Kim's
-     longest saying takes three on a phone — so the reserve is three lines
-     of the bubble plus its padding and border, and the idle rotation stops
-     nudging everything under it by a few pixels every six seconds. */
-  .say { display: grid; justify-items: center; align-content: start;
-         gap: 6px; min-height: 108px; }
+  /* The balloon is a fixed box that words appear inside — never a box that
+     resizes itself around each new sentence. It used to shrink-wrap every
+     message, and because it is centred on a phone and right-aligned on a
+     desktop, that meant the one thing a child is actually reading was the
+     one thing that moved: 300px of width and 150px of sideways travel on
+     every tap at 390px, 352px of travel at 1280px, plus a deflate to a
+     57px "…" pill in the middle of the beat before each answer.
+
+     So it stretches to its column (the stage's width on a phone, the
+     46ch text column beside Gritty on a desktop) and holds the height of
+     the longest thing Gritty can ever say at that width. That height is
+     measured from the real strings by the script below rather than
+     guessed at, because the words are Kim's to edit and a sentence one
+     word longer would silently burst a hard-coded reserve. The 108px
+     fallback is the old three-line guess, for the moment before the
+     script runs. */
+  .say { display: grid; justify-self: stretch; justify-items: center;
+         align-content: start; gap: 6px; }
   .bubble {
     position: relative; background: #fff; border: 3px solid var(--gg-ink);
     border-radius: 26px 30px 28px 26px / 28px 26px 30px 28px;
-    padding: 13px 20px; max-width: 44ch;
+    padding: 13px 20px;
+    width: 100%; min-height: var(--say-reserve, 108px);
+    /* grid, so a one-line saying sits in the middle of the box instead of
+       clinging to its ceiling */
+    display: grid; align-content: center;
     font-family: var(--gg-hand); font-size: 1.3rem; line-height: 1.35;
     color: var(--gg-ink); box-shadow: var(--gg-shadow); text-align: center;
   }
@@ -348,7 +362,12 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     margin-bottom: -46px;
     border: none; background: none; padding: 0; cursor: pointer;
     transform-origin: 50% 97%; /* hooves stay planted */
-    transition: translate 900ms var(--gg-ease-bouncy);
+    /* ease-out, not the spring: the spring overshoots by a quarter, and
+       from 130% below that fired him ~80px into the sky before he settled.
+       On a desktop the grass in front of him sold it as a bound out of the
+       meadow; on a phone there is nothing in front of him and he simply
+       flew. He rises to the ground and stops there. */
+    transition: translate 900ms ease-out;
   }
   /* a pool of shade under his hooves, not a floating silhouette — this is
      what actually puts him ON the ground */
@@ -406,18 +425,21 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
   }
   @keyframes breathe { 0%, 100% { scale: 1 1; } 50% { scale: 1 1.03; } }
 
-  /* moods, acted out in motion (his emote replaces breathing while it runs) */
+  /* moods, acted out in motion (his emote replaces breathing while it runs).
+     Every one of them keeps his hooves on the ground: the origin is at his
+     hooves, so a hop is a stretch upward from where he stands, never a
+     lift. He is a goat in a meadow, not a goat over one. */
   .gritty.e-happy { animation: hop 620ms var(--gg-ease-back); }
   .gritty.e-proud { animation: hop 560ms var(--gg-ease-back) 2; }
   .gritty.e-laugh { animation: giggle 760ms ease-in-out; }
   .gritty.e-surprised { animation: startle 520ms var(--gg-ease-back); }
   .gritty.e-thinking { animation: sway 1500ms ease-in-out; }
   @keyframes hop {
-    0% { scale: 1 1; translate: 0 0; }
-    18% { scale: 1.06 0.9; translate: 0 4px; }   /* anticipation: dip */
-    45% { scale: 0.94 1.1; translate: 0 -18px; } /* stretch going up */
-    72% { scale: 1.05 0.95; translate: 0 2px; }  /* squash on landing */
-    100% { scale: 1 1; translate: 0 0; }
+    0% { scale: 1 1; }
+    18% { scale: 1.06 0.9; }   /* anticipation: crouch */
+    45% { scale: 0.94 1.12; }  /* stretch up, hooves planted */
+    72% { scale: 1.05 0.95; }  /* squash on landing */
+    100% { scale: 1 1; }
   }
   @keyframes giggle {
     0%, 100% { rotate: 0deg; scale: 1 1; }
@@ -427,10 +449,10 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     80% { rotate: 2deg; }
   }
   @keyframes startle {
-    0% { scale: 1 1; translate: 0 0; }
-    30% { scale: 0.96 1.12; translate: 0 -12px; } /* jump! */
-    60% { scale: 1.04 0.94; translate: 0 1px; }
-    100% { scale: 1 1; translate: 0 0; }
+    0% { scale: 1 1; }
+    30% { scale: 0.96 1.14; } /* bolt upright */
+    60% { scale: 1.04 0.94; }
+    100% { scale: 1 1; }
   }
   @keyframes sway {
     0%, 100% { rotate: 0deg; }
@@ -454,14 +476,21 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
       grid-template-columns: minmax(0, 46ch) auto;
       /* the chips' half of Gritty's height is never smaller than the row
          they need, so the two halves stay equal whoever is talking */
-      grid-template-rows: minmax(0, 1fr) minmax(var(--chips-row), 1fr);
+      grid-template-rows: minmax(0, 1fr)
+                          minmax(var(--chips-reserve, var(--chips-row)), 1fr);
       justify-content: center; align-items: center;
       column-gap: 40px; margin-top: 4px;
     }
-    .say, .chips { grid-column: 1; justify-self: end; }
-    .say { grid-row: 1; justify-items: end; align-self: end; align-content: end; }
+    .chips { grid-column: 1; justify-self: end; }
+    /* stretch, not end: the balloon is as wide as its column at every
+       message, so its right edge — and the thought dots pinned to it —
+       stay exactly where Gritty's mouth is */
+    .say { grid-column: 1; grid-row: 1; justify-items: end;
+           align-self: end; align-content: end; }
     .chips { grid-row: 2; align-self: start; justify-content: flex-end; }
-    .bubble { text-align: left; }
+    /* The balloon is a fixed box now, so its words are centred in it at
+       every width. Left-aligned, a one-line saying sat in the top corner
+       of a 46ch panel and the balloon read as empty rather than as spoken. */
     .gritty { grid-column: 2; grid-row: 1 / 3; width: min(280px, 26vw); }
     /* the hint shares his cell and floats up beside his head, the arrow
        diving toward him */
@@ -482,7 +511,8 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
   }
 
   @media (max-width: 600px) {
-    /* room under Gritty for the reply chips to stand in the meadow */
+    /* room under Gritty for the reply chips to stand in the meadow, clear
+       of the 82px band of grass along the bottom */
     .meadow { padding-bottom: 96px; }
     .bubble { font-size: 1.15rem; }
     /* On a phone your replies hang BELOW Gritty, not between him and his
@@ -498,6 +528,32 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
        likely to be met with a keyboard. Here the two swap places visually;
        the script hands focus straight to the first chip, so the tab from
        Gritty down to them is a path almost nobody walks. */
+    /* Row 4 is the replies' room, and it is held open whether or not the
+       buttons are in it. It has to be sized here rather than left to the
+       chips themselves, because .chips[hidden] leaves the flow entirely: a
+       row that exists only while the buttons do is a row that springs into
+       being under a child's thumb. That is what the meadow was doing — it
+       grew 230px the instant the choices appeared and snapped back the
+       instant one was answered, twice per tap, carrying the whole page
+       under the hero with it.
+
+       The height comes from the script below: the tallest set of three
+       replies at this width, so a long line from the CMS or a chip that
+       wraps to two lines widens the reserve instead of bursting it. The
+       56px is the clearance over Gritty's hooves, which the row owns
+       rather than the buttons. */
+    .stage {
+      grid-template-rows: auto auto auto
+                          calc(56px + var(--chips-reserve, var(--chips-row)));
+      /* Above the grass, not behind it. The buttons ask for z-index 8, but
+         .stage is itself a z-index: 6 stacking context, so that 8 only ever
+         sorted them against their own siblings and the grass border (7)
+         painted straight over the bottom row. Nothing is lost by lifting
+         the stage here: on a phone Gritty stands high on the hill, well
+         clear of the grass, so the blades in front of him are a desktop
+         effect only. */
+      z-index: 8;
+    }
     .say { grid-row: 1; }
     .tap-hint {
       grid-row: 2; justify-self: end;
@@ -507,10 +563,17 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     .gritty { grid-row: 3; }
     /* clear of the hooves he tucks into the grass with, and over the grass
        border rather than under it */
+    /* One full-width button per row: three tap targets a thumb cannot
+       miss, all the same size, in a predictable order. Shrink-wrapped
+       pills centred on a ragged three rows made every set of replies a
+       different shape, and put the shortest answer in the hardest place
+       to hit. */
     .chips {
       grid-row: 4; position: relative; z-index: 8;
-      margin-top: 56px;
+      justify-self: stretch; align-self: start; margin-top: 56px;
+      flex-direction: column; align-items: stretch;
     }
+    .chip { width: 100%; }
     .tap-hint .hint-arrow { width: 62px; }
     .c2 { top: 300px; }
     /* the headline wraps to two full-width lines here, so the sun ducks
@@ -568,6 +631,69 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     /* he climbs out of the meadow */
     gritty.disabled = false;
     setTimeout(() => gritty.classList.add('arrived'), 350);
+
+    /* ——— the room the hero holds open ———
+       Two things here change size as a conversation goes: the balloon, and
+       the row of replies. Both sit in the meadow's own flow, so either one
+       growing moves the meadow — which on a phone means the page moving
+       under the child who just tapped it. So both are measured up front:
+       every string that can ever appear, laid out at the real width, and
+       the tallest of each held open from the first paint.
+
+       Measured on the real elements rather than on a hidden copy, because
+       they are the only nodes on the page with the right width, font and
+       padding — and the loop is synchronous, so nothing is ever painted
+       mid-measure. offsetHeight, not a bounding box: the balloon's pop and
+       Gritty's breathing are transforms, and a box that includes them
+       reports motion as height. */
+    const stage = section.querySelector<HTMLElement>('.stage')!;
+
+    function measure() {
+      const shown = say.textContent;
+      stage.style.setProperty('--say-reserve', 'auto');
+      let tallest = 0;
+      for (const line of [shown!, ...data.sayings,
+                          ...data.chats.flatMap(
+                            (c) => [c.opener, ...c.replies.map((r) => r.react)])]) {
+        say.textContent = `"${line.replace(/^"|"$/g, '')}"`;
+        tallest = Math.max(tallest, say.offsetHeight);
+      }
+      say.textContent = shown;
+      stage.style.setProperty('--say-reserve', `${tallest}px`);
+
+      const labels = chips.map((c) => c.textContent);
+      const wasHidden = chips.map((c) => c.hidden);
+      const boxWasHidden = chipBox.hidden;
+      stage.style.setProperty('--chips-reserve', 'auto');
+      chipBox.hidden = false;
+      let deepest = 0;
+      for (const chat of data.chats) {
+        chips.forEach((chip, i) => {
+          const reply = chat.replies[i];
+          chip.hidden = !reply;
+          if (reply) chip.textContent = reply.say;
+        });
+        deepest = Math.max(deepest, chipBox.offsetHeight);
+      }
+      chipBox.hidden = boxWasHidden;
+      chips.forEach((chip, i) => { chip.textContent = labels[i]; chip.hidden = wasHidden[i]; });
+      stage.style.setProperty('--chips-reserve', `${deepest}px`);
+    }
+
+    measure();
+    /* the hand font lands after first paint, and wraps differently */
+    document.fonts?.ready.then(measure);
+    /* Only a change of WIDTH can rewrap anything. On a phone the address
+       bar sliding away fires resize on every scroll, and re-measuring on
+       each of those would be the very jitter this exists to prevent. */
+    let measuredAt = innerWidth;
+    let pending = 0;
+    addEventListener('resize', () => {
+      if (innerWidth === measuredAt) return;
+      measuredAt = innerWidth;
+      clearTimeout(pending);
+      pending = window.setTimeout(measure, 150);
+    });
 
     function speak(text: string, opts: { cheer?: boolean } = {}) {
       say.textContent = `"${text.replace(/^"|"$/g, '')}"`;
