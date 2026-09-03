@@ -850,6 +850,11 @@ const tabArt = {                        /* pixel sprites for the three game tabs
       const pressBtn = yetMachine.querySelector<HTMLElement>('[data-yet-press]')!;
       const nextBtn = yetMachine.querySelector<HTMLElement>('[data-yet-next]')!;
       let i = 0;
+      /* The payoff lands a beat after the press, and a five-year-old fits
+         two taps into that beat — which let the sparks off twice and cut
+         the announcement in half with a copy of itself. As on the trail,
+         the press is spent the moment it lands, not when it pays out. */
+      let spent = false;
 
       const load = (n: number) => {
         sentenceEl.textContent = sentences[n].text;
@@ -858,9 +863,12 @@ const tabArt = {                        /* pixel sprites for the three game tabs
         tipEl.hidden = true;
         nextBtn.hidden = true;
         pressBtn.hidden = false;
+        spent = false;
       };
 
       pressBtn.addEventListener('click', () => {
+        if (spent) return;
+        spent = true;
         replay(yetMachine, 'rumble');
         /* hit stop, then the word slams in */
         setTimeout(() => {
