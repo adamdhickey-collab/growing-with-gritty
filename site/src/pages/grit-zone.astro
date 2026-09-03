@@ -1609,7 +1609,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     display: grid; place-items: center;
     background: var(--gg-card); border: 3px solid var(--gg-ink);
     box-shadow: 4px 4px 0 var(--gg-ink);
-    transition: background 0.2s ease, translate 0.12s ease, box-shadow 0.12s ease,
+    transition: translate 0.12s ease, box-shadow 0.2s ease,
                 rotate 0.3s var(--gg-ease-back), scale 0.2s ease;
   }
   .chip-emoji { display: grid; place-items: center; line-height: 0; }
@@ -1619,10 +1619,19 @@ const tabArt = {                        /* pixel sprites for the three game tabs
   }
   .check-chip:hover .coin { translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink); }
   .check-chip:active .coin { scale: 0.94; }
+  /* Earned is a gold RIM, not a gold flood. Half these icons are drawn in
+     the same yellow as the coin (star, sparkles, hearts, handshake), so
+     filling the face with gold swallowed them — the badge lit up and the
+     picture went out. The face stays card-white in both states, and the
+     ring, the tilt, the shadow and the check carry the state instead. */
   .check-chip:has(input:checked) .coin {
-    background: var(--gg-px-gold); rotate: -5deg;
-    box-shadow: 4px 4px 0 var(--gg-gold-ink);
+    rotate: -5deg;
+    box-shadow: inset 0 0 0 9px var(--gg-px-gold), 4px 4px 0 var(--gg-gold-ink);
     animation: coin-pop 550ms var(--gg-ease-bouncy);
+  }
+  /* a checked coin still lifts under a cursor — the rim comes along */
+  .check-chip:hover:has(input:checked) .coin {
+    box-shadow: inset 0 0 0 9px var(--gg-px-gold), 5px 5px 0 var(--gg-gold-ink);
   }
   @keyframes coin-pop {
     0% { scale: 0.85 1.1; }
@@ -1632,11 +1641,11 @@ const tabArt = {                        /* pixel sprites for the three game tabs
   /* an earned badge wears a check — the state in a mark, not only in a
      colour, so it reads for colour-blind kids and in high-contrast mode */
   .check-chip:has(input:checked) .coin::after {
-    content: '✓'; position: absolute; right: -6px; bottom: -6px;
-    width: 30px; height: 30px; border-radius: 6px;
+    content: '✓'; position: absolute; right: -4px; bottom: -4px;
+    width: 28px; height: 28px; border-radius: 50%;
     display: grid; place-items: center;
     background: var(--gg-gold-ink); color: #fff; border: 2px solid var(--gg-ink);
-    font-family: var(--gg-body); font-weight: 800; font-size: 1.05rem; line-height: 1;
+    font-family: var(--gg-body); font-weight: 800; font-size: 1rem; line-height: 1;
   }
   .check-chip:has(input:checked) .coin-label { color: var(--gg-gold-ink); }
   .check-chip:has(input:focus-visible) .coin { outline: 3px solid var(--gg-focus); outline-offset: 3px; }
