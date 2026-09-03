@@ -20,6 +20,9 @@
   --gg-sky:        #BDD7E7;  /* Sky Wash — soft washes and bands         */
   --gg-ink:        #2A3238;  /* reading text                             */
   --gg-ink-soft:   #55606A;  /* captions, secondary text (AA on paper)   */
+  /* what the page dims to when a game raises a screen over it. Ink, not
+     black — this site has no true black in it anywhere. */
+  --gg-scrim:      color-mix(in srgb, var(--gg-ink) 62%, transparent);
 
   /* the door grounds — sampled from the backdrops in Kim's own card art,
      so a page's hero can wear the colour its door wears on the home page.

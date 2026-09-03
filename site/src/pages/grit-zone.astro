@@ -195,6 +195,12 @@ const tabArt = {                        /* pixel sprites for the three game tabs
           .scenario [data-ask] { display: none; }
           .scenario [data-ask-said][hidden] { display: block; }
           .scenario [data-flee] { display: none; }
+          /* the layer only exists when JS can raise it; without JS the
+             challenges lie down on the page as plain sections */
+          .gz-dialog { display: block; position: static; inset: auto;
+                       width: auto; height: auto; background: none;
+                       overflow: visible; }
+          .gz-dialog-in { display: block; padding: 0; }
         </style>
       </noscript>
 
@@ -291,10 +297,24 @@ const tabArt = {                        /* pixel sprites for the three game tabs
             <button type="button" class="btn btn-gold cab-btn trail-play" data-play>
               <Icon name="ui-play" /> Play the glowing challenge
             </button>
+            {/* once the climb is done the summit is somewhere you can go
+                back to, not a screen that exists for one moment only */}
+            <button type="button" class="btn btn-gold cab-btn trail-play" data-summit hidden>
+              <Icon name="badge-star-burst" /> See the summit
+            </button>
           </div>
         </div>
 
-        <div class="quiz" data-quiz>
+        {/* The challenge comes up ON the map, in the top layer, instead of
+            taking its place. A modal <dialog> is what makes that honest: it
+            holds the page still underneath, so the trail cannot move by a
+            pixel while you play, and it brings Escape, a focus trap and an
+            inert background along for free. The layer wears the same
+            cabinet the map does, so this still reads as the machine
+            changing what is on its screen. */}
+        <dialog class="gz-dialog" data-dlg aria-label="A challenge on the Grit Trail">
+          <p class="visually-hidden" data-live aria-live="polite"></p>
+          <div class="gz-dialog-in quiz" data-quiz>
           {scenarios.map((s, i) => (
             <article class="scenario cab" data-scenario data-id={s.id} data-answer={s.data.answer}>
               {logo && <div class="cab-marquee small"><img src={logo} alt="The Grit Trail" width="480" height="160" /></div>}
@@ -359,39 +379,45 @@ const tabArt = {                        /* pixel sprites for the three game tabs
               </div>
             </article>
           ))}
-        </div>
-
-        <div class="finale cab" data-finale tabindex="-1" hidden>
-          {logo && <div class="cab-marquee small"><img src={logo} alt="The Grit Trail" width="480" height="160" /></div>}
-          <div class="cab-hud">
-            <span class="hud-title"><Icon name="badge-star-burst" size="1.35em" /> The summit</span>
           </div>
-          {/* The view from the top. Once summit.webp lands it fills the
-              screen edge to edge — Gritty on the peak, the whole meadow far
-              below — and the words sit under it. Until then, the flag. */}
-          <div class:list={['cab-screen', 'stage', 'finale-screen',
-                            { 'has-bg': !!stageBg && !summit, 'has-summit': !!summit }]}
-               style={stageBg && !summit ? `--stage-bg: url('${stageBg}');` : undefined}>
-            {/* lazy: the summit only appears after six challenges, and
-                `hidden` does not stop a fetch — without this every visit
-                pays for a screen most of them never reach */}
-            {summit
-              ? <img class="finale-art" src={summit} loading="lazy"
-                     alt="Gritty stands on the mountaintop beside the flag, looking out over the whole meadow far below."
-                     width="1536" height="1024" />
-              : <img class="finale-flag" src={u('/images/grit-zone/flag.webp')} alt="" width="110" height="110" />}
-            <div class="say finale-say">
-              <h3>You climbed the whole trail!</h3>
-              <p>You helped Gritty {N} times. You know what grit
-              looks like: trying again, taking a breath, asking for help, and
-              never giving up.</p>
-              <p class="finale-motto">"I have grit! I don't quit!"</p>
+        </dialog>
+
+        <dialog class="gz-dialog" data-dlg-finale aria-label="The summit">
+          <p class="visually-hidden" data-live aria-live="polite"></p>
+          <div class="gz-dialog-in">
+            <div class="finale cab" data-finale tabindex="-1">
+              {logo && <div class="cab-marquee small"><img src={logo} alt="The Grit Trail" width="480" height="160" /></div>}
+              <div class="cab-hud">
+                <span class="hud-title"><Icon name="badge-star-burst" size="1.35em" /> The summit</span>
+              </div>
+              {/* The view from the top. Once summit.webp lands it fills the
+                  screen edge to edge — Gritty on the peak, the whole meadow
+                  far below — and the words sit under it. Until then, the flag. */}
+              <div class:list={['cab-screen', 'stage', 'finale-screen',
+                                { 'has-bg': !!stageBg && !summit, 'has-summit': !!summit }]}
+                   style={stageBg && !summit ? `--stage-bg: url('${stageBg}');` : undefined}>
+                {/* lazy: the summit only appears after six challenges, and
+                    `hidden` does not stop a fetch — without this every visit
+                    pays for a screen most of them never reach */}
+                {summit
+                  ? <img class="finale-art" src={summit} loading="lazy"
+                         alt="Gritty stands on the mountaintop beside the flag, looking out over the whole meadow far below."
+                         width="1536" height="1024" />
+                  : <img class="finale-flag" src={u('/images/grit-zone/flag.webp')} alt="" width="110" height="110" />}
+                <div class="say finale-say">
+                  <h3>You climbed the whole trail!</h3>
+                  <p>You helped Gritty {N} times. You know what grit
+                  looks like: trying again, taking a breath, asking for help, and
+                  never giving up.</p>
+                  <p class="finale-motto">"I have grit! I don't quit!"</p>
+                </div>
+              </div>
+              <div class="cab-bar">
+                <button type="button" class="btn btn-gold cab-btn" data-replay><Icon name="action-try-again" /> Start a new climb</button>
+              </div>
             </div>
           </div>
-          <div class="cab-bar">
-            <button type="button" class="btn btn-gold cab-btn" data-replay><Icon name="action-try-again" /> Start a new climb</button>
-          </div>
-        </div>
+        </dialog>
       </section>
 
       {/* ————— Game 2: the YET Machine ————— */}
@@ -505,6 +531,19 @@ const tabArt = {                        /* pixel sprites for the three game tabs
   /* what a shown element says, as one line for the announcer */
   const words = (el: Element) => (el.textContent ?? '').replace(/\s+/g, ' ').trim();
 
+  /* A modal dialog makes the rest of the page inert, and a live region
+     inside inert content goes unread — so while a game has a screen raised
+     over the page, that layer does its own talking, and the page's one
+     announcer takes back over the moment it closes. */
+  function speak(text: string) {
+    const live = document.querySelector<HTMLElement>('dialog[open] [data-live]');
+    if (!live) { announce(text); return; }
+    live.textContent = '';
+    /* the same beat between clear and set the announcer uses, so the second
+       wrong answer in a row still registers as a change */
+    window.setTimeout(() => { live.textContent = text; }, 50);
+  }
+
   /* gold sparks — celebration only, and never under reduced motion */
   function burst(el: Element, count = 12) {
     if (isCalm()) return;
@@ -532,7 +571,9 @@ const tabArt = {                        /* pixel sprites for the three game tabs
         `animation:gz-spark 800ms ease-out ${i * 12}ms forwards;`;
       box.appendChild(s);
     }
-    document.body.appendChild(box);
+    /* the top layer sits above everything: sparks let off while a screen is
+       raised have to be let off inside it, or the scrim swallows them */
+    (document.querySelector('dialog[open]') ?? document.body).appendChild(box);
     setTimeout(() => box.remove(), 1250);
   }
 
@@ -575,7 +616,10 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     const walker = trail.querySelector<HTMLElement>('[data-walker]')!;
     const playBtn = trail.querySelector<HTMLElement>('[data-play]')!;
     const hudStop = trail.querySelector<HTMLElement>('[data-hud-stop]')!;
+    const summitBtn = trail.querySelector<HTMLElement>('[data-summit]')!;
     const finale = document.querySelector<HTMLElement>('[data-finale]')!;
+    const dlg = document.querySelector<HTMLDialogElement>('[data-dlg]')!;
+    const dlgFinale = document.querySelector<HTMLDialogElement>('[data-dlg-finale]')!;
 
     /* progress lives on this device only, like the check-in */
     const KEY = 'gg-grit-trail';
@@ -629,29 +673,63 @@ const tabArt = {                        /* pixel sprites for the three game tabs
       walker.style.left = `${at.x}%`;
       walker.style.top = `${at.y}%`;
       if (justId) replay(walker, 'hop');
-      finale.hidden = cur !== -1;
       playBtn.hidden = cur === -1;
+      summitBtn.hidden = cur !== -1;
       /* the HUD names the glowing stop, and the challenge's HUD answers it */
       hudStop.hidden = cur === -1;
       hudStop.textContent = cur === -1 ? '' : `Stop ${cur + 1}`;
     }
 
-    const showTrail = () => {
-      cards.forEach((c) => { c.hidden = true; });
-      trail.hidden = false;
-    };
+    /* Up goes the layer, down comes the layer, and the map underneath is
+       never asked to move. Every way out — Escape, "Back to the trail", the
+       gold button after a win — arrives at the same `close` event, so the
+       map is repainted and focus is handed back in exactly one place. */
+    const raise = (d: HTMLDialogElement) => { d.showModal(); replay(d, 'enter'); };
+    /* the star just won, handed to the map by the close handler */
+    let earned: string | undefined;
+    /* each card's way back to how it opened, so a replay starts clean */
+    const resets: (() => void)[] = [];
+
     /* open the challenge standing at stop i */
     function openChallenge(i: number) {
       const at = cardAt(i);
-      trail.hidden = true;
-      finale.hidden = true;
       cards.forEach((c, j) => { c.hidden = j !== at; });
       /* the card's HUD names the stop it stands at this climb, matching
          the map's tile, not its place in Kim's list */
       const tile = cards[at].querySelector<HTMLElement>('.hud-tile');
       if (tile) tile.textContent = `Stop ${i + 1}`;
-      cards[at].querySelector<HTMLElement>('.situation')?.focus();
+      raise(dlg);
+      /* preventScroll, here and everywhere below: focus is how a keyboard
+         reader is told where they are, never a reason to move the page. */
+      cards[at].querySelector<HTMLElement>('.situation')?.focus({ preventScroll: true });
     }
+
+    dlg.addEventListener('close', () => {
+      cards.forEach((c, j) => { if (!c.hidden) resets[j]?.(); });
+      const star = earned;
+      earned = undefined;
+      /* let the map paint at the old state, then move — so the star pops
+         and Gritty visibly hops to the next stop. A timer, not rAF: rAF
+         never fires in a hidden tab, and the state must land regardless. */
+      setTimeout(() => {
+        render(star);
+        const cur = currentIdx();
+        /* the summit is the payoff for the climb you just finished — it
+           comes up on its own only then, never on a later visit */
+        if (star && cur === -1) { raise(dlgFinale); return; }
+        (cur === -1 ? summitBtn : stops[cur]).focus({ preventScroll: true });
+      }, 60);
+    });
+
+    /* what the summit hands back to when it comes down */
+    let afterSummit: (() => void) | null = null;
+    dlgFinale.addEventListener('close', () => {
+      const next = afterSummit;
+      afterSummit = null;
+      if (next) { setTimeout(next, 60); return; }
+      (playBtn.hidden ? summitBtn : playBtn).focus({ preventScroll: true });
+    });
+    summitBtn.addEventListener('click', () => raise(dlgFinale));
 
     cards.forEach((card, i) => {
       const situation = card.querySelector<HTMLElement>('.situation')!;
@@ -674,7 +752,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
         askSaid!.hidden = false;
         ask.hidden = true;
         setFace('idea');
-        announce(`Gritty says: ${words(askSaid!)}`);
+        speak(`Gritty says: ${words(askSaid!)}`);
       });
 
       card.querySelectorAll<HTMLButtonElement>('.choice').forEach((btn) => {
@@ -690,26 +768,29 @@ const tabArt = {                        /* pixel sprites for the three game tabs
               nudge.hidden = true;
               cheer.hidden = false;
               back.hidden = false;
+              /* the payoff can be taller than the screen it lands on, so the
+                 machine scrolls its own screen down to it. The page under
+                 the layer still cannot move — this is the cabinet, not the
+                 site, deciding what you are looking at. */
+              cheer.scrollIntoView({ block: 'nearest', behavior: isCalm() ? 'auto' : 'smooth' });
               burst(btn.querySelector('b')!);
-              announce(words(cheer));
+              speak(words(cheer));
             }, 100);
           } else {
             btn.classList.add('tried');
             replay(btn, 'shake');
             setFace('oops');
             nudge.hidden = false;
-            announce(words(nudge));
+            speak(words(nudge));
             /* Sesame's scaffold: after a miss, the hint offers itself */
             if (ask && !ask.hidden) ask.classList.add('beckon');
           }
         });
       });
 
-      const finish = () => {
-        const id = cardIds[i];
-        const fresh = !done.has(id);
-        if (fresh) { done.add(id); save(); }
-        /* reset the card so a replay starts clean */
+      /* the card back at its opening state — run by the close handler, so
+         Escape leaves a card just as tidy as the button does */
+      resets[i] = () => {
         card.classList.remove('solved');
         card.querySelectorAll('.choice').forEach((b) => b.classList.remove('tried', 'is-grit', 'shake'));
         nudge.hidden = true;
@@ -717,18 +798,13 @@ const tabArt = {                        /* pixel sprites for the three game tabs
         back.hidden = true;
         if (ask) { ask.hidden = false; ask.classList.remove('beckon'); askSaid!.hidden = true; }
         setFace('think');
-        showTrail();
-        /* let the map paint at the old state, then move — so the star pops
-           and Gritty visibly hops to the next stop. A timer, not rAF: rAF
-           never fires in a hidden tab, and the state must land regardless. */
-        setTimeout(() => {
-          render(fresh ? id : undefined);
-          const cur = currentIdx();
-          (cur === -1 ? finale : stops[cur]).focus();
-        }, 60);
       };
-      back.addEventListener('click', finish);
-      flee.addEventListener('click', () => { showTrail(); render(); playBtn.focus(); });
+      back.addEventListener('click', () => {
+        const id = cardIds[i];
+        if (!done.has(id)) { done.add(id); earned = id; save(); }
+        dlg.close();
+      });
+      flee.addEventListener('click', () => dlg.close());
     });
 
     stops.forEach((el, i) => el.addEventListener('click', () => openChallenge(i)));
@@ -743,14 +819,17 @@ const tabArt = {                        /* pixel sprites for the three game tabs
       done.clear();
       climb += 1;
       save();
-      render();
-      const first = stops[0];
-      first.focus();
-      burst(first, 8);
+      afterSummit = () => {
+        render();
+        stops[0].focus({ preventScroll: true });
+        burst(stops[0], 8);
+      };
+      dlgFinale.close();
     });
 
     quiz.classList.add('armed');
-    showTrail();
+    cards.forEach((c) => { c.hidden = true; });
+    trail.hidden = false;
     render();
   }
 
@@ -1000,6 +1079,59 @@ const tabArt = {                        /* pixel sprites for the three game tabs
   }
   /* a bar with nothing showing on it folds away */
   .cab-bar:not(:has(> :not([hidden]))) { display: none; }
+
+  /* — the layer —
+     A challenge and the summit come up ON the map rather than in place of
+     it. Being a modal <dialog>, the page underneath is held still: whatever
+     you could see of the trail when you pressed Play is exactly what is
+     behind the scrim, and exactly what you come back to.
+
+     The dialog paints its own scrim instead of leaving it to ::backdrop,
+     which does not inherit the page's custom properties in every browser
+     that ships <dialog> — a token has to reach it to be law. */
+  .gz-dialog {
+    position: fixed; inset: 0;
+    width: 100%; max-width: 100%; height: 100%; max-height: 100%;
+    margin: 0; padding: 0; border: none;
+    background: var(--gg-scrim);
+    overflow: auto; overscroll-behavior: contain;
+  }
+  .gz-dialog::backdrop { background: none; }
+  /* the padding is room for the cabinet's hard shadow to fall into */
+  .gz-dialog-in {
+    min-height: 100%; display: grid; place-items: center;
+    padding: 18px 26px 26px 18px;
+  }
+  /* the machine slides up out of the scrim — the same spring the stars and
+     the walker use, and the global calm switch stills it with everything else */
+  .gz-dialog.enter { animation: layer-in 200ms ease; }
+  .gz-dialog.enter .cab { animation: cab-in 340ms var(--gg-ease-back); }
+  @keyframes layer-in { from { opacity: 0; } }
+  @keyframes cab-in { from { opacity: 0; scale: 0.94; translate: 0 12px; } }
+  /* An arcade machine does not grow when the game gets to the good bit.
+     Inside the layer the cabinet is capped to the window and the marquee,
+     the HUD and the control bar stay put — it is the SCREEN that scrolls.
+     So the payoff can be as tall as it likes and the way out is never
+     below the fold. Flex, not grid rows: the marquee is only there once
+     Kim's title art lands, and a row count must not depend on that. */
+  .gz-dialog .cab:not([hidden]) {
+    display: flex; flex-direction: column;
+    max-height: calc(100dvh - 44px);
+  }
+  .gz-dialog .cab-screen {
+    flex: 1 1 auto; min-height: 0;
+    overflow: auto; overscroll-behavior: contain;
+  }
+  /* On the summit the picture gives up height before the words do: the
+     screen becomes a column, the mountaintop is the only thing in it
+     allowed to shrink, and it keeps its shape as it does — so "You climbed
+     the whole trail!" is never a sentence cut off at the bezel. */
+  .gz-dialog .finale-screen { display: flex; flex-direction: column; align-items: center; }
+  .gz-dialog .finale-art {
+    flex: 0 1 auto; min-height: 96px;
+    width: auto; max-width: 100%;
+  }
+  .gz-dialog .finale-say { flex: none; }
 
   /* the level tile: paper, an ink edge, a hard shadow. The number on a
      map stop, the "Stop 2" in a HUD, the A/B/C on a choice — one shape */
