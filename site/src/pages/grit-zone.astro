@@ -896,7 +896,11 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     const streakEl = document.querySelector<HTMLElement>('[data-streak]')!;
     const streakLine = document.querySelector<HTMLElement>('[data-streak-line]')!;
     const KEY = 'gg-grit-checkin';
-    const today = new Date().toLocaleDateString('en-CA'); /* YYYY-MM-DD, local */
+    /* Which day it is, asked fresh every time. A tablet can sit open on this
+       page from Tuesday night into Wednesday morning, and a stamp taken once
+       at load would still be calling it Tuesday. */
+    const stamp = () => new Date().toLocaleDateString('en-CA'); /* YYYY-MM-DD, local */
+    let today = stamp();
 
     /* localStorage can throw (private windows, blocked storage) — the
        badges must keep working without it. */
@@ -908,27 +912,52 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     };
 
     let state = read();
-    if (!state || typeof state !== 'object') state = { days: 0, lastDate: null, checked: [] };
+    /* An array is an object too, and the fields written onto one are dropped
+       by JSON.stringify — a saved shape like that would swallow every badge
+       from then on, in silence. Anything but a plain object starts over. */
+    if (!state || typeof state !== 'object' || Array.isArray(state)) {
+      state = { days: 0, lastDate: null, checked: [] };
+    }
     if (state.lastDate === today && Array.isArray(state.checked)) {
       boxes.forEach((b) => { b.checked = state.checked.includes(b.dataset.check); });
     }
 
     const refresh = (spoken = false) => {
+      const now = stamp();
       const checked = boxes.filter((b) => b.checked).map((b) => b.dataset.check);
-      const first = cheer.hidden && checked.length > 0;
+      const newCheer = cheer.hidden && checked.length > 0;
       cheer.hidden = checked.length === 0;
-      if (spoken && first) announce(words(cheer));
-      if (checked.length > 0 && state.lastDate !== today) {
+      if (checked.length > 0 && state.lastDate !== now) {
         state.days = (state.days ?? 0) + 1;
-        state.lastDate = today;
+        state.lastDate = now;
+        today = now;
       }
       state.checked = checked;
       write(state);
+      const newStreak = streakLine.hidden && (state.days ?? 0) >= 2;
       if ((state.days ?? 0) >= 2) {
         streakLine.hidden = false;
         streakEl.textContent = `You've shown grit on ${state.days} different days. Amazing!`;
       }
+      /* There is one announcer for the page, so the cheer and the day count
+         travel as a single sentence — sent one after the other, the second
+         would cut the first off mid-word. */
+      const said = [newCheer ? words(cheer) : '', newStreak ? words(streakLine) : '']
+        .filter(Boolean).join(' ');
+      if (spoken && said) announce(said);
     };
+
+    /* Coming back to a page left open overnight: yesterday's badges were
+       yesterday's, so the chart starts the new day empty and the first tap
+       of the morning counts as a day of its own. */
+    const wake = () => {
+      if (stamp() === today) return;
+      today = stamp();
+      boxes.forEach((b) => { b.checked = false; });
+      refresh();
+    };
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) wake(); });
+    window.addEventListener('pageshow', wake);
 
     boxes.forEach((b) => b.addEventListener('change', () => {
       if (b.checked) burst(b.closest('.check-chip')!.querySelector('.coin')!, 8);
