@@ -138,6 +138,10 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
   .meadow {
     position: relative; overflow: hidden;
     padding: 26px 0 96px;
+    /* The room three reply chips need when they stack: three tap targets
+       and the two gaps between them — the no-JS fallback for the measured
+       --chips-reserve the script sets here. */
+    --chips-row: calc(3 * var(--gg-tap) + 2 * 10px);
     background: linear-gradient(180deg,
       var(--gg-sky-high) 0%, var(--gg-sky) 34%, var(--gg-sky-low) 64%);
   }
@@ -290,13 +294,6 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     position: relative; z-index: 6;
     display: grid; justify-items: center; gap: 10px;
     margin-top: 14px; padding-inline: 16px;
-    /* The room three reply chips need when they stack: three tap targets
-       and the two gaps between them. Held open in the side-by-side layout
-       below, where Gritty is tall enough to pay for it out of height the
-       stage already had — so starting a conversation never moves him.
-       On a phone he is not, and holding it open there costs 176px of sky
-       and pushes him under the fold; that one is still open. */
-    --chips-row: calc(3 * var(--gg-tap) + 2 * 10px);
   }
 
   /* The balloon is a fixed box that words appear inside — never a box that
@@ -511,9 +508,20 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
   }
 
   @media (max-width: 600px) {
-    /* room under Gritty for the reply chips to stand in the meadow, clear
-       of the 82px band of grass along the bottom */
-    .meadow { padding-bottom: 96px; }
+    /* Room under Gritty for the reply chips, clear of the 82px band of
+       grass along the hem — and the scenery's rise. His hooves stand
+       116px + the replies' reserve above the hem (96 floor + 56 clearance
+       + 10 gap − 46 of him overlapping the row). With the hills, school
+       and tree anchored to the hem, the ground was 200px below him and he
+       floated. They come up by --lawn so the ground is 50px under his
+       hooves again — where it is on a desktop — and the near meadow's
+       flat paint continues down under the buttons. */
+    .meadow {
+      padding-bottom: 96px;
+      --lawn: calc(66px + var(--chips-reserve, var(--chips-row)));
+    }
+    .meadow-layer.far { min-height: calc(300px + var(--lawn)); }
+    .meadow-layer.near { min-height: calc(175px + var(--lawn)); }
     .bubble { font-size: 1.15rem; }
     /* On a phone your replies hang BELOW Gritty, not between him and his
        bubble. Stacked above him, three chips appearing shoved him 164px
@@ -580,8 +588,10 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
        into the corner instead of sitting behind the words */
     .sun { width: 64px; top: 4px; left: 3%; }
     /* school and tree shrink and tuck so Gritty keeps the stage */
-    .school { width: clamp(200px, 56vw, 270px); left: -3%; bottom: 96px; }
-    .tree { width: clamp(70px, 19vw, 104px); right: 2%; bottom: 116px; }
+    .school { width: clamp(200px, 56vw, 270px); left: -3%;
+              bottom: calc(96px + var(--lawn)); }
+    .tree { width: clamp(70px, 19vw, 104px); right: 2%;
+            bottom: calc(116px + var(--lawn)); }
     .bushes { display: none; } /* three set pieces is enough on a phone */
   }
 </style>
@@ -645,12 +655,12 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
        padding — and the loop is synchronous, so nothing is ever painted
        mid-measure. offsetHeight, not a bounding box: the balloon's pop and
        Gritty's breathing are transforms, and a box that includes them
-       reports motion as height. */
-    const stage = section.querySelector<HTMLElement>('.stage')!;
-
+       reports motion as height. The values go on the section, not the
+       stage: on a phone the scenery reads them too, to put the ground
+       under his hooves. */
     function measure() {
       const shown = say.textContent;
-      stage.style.setProperty('--say-reserve', 'auto');
+      section.style.setProperty('--say-reserve', 'auto');
       let tallest = 0;
       for (const line of [shown!, ...data.sayings,
                           ...data.chats.flatMap(
@@ -659,12 +669,12 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
         tallest = Math.max(tallest, say.offsetHeight);
       }
       say.textContent = shown;
-      stage.style.setProperty('--say-reserve', `${tallest}px`);
+      section.style.setProperty('--say-reserve', `${tallest}px`);
 
       const labels = chips.map((c) => c.textContent);
       const wasHidden = chips.map((c) => c.hidden);
       const boxWasHidden = chipBox.hidden;
-      stage.style.setProperty('--chips-reserve', 'auto');
+      section.style.setProperty('--chips-reserve', 'auto');
       chipBox.hidden = false;
       let deepest = 0;
       for (const chat of data.chats) {
@@ -677,7 +687,7 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
       }
       chipBox.hidden = boxWasHidden;
       chips.forEach((chip, i) => { chip.textContent = labels[i]; chip.hidden = wasHidden[i]; });
-      stage.style.setProperty('--chips-reserve', `${deepest}px`);
+      section.style.setProperty('--chips-reserve', `${deepest}px`);
     }
 
     measure();
