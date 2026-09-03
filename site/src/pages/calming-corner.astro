@@ -246,9 +246,12 @@ const feelings = [
     color: var(--gg-blue); background: var(--gg-card);
     border: 2.5px solid rgba(44, 95, 138, 0.25);
     border-radius: var(--gg-radius-small); cursor: pointer;
-    transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
+    transition: border-color var(--gg-dur-tap) ease, transform var(--gg-dur-tap) ease, background var(--gg-dur-tap) ease;
   }
-  .feeling:hover { border-color: var(--gg-blue); transform: translateY(-2px); }
+  @media (hover: hover) {
+    .feeling:hover { border-color: var(--gg-blue); transform: translateY(-2px); }
+  }
+  .feeling:active { border-color: var(--gg-blue); transform: translateY(1px) scale(0.97); }
   .feeling[aria-pressed='true'] {
     border-color: var(--gg-blue); background: color-mix(in srgb, var(--gg-sky) 45%, #fff);
   }
@@ -269,7 +272,7 @@ const feelings = [
   .strategy summary::-webkit-details-marker { display: none; }
   .strategy summary:hover { background: color-mix(in srgb, var(--gg-sky) 30%, transparent); }
   .strat-name { flex: 1; }
-  .strat-chevron { transition: rotate 0.2s ease; color: var(--gg-ink-soft); }
+  .strat-chevron { transition: rotate var(--gg-dur-state) ease; color: var(--gg-ink-soft); }
   .strategy[open] .strat-chevron { rotate: 180deg; }
   .steps {
     margin: 0 22px 20px 22px; padding-left: 26px;

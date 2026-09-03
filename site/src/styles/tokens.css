@@ -72,6 +72,10 @@
   --gg-radius-small: 14px;
   --gg-shadow: 0 10px 24px -14px rgba(44, 95, 138, 0.45);
   --gg-shadow-lift: 0 16px 32px -16px rgba(44, 95, 138, 0.55);
+  /* the third rung: a card pushed into the paper under a finger. A
+     touch screen has no hover, so this press is the only answer a
+     child on a tablet gets — every card that lifts must also sink. */
+  --gg-shadow-press: 0 4px 10px -8px rgba(44, 95, 138, 0.5);
 
   /* touch — little fingers and grandparents' too */
   --gg-tap: 48px;
@@ -86,6 +90,13 @@
      time; cubic-bezier mathematically cannot bounce more than once. */
   --gg-ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
   --gg-ease-bouncy: linear(0,0.062,0.218,0.427,0.651,0.86,1.033,1.159,1.235,1.265,1.255,1.219,1.165,1.106,1.049,1,0.964,0.941,0.931,0.931,0.939,0.953,0.968,0.984,0.997,1.008,1.015,1.018,1.019,1.017,1.013,1.009,1.005,1.001,0.999,0.996,0.995,0.995,0.996,0.997,0.998,0.999,1,1.001,1.001,1.001,1.001,1.001,1);
+  /* three speeds, and no fourth. These govern `transition` — the site
+     answering a finger. Keyframe choreography (Gritty's hop, the walker's
+     900ms stride, the trail march) keeps its own hand-tuned timings;
+     those are performances, not feedback. */
+  --gg-dur-tap:   150ms;  /* hover and press: the answer under the finger */
+  --gg-dur-state: 250ms;  /* something changing state where it stands     */
+  --gg-dur-enter: 340ms;  /* something arriving: a panel, a screen        */
 }
 
 /* seasonal meadow — automatic, cosmetic, nothing to unlock. The hero sets

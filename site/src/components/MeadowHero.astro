@@ -348,9 +348,10 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     border: 3px solid var(--gg-blue); border-radius: 999px;
     font-family: var(--gg-display); font-weight: 600; font-size: 1rem;
     cursor: pointer;
-    transition: translate 0.16s ease, scale 0.16s ease, background 0.16s ease;
+    transition: translate var(--gg-dur-tap) ease, scale var(--gg-dur-tap) ease, background var(--gg-dur-tap) ease;
   }
-  .chip:hover { translate: 0 -2px; background: color-mix(in srgb, var(--gg-sky) 40%, #fff); }
+  .chip:hover { background: color-mix(in srgb, var(--gg-sky) 40%, #fff); }
+  @media (hover: hover) { .chip:hover { translate: 0 -2px; } }
   .chip:active { scale: 0.95; }
 
   /* ── Gritty ── */
@@ -398,7 +399,7 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     text-shadow: 0 0 6px var(--gg-paper), 0 0 12px var(--gg-paper),
                  0 2px 0 rgba(255, 255, 255, 0.8);
     rotate: -3deg;
-    transition: opacity 300ms ease;
+    transition: opacity var(--gg-dur-enter) ease;
   }
   .hint-arrow { width: 76px; height: auto; margin-top: -2px; }
   .hint-arrow .shaft-ink {

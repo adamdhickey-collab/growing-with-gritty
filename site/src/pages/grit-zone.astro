@@ -1044,11 +1044,18 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     box-shadow: 4px 4px 0 var(--gg-ink);
     font-family: var(--gg-display); font-weight: 600; font-size: 1.02rem;
     cursor: pointer;
-    transition: translate 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    transition: translate var(--gg-dur-tap) ease, box-shadow var(--gg-dur-tap) ease, background var(--gg-dur-tap) ease;
   }
   .gz-tab .ico { display: grid; place-items: center; line-height: 0; }
   .gz-tab .ico img { width: 48px; height: 48px; image-rendering: pixelated; }
-  .gz-tab:hover { translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink); }
+  /* Every arcade control already answers a finger with :active — the
+     press into its own shadow. The hover lift is the pointer's version
+     of that answer, and a touch screen has no way to end a :hover, so
+     it is gated: tap a cartridge on an iPad and it presses in and comes
+     back, instead of staying raised for the rest of the visit. */
+  @media (hover: hover) {
+    .gz-tab:hover { translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink); }
+  }
   .gz-tab:active { translate: 3px 3px; box-shadow: 1px 1px 0 var(--gg-ink); }
   /* the chosen game is the cartridge pushed in: gold, ink-lettered (≈6:1),
      and sitting lower than its neighbours */
@@ -1192,9 +1199,11 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     font-size: 1.1rem;
     border: 3px solid var(--gg-ink); border-radius: 10px;
     box-shadow: 4px 4px 0 var(--gg-ink);
-    transition: translate 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
+    transition: translate var(--gg-dur-tap) ease, box-shadow var(--gg-dur-tap) ease, background var(--gg-dur-tap) ease;
   }
-  .cab-btn:hover { transform: none; translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink); }
+  @media (hover: hover) {
+    .cab-btn:hover { transform: none; translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink); }
+  }
   .cab-btn:active { transform: none; translate: 3px 3px; box-shadow: 1px 1px 0 var(--gg-ink); }
   /* the quiet button on the dark shell wears white */
   .cab .btn-ghost { color: var(--gg-card); border-color: var(--gg-card); }
@@ -1243,7 +1252,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     isolation: isolate; /* keeps the ::before sprite behind the number, not behind the map */
     font-family: var(--gg-display); font-weight: 700;
     color: var(--gg-ink); font-size: calc(0.82rem + var(--row) * 0.12rem);
-    transition: width 0.25s var(--gg-ease-back), height 0.25s var(--gg-ease-back);
+    transition: width var(--gg-dur-state) var(--gg-ease-back), height var(--gg-dur-state) var(--gg-ease-back);
   }
   /* Every drawing in this game is pixel art shown far smaller than the
      file it comes from — a 512px sprite in a 64px tile. Left alone the
@@ -1267,7 +1276,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
   .stop.done { --size: calc(48px + var(--row) * 4px); cursor: pointer; }
   .stop.done::before { background-image: var(--stop-done); }
   .stop.done .stop-num { display: none; }
-  .stop.done:hover { scale: 1.12; }
+  @media (hover: hover) { .stop.done:hover { scale: 1.12; } }
   .stop.current {
     --size: calc(64px + var(--row) * 5px);
     cursor: pointer; z-index: 2;
@@ -1352,7 +1361,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     min-height: var(--gg-tap); display: inline-flex; align-items: center; gap: 0.4em;
     background: none; border: none; cursor: pointer;
     font: inherit; color: var(--gg-card); border-radius: 8px;
-    transition: background 0.15s ease;
+    transition: background var(--gg-dur-tap) ease;
   }
   .flee:hover { background: color-mix(in srgb, var(--gg-card) 16%, transparent); }
 
@@ -1378,10 +1387,14 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     font-family: var(--gg-body); font-size: 1.05rem; color: var(--gg-ink);
     background: var(--gg-paper); border: 3px solid var(--gg-ink);
     border-radius: 8px; box-shadow: 4px 4px 0 var(--gg-ink); cursor: pointer;
-    transition: translate 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+    transition: translate var(--gg-dur-tap) ease, box-shadow var(--gg-dur-tap) ease, background var(--gg-dur-tap) ease;
   }
-  .choice:hover, .choice:focus-visible {
-    background: var(--gg-card); translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink);
+  .choice:hover, .choice:focus-visible { background: var(--gg-card); }
+  /* the keyboard's version is never gated — a laptop with a touch screen
+     still tabs through these */
+  .choice:focus-visible { translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink); }
+  @media (hover: hover) {
+    .choice:hover { translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink); }
   }
   .choice:active { translate: 3px 3px; box-shadow: 1px 1px 0 var(--gg-ink); }
   .choice::before {
@@ -1389,7 +1402,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     width: 0; height: 0; border: 9px solid transparent;
     border-left: 13px solid var(--gg-px-gold); border-right: 0;
     filter: drop-shadow(2px 2px 0 var(--gg-ink));
-    opacity: 0; transition: opacity 0.12s ease;
+    opacity: 0; transition: opacity var(--gg-dur-tap) ease;
   }
   .has-cursor .choice::before {
     left: -18px; width: 20px; height: 20px; border: 0; filter: none;
@@ -1397,7 +1410,12 @@ const tabArt = {                        /* pixel sprites for the three game tabs
   }
   .choice:hover::before, .choice:focus-visible::before { opacity: 1; }
   @media (prefers-reduced-motion: no-preference) {
-    .choice:hover::before, .choice:focus-visible::before { animation: cursor-nudge 0.7s ease-in-out infinite; }
+    .choice:focus-visible::before { animation: cursor-nudge 0.7s ease-in-out infinite; }
+  }
+  /* an arrow that nudges forever beside an answer you already tapped is
+     what sticky hover looks like on a tablet */
+  @media (prefers-reduced-motion: no-preference) and (hover: hover) {
+    .choice:hover::before { animation: cursor-nudge 0.7s ease-in-out infinite; }
   }
   @keyframes cursor-nudge { 50% { translate: 3px -50%; } }
   .choice b {
@@ -1406,9 +1424,9 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     background: var(--gg-blue); color: #fff; font-size: 0.95rem;
     border: 2px solid var(--gg-ink); border-radius: 5px;
     box-shadow: 2px 2px 0 var(--gg-ink);
-    transition: scale 0.2s var(--gg-ease-back);
+    transition: scale var(--gg-dur-state) var(--gg-ease-back);
   }
-  .choice:hover b { scale: 1.1; }
+  @media (hover: hover) { .choice:hover b { scale: 1.1; } }
   /* a tried answer sits pressed in and steps back, but stays readable
      (≈4.9:1 at 0.7) — the dashed edge does the rest of the telling */
   .choice.tried {
@@ -1452,14 +1470,16 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     border: 3px solid var(--gg-ink); border-radius: 10px;
     box-shadow: 4px 4px 0 var(--gg-ink);
     font-family: var(--gg-display); font-weight: 600; font-size: 1rem;
-    cursor: pointer; transition: translate 0.12s ease, box-shadow 0.12s ease;
+    cursor: pointer; transition: translate var(--gg-dur-tap) ease, box-shadow var(--gg-dur-tap) ease;
   }
   .ask-btn img {
     width: 34px; height: 34px; border-radius: 6px;
     background: var(--gg-sky); border: 2px solid var(--gg-ink);
     image-rendering: pixelated;
   }
-  .ask-btn:hover { translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink); }
+  @media (hover: hover) {
+    .ask-btn:hover { translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink); }
+  }
   .ask-btn:active { translate: 3px 3px; box-shadow: 1px 1px 0 var(--gg-ink); }
   /* after a miss, the idea button raises its hand */
   @media (prefers-reduced-motion: no-preference) {
@@ -1582,9 +1602,9 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     box-shadow: 0 9px 0 var(--gg-gold-ink), 0 9px 0 3px var(--gg-ink);
     font-family: var(--gg-display); font-weight: 700; font-size: 1.5rem;
     cursor: pointer;
-    transition: translate 0.1s ease, box-shadow 0.1s ease, scale 0.15s ease;
+    transition: translate var(--gg-dur-tap) ease, box-shadow var(--gg-dur-tap) ease, scale var(--gg-dur-tap) ease;
   }
-  .yet-press:hover { scale: 1.05; }
+  @media (hover: hover) { .yet-press:hover { scale: 1.05; } }
   .yet-press:active {
     translate: 0 7px;
     box-shadow: 0 2px 0 var(--gg-gold-ink), 0 2px 0 3px var(--gg-ink);
@@ -1609,15 +1629,17 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     display: grid; place-items: center;
     background: var(--gg-card); border: 3px solid var(--gg-ink);
     box-shadow: 4px 4px 0 var(--gg-ink);
-    transition: translate 0.12s ease, box-shadow 0.2s ease,
-                rotate 0.3s var(--gg-ease-back), scale 0.2s ease;
+    transition: translate var(--gg-dur-tap) ease, box-shadow var(--gg-dur-state) ease,
+                rotate var(--gg-dur-enter) var(--gg-ease-back), scale var(--gg-dur-state) ease;
   }
   .chip-emoji { display: grid; place-items: center; line-height: 0; }
   .coin-label {
     font-family: var(--gg-display); font-weight: 600; font-size: 0.95rem;
     color: var(--gg-blue); text-align: center; max-width: 12ch;
   }
-  .check-chip:hover .coin { translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink); }
+  @media (hover: hover) {
+    .check-chip:hover .coin { translate: -1px -1px; box-shadow: 5px 5px 0 var(--gg-ink); }
+  }
   .check-chip:active .coin { scale: 0.94; }
   /* Earned is a gold RIM, not a gold flood. Half these icons are drawn in
      the same yellow as the coin (star, sparkles, hearts, handshake), so
@@ -1630,8 +1652,10 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     animation: coin-pop 550ms var(--gg-ease-bouncy);
   }
   /* a checked coin still lifts under a cursor — the rim comes along */
-  .check-chip:hover:has(input:checked) .coin {
-    box-shadow: inset 0 0 0 9px var(--gg-px-gold), 5px 5px 0 var(--gg-gold-ink);
+  @media (hover: hover) {
+    .check-chip:hover:has(input:checked) .coin {
+      box-shadow: inset 0 0 0 9px var(--gg-px-gold), 5px 5px 0 var(--gg-gold-ink);
+    }
   }
   @keyframes coin-pop {
     0% { scale: 0.85 1.1; }

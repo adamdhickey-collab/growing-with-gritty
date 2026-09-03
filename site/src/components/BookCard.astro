@@ -53,9 +53,12 @@ const hasInside = spreads.length > 0;
   .book-card {
     display: flex; flex-direction: column;
     padding: 18px 18px 22px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform var(--gg-dur-tap) ease, box-shadow var(--gg-dur-tap) ease;
   }
-  .book-card:hover { transform: translateY(-4px) rotate(-0.6deg); box-shadow: var(--gg-shadow-lift); }
+  @media (hover: hover) {
+    .book-card:hover { transform: translateY(-4px) rotate(-0.6deg); box-shadow: var(--gg-shadow-lift); }
+  }
+  .book-card:active { transform: translateY(1px); box-shadow: var(--gg-shadow-press); }
   .cover-link { position: relative; display: block; border-radius: var(--gg-radius-small); overflow: hidden; }
   .cover-link img { display: block; width: 100%; }
   .meta { padding-top: 14px; flex: 1; display: flex; flex-direction: column; align-items: flex-start; }

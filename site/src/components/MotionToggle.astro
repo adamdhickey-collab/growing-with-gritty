@@ -30,7 +30,7 @@ const { class: cls } = Astro.props;
     border: 2.5px solid var(--gg-blue); border-radius: 999px;
     font-family: var(--gg-display); font-weight: 600; font-size: var(--gg-text-small);
     cursor: pointer;
-    transition: background 0.15s ease;
+    transition: background var(--gg-dur-tap) ease;
   }
   .motion-toggle:hover { background: color-mix(in srgb, var(--gg-sky) 40%, #fff); }
   .when-moving, .when-still { display: inline-flex; align-items: center; gap: 0.45em; }

@@ -147,9 +147,12 @@ main > article:last-child:has(> .band-gold:last-child) { margin-bottom: 0; }
   align-items: center;
   gap: 0.5em;
   text-decoration: none;
-  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  transition: transform var(--gg-dur-tap) ease, background var(--gg-dur-tap) ease, box-shadow var(--gg-dur-tap) ease;
 }
-.btn:hover { transform: translateY(-2px); }
+/* The lift belongs to a pointer. A touch screen has no hover to leave,
+   so it would keep the button raised after the tap; the press below is
+   the answer a finger gets. */
+@media (hover: hover) { .btn:hover { transform: translateY(-2px); } }
 .btn:active { transform: translateY(1px) scale(0.98); }
 .btn-primary { background: var(--gg-blue); color: #fff; box-shadow: 0 8px 16px -8px rgba(31, 70, 102, 0.7); }
 .btn-primary:hover { background: var(--gg-blue-deep); color: #fff; }

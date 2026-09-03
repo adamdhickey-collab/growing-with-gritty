@@ -71,9 +71,9 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     width: 132px; height: 132px; object-fit: contain;
     margin: -8px -4px -8px -12px;
     transform-origin: 50% 88%; /* he springs from the chin, hooves planted */
-    transition: rotate 0.18s var(--gg-ease-back), scale 0.18s var(--gg-ease-back);
+    transition: rotate var(--gg-dur-tap) var(--gg-ease-back), scale var(--gg-dur-tap) var(--gg-ease-back);
   }
-  .wordmark:hover img { rotate: -5deg; scale: 1.08; }
+  @media (hover: hover) { .wordmark:hover img { rotate: -5deg; scale: 1.08; } }
   .wordmark:active img { rotate: -3deg; scale: 0.92; } /* winding up to jump */
   .wordmark.away img { animation: logo-hop 460ms var(--gg-ease-back); }
   /* every frame states all three properties, so the hop looks the same
@@ -129,12 +129,18 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     /* the small-text floor: these are the first words a new reader meets */
     font-size: var(--gg-text-small); line-height: 1.1; text-align: center;
     color: var(--gg-blue-deep); text-decoration: none;
-    transition: background 0.15s ease, translate 0.15s ease;
+    transition: background var(--gg-dur-tap) ease, translate var(--gg-dur-tap) ease;
   }
   nav a img { width: 48px; height: 48px; object-fit: contain;
-              transition: rotate 0.18s var(--gg-ease-back), scale 0.18s var(--gg-ease-back); }
-  nav a:hover { background: color-mix(in srgb, var(--gg-sky) 45%, transparent); translate: 0 -2px; }
-  nav a:hover img { rotate: -5deg; scale: 1.12; }
+              transition: rotate var(--gg-dur-tap) var(--gg-ease-back), scale var(--gg-dur-tap) var(--gg-ease-back); }
+  /* colour on any pointer; the lift and the tilt only where a pointer
+     can leave again, or a tap would strand them raised */
+  nav a:hover { background: color-mix(in srgb, var(--gg-sky) 45%, transparent); }
+  @media (hover: hover) {
+    nav a:hover { translate: 0 -2px; }
+    nav a:hover img { rotate: -5deg; scale: 1.12; }
+  }
+  nav a:active { translate: 0 1px; }
   nav a:focus-visible { outline: 3px solid var(--gg-focus); outline-offset: 2px; }
   nav a[aria-current='page'] {
     background: var(--gg-blue); color: #fff;
@@ -186,9 +192,11 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     nav a:nth-child(5) { grid-column: 2 / span 2; }
     nav a img { width: 40px; height: 40px; }
     /* the cells are one surface now: lift and tilt on hover would break
-       the grid lines, so the hover is colour only */
+       the grid lines, so the hover is colour only — and so is the press,
+       which is the one a phone actually reaches */
     nav a:hover { translate: 0; }
     nav a:hover img { rotate: 0deg; scale: 1; }
+    nav a:active { translate: 0; background: color-mix(in srgb, var(--gg-sky) 70%, transparent); }
     nav a:focus-visible { outline-offset: -3px; }
   }
 

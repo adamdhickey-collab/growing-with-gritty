@@ -172,8 +172,11 @@ const groups = [
     width: 100%; max-width: 160px; height: auto;
     border-radius: var(--gg-radius-small);
     box-shadow: var(--gg-shadow);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform var(--gg-dur-tap) ease, box-shadow var(--gg-dur-tap) ease;
   }
-  .own-books a:hover img { transform: translateY(-3px) rotate(-0.6deg); box-shadow: var(--gg-shadow-lift); }
+  @media (hover: hover) {
+    .own-books a:hover img { transform: translateY(-3px) rotate(-0.6deg); box-shadow: var(--gg-shadow-lift); }
+  }
+  .own-books a:active img { transform: translateY(1px); box-shadow: var(--gg-shadow-press); }
   .own-books a:hover span { text-decoration: underline; text-decoration-thickness: 2px; }
 </style>

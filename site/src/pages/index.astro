@@ -173,9 +173,14 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
   .world-card {
     padding: 0 0 26px; display: grid; gap: 10px; justify-items: start;
     text-decoration: none; color: var(--gg-ink); overflow: hidden;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform var(--gg-dur-tap) ease, box-shadow var(--gg-dur-tap) ease;
   }
-  .world-card:hover { transform: translateY(-3px); box-shadow: var(--gg-shadow-lift); color: var(--gg-ink); }
+  @media (hover: hover) {
+    .world-card:hover { transform: translateY(-3px); box-shadow: var(--gg-shadow-lift); color: var(--gg-ink); }
+  }
+  /* the four doors are how a child on a tablet gets anywhere, and a
+     tablet never hovers: the press is their only confirmation */
+  .world-card:active { transform: translateY(1px); box-shadow: var(--gg-shadow-press); }
   .world-card > * { padding-inline: 26px; }
   /* Kim's scene art is the button — square, sitting flush at the top */
   .world-card img {

@@ -251,10 +251,14 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
     display: grid; place-items: center; line-height: 0;
     background: #fff; color: var(--gg-blue);
     border: 2.5px solid var(--gg-blue); cursor: pointer;
-    transition: background 0.15s ease, translate 0.15s ease, opacity 0.15s ease;
+    transition: background var(--gg-dur-tap) ease, translate var(--gg-dur-tap) ease,
+                scale var(--gg-dur-tap) ease, opacity var(--gg-dur-tap) ease;
   }
   .spreads-btn:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--gg-sky) 45%, #fff); translate: 0 -2px;
+    background: color-mix(in srgb, var(--gg-sky) 45%, #fff);
+  }
+  @media (hover: hover) {
+    .spreads-btn:hover:not(:disabled) { translate: 0 -2px; }
   }
   .spreads-btn:active:not(:disabled) { scale: 0.95; }
   .spreads-btn:disabled { opacity: 0.35; cursor: default; }
