@@ -1,5 +1,10 @@
 # The launch picture — ChatGPT prompts
 
+> **Status: it landed, 5 Sep 2026.** Generated in ChatGPT from Kim's master
+> drawing, corrected once (see §"What came back"), and lettered here in
+> Fredoka. The finished files are `gritty-launch-1536.png` and
+> `gritty-launch-email-1200.jpg` in Adam's Downloads. Kept for a redo.
+
 One image, for the email Kim sends her colleagues and students to introduce
 **grittythegoat.com**. Wide, sunny, and readable at 600 pixels, because that
 is all the width an email client gives a picture.
@@ -80,6 +85,60 @@ blank board, because it is an address that does not work.
 - **It reads at 600 pixels wide.** Shrink it before sending. If the daisies
   turn to mud, ask for fewer, bigger shapes.
 - **No stray text.** Sign, hills, clouds, corners — all clean.
+
+## What came back, 5 Sep 2026
+
+The first render got the scene right and the goat half right. Two things
+needed a second pass, and both are worth watching for in any redo:
+
+- **His pupils pointed left, at the viewer**, not at the sign.
+- **He grew long, curved, heavily ridged horns.** Kim's are short, straight,
+  cream with soft tan stripes, about as long as his ears.
+
+The correction prompt that fixed them, sent as a follow-up in the same chat:
+
+> Good start. Now edit that image with two fixes, and change nothing else —
+> same composition, same signpost with both boards still completely blank,
+> same hills, sun, clouds, daisies, same colours and colored-pencil texture.
+>
+> ONE: his eyes. Both pupils must look RIGHT, toward the signpost. Right now
+> they point left, back at the viewer. Move the pupils to the right side of
+> his eyes so he is clearly looking at the sign, and keep the same happy
+> closed-mouth smile.
+>
+> TWO: his horns. Match the attached drawing exactly — TWO SHORT, straight,
+> cream-coloured horns with soft tan stripes, only about as long as his ears,
+> angled up and slightly back. The long, curved, heavily ridged horns you
+> drew are wrong. Everything else about the goat — face, eyes shape, ears,
+> brown chest tuft, backpack, body, line weight — stays exactly as it is.
+
+He is still a little longer and lankier than Kim's chunkier original. It
+reads fine at email size; a third pass could ask for a shorter, stockier
+body if she wants it closer.
+
+## Lettering the sign
+
+The boards come back blank on purpose, and the words go on here in the
+site's own display font — sharp, correctly spelled, on brand.
+
+**The wording:** the top board says **Check it out!** and the lower board
+says **grittythegoat.com**. The first draft put the book title on top and the
+address below, which just said the same thing twice; the invitation on top
+does a job the address cannot.
+
+Ink `#2A3238` on the wood, Fredoka 600 for the invitation and 500 for the
+address, centred on each plank and clear of the drawn nail. The recipe is a
+one-page HTML file over the raw PNG, rendered by headless Chrome at
+1536 × 1024 — the same font file the site ships:
+
+```
+site/node_modules/@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2
+```
+
+Board boxes measured off the 5 Sep render, in image pixels: top plank
+`left 845, top 400, 325 × 95` at 46px; lower plank `left 838, top 525,
+365 × 105` at 40px. Re-measure both if the picture is ever regenerated —
+ChatGPT will not put the signpost back in exactly the same place.
 
 ## Sizing it for email
 
