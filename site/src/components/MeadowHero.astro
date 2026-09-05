@@ -90,8 +90,6 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
          width="420" height="573" loading="lazy" />
     <img class="meadow-layer near" src={u("/images/scenery/meadow-near.webp")} alt=""
          width="5376" height="560" />
-    <img class="bushes" src={u("/images/scenery/bushes.webp")} alt=""
-         width="460" height="292" loading="lazy" />
     <div class="grass-border"
          style={`--grass-art: url('${u("/images/scenery/grass-border.webp")}')`}></div>
   </div>
@@ -220,12 +218,6 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
     transform-origin: 50% 100%;
   }
 
-  .bushes {
-    position: absolute; z-index: 4; right: 26%; bottom: 56px;
-    width: clamp(58px, 7vw, 104px); height: auto;
-    transform-origin: 50% 100%;
-  }
-
   /* The grass border is the frontmost detail, ahead of Gritty himself, so
      he stands *in* the meadow rather than on it. It repeats at its own
      aspect ratio — a stretched daisy is an oval. */
@@ -240,7 +232,6 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
   @media (prefers-reduced-motion: no-preference) {
     .sun { animation: sun-glow 6s ease-in-out infinite; }
     .tree { animation: tree-sway 7s ease-in-out infinite; }
-    .bushes { animation: tree-sway 8.5s ease-in-out -4s infinite; }
     .grass-border { animation: grass-lean 5.5s ease-in-out infinite; }
     .hint-arrow { animation: arrow-nudge 1.8s var(--gg-ease-back) infinite; }
   }
@@ -593,7 +584,6 @@ const payload = JSON.stringify({ chats, moods: moodFrames, sayings })
               bottom: calc(96px + var(--lawn)); }
     .tree { width: clamp(70px, 19vw, 104px); right: 2%;
             bottom: calc(116px + var(--lawn)); }
-    .bushes { display: none; } /* three set pieces is enough on a phone */
   }
 </style>
 
