@@ -14,7 +14,7 @@ the deck's domain slide: Gritty gets its own address, and
 | Apex serves | A Squarespace **"Coming Soon" parking page** |
 | Apex `MX` | **None.** No email exists on this domain |
 | `growingwithgritty.com` | Never registered. Does not resolve. Dead idea |
-| **DNSSEC** | **On.** A DS record is published at the `.com` registry — see step 3 |
+| **DNSSEC** | **Off since 5 Sep 2026.** Was on; turned off and confirmed clear — see step 3 |
 
 Two things follow from that table:
 
@@ -85,36 +85,37 @@ _domainkey v=DKIM1; p=
 — they say "nothing may send mail as this domain," which is exactly right
 while no mailbox exists, and they are what stops someone spoofing Kim.
 
-### ⚠️ 3. Turn DNSSEC OFF at Squarespace, then wait
+### ✅ 3. DNSSEC off at Squarespace — DONE (5 Sep 2026)
 
-**This is the step that will take the site down if it is skipped, and it is
-the reason launch cannot be same-day.**
+**This was the step that would have taken the site down, and it is worth
+understanding even now that it is finished.**
 
-`grittythegoat.com` is DNSSEC-signed today. The `.com` registry publishes a
-DS record pointing at Squarespace's signing key:
+`grittythegoat.com` was DNSSEC-signed. The `.com` registry published a DS
+record pointing at Squarespace's signing key:
 
 ```
 28519 8 2 1A20A4816C17C75D555B4C539F4DE8FA36BAEFD61A31473EEB0C9963542CC1CC
 ```
 
-Move the nameservers while that DS record still stands and every validating
-resolver — Google, Cloudflare, Quad9, most ISPs — will refuse to answer for
-the domain. Not "wrong site": `SERVFAIL`, no site at all, for most of the
-internet, until the registry record expires.
+Moving nameservers while that record stood would have made every validating
+resolver refuse to answer. Not "wrong site": `SERVFAIL`, no site at all, for
+most of the internet, until the registry record expired. doorcountyfound.com
+has no DS record, which is why its move was painless. This domain was not
+the same case.
 
-doorcountyfound.com has no DS record, which is why its move was painless.
-This domain is not the same case.
-
-So: **Squarespace → grittythegoat.com → DNSSEC → turn it off.** Then wait
-for the registry to drop the record. Check with:
+Adam turned it off at **Squarespace → Domains → grittythegoat.com → DNS →
+DNSSEC**, a single toggle. The registry dropped the record within minutes
+rather than the day the TTL allows. Confirmed clear:
 
 ```bash
-dig +short DS grittythegoat.com @a.gtld-servers.net
+dig +short DS grittythegoat.com @a.gtld-servers.net   # empty
 ```
 
-**Empty output is the green light.** The `.com` DS TTL is 86400, so allow
-up to 24 hours. Re-enable DNSSEC from Cloudflare's side afterwards if
-wanted; it is a one-click setting there.
+Google, Cloudflare, Quad9 and OpenDNS all report the domain unsigned and
+still resolving. **The nameserver change is now safe to make.**
+
+If DNSSEC is wanted again later, turn it on from Cloudflare's side once the
+zone is active. Do not re-enable it at Squarespace.
 
 ### 4. Change the nameservers at Squarespace
 
@@ -162,25 +163,34 @@ What is still outstanding:
 Steps 1 and 2 are done and touched nothing the public can see. Step 4 is the
 point of no return for the parking page. Step 6 is the actual launch.
 
-## Known issue: pushes do not deploy themselves yet
+## The deploy that would not fire, and why
 
-Cloudflare shows *"This project is disconnected from your Git account"* on
-the project, and it is not cosmetic. Commit `859379d` was pushed at 10:15
-and no build had fired six minutes later. The only deployment so far is the
-one the dashboard was told to run by hand.
+Worth recording, because the symptom pointed away from the cause.
 
-Everything else about the wiring is correct — automatic deployments are
-enabled, build watch paths are `*`, the branch is `main`, and the repository
-does show as `adamdhickey-collab/growing-with-gritty`. It is the Git
-authorization that is stale, not the configuration.
+Cloudflare showed *"This project is disconnected from your Git account"* and
+pushes did not build. Four commits and seventeen minutes went by with no
+deployment; the only build was one run by hand from the dashboard.
 
-Fix: project → **Settings → Build → Git repository → Manage**, and
-re-authorize. That is an OAuth grant against Adam's GitHub account, so it
-needs Adam to click it.
+Everything on the Cloudflare side looked right and was right — automatic
+deployments enabled, build watch paths `*`, branch `main`, repository shown
+as `adamdhickey-collab/growing-with-gritty`.
 
-**This must be fixed before launch**, or the live site silently freezes at
-whatever commit was last deployed by hand — the worst kind of bug, because
-the repo looks right and the site is simply old.
+The actual cause was on GitHub. The **Cloudflare Workers and Pages** app is
+installed with *Only select repositories*, and the only repository selected
+was `door-county-found`. This repo was never granted, so the app never saw a
+push and no webhook ever fired.
+
+The misleading part: the repo **did** appear in Cloudflare's picker when the
+project was created. That list comes from the user's OAuth token, which can
+see every repo. Whether the *app installation* can see it is a separate
+grant, and that is the one that drives deployments.
+
+Fixed 5 Sep 2026 by adding this repo to the installation at
+**github.com/settings/installations → Cloudflare Workers and Pages →
+Repository access**, keeping the narrow *Only select repositories* scope.
+
+If deployments ever stall again, check that grant first. It is not visible
+anywhere in the Cloudflare dashboard.
 
 ## Already done in the repo
 
