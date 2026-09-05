@@ -168,6 +168,12 @@ content:
               label: Teachers
             - name: everyone
               label: Everyone
+      - name: blurb
+        label: One line about it
+        type: text
+        description: >-
+          What's on the sheet, and the day a kid might want it. Shown under
+          the title on the download card.
       - name: download
         label: The PDF
         type: file

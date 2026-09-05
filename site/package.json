@@ -10,6 +10,7 @@
     "chute": "node scripts/chute-server.mjs",
     "library": "node scripts/build-image-index.mjs",
     "add-image": "node scripts/add-image.mjs",
+    "printable": "node scripts/make-printable.mjs",
     "test:scroll": "node scripts/scroll-stability.mjs"
   },
   "dependencies": {

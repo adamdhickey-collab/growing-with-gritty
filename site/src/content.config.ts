@@ -64,6 +64,9 @@ const printables = defineCollection({
     /* Who it's for — drives the Grown-Up Grit Guide sections. */
     audience: z.enum(['kids', 'parents', 'teachers', 'everyone'])
       .nullish().transform((v) => v ?? 'everyone'),
+    /* One line under the title: what's on the sheet, and who it's for on
+       the day they need it. Optional — the card reads fine without it. */
+    blurb: optionalString,
     /* The PDF itself, uploaded through the CMS. */
     download: z.string(),
     thumb: optionalString,

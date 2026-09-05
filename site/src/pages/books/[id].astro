@@ -47,7 +47,7 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
                 <IconCart />{buyLabel(buyLink)}
               </a>
             )}
-            {sheet && <a class="btn btn-ghost" href={u(sheet.data.download)}><Icon name="printable-coloring-page" /> Activity sheet</a>}
+            {sheet && <a class="btn btn-ghost" href={u(sheet.data.download)} download><Icon name="printable-coloring-page" /> Activity sheet</a>}
             {!buyLink && <p class="soon">Buy link coming soon — ask at your favorite bookstore!</p>}
           </div>
         </div>

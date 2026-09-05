@@ -51,6 +51,10 @@ const groups = [
       kinds of materials she uses in her own classroom to talk about grit,
       mistakes, kindness, and big feelings. Everything here is free to
       download and print.</p>
+      <p class="print-note"><Icon name="ui-download" /> Every download is a
+      one-page PDF set up for US Letter paper, with a half-inch margin so a
+      home printer can't clip the edges. Black and white — no color ink
+      needed.</p>
     </div>
   </section>
 
@@ -73,13 +77,28 @@ const groups = [
           <ul class="dl-grid" role="list">
             {g.items.map((p) => (
               <li class="dl card">
-                {p.data.thumb && <img src={u(p.data.thumb)} alt="" width="280" height="200" loading="lazy" />}
+                {p.data.thumb && (
+                  /* The picture saves the sheet too, because people tap the
+                     picture. It's hidden from screen readers and out of the
+                     tab order so the button below stays the one link to it. */
+                  <a class="sheet" href={u(p.data.download)} download tabindex="-1" aria-hidden="true">
+                    <img src={u(p.data.thumb)} alt="" width="560" height="725" loading="lazy" />
+                  </a>
+                )}
                 <h3>{p.data.title}</h3>
+                {p.data.blurb && <p class="dl-blurb">{p.data.blurb}</p>}
                 <p class="kind">
                   {kindLabels[p.data.kind]?.icon && <Icon name={kindLabels[p.data.kind].icon!} />}
                   {kindLabels[p.data.kind]?.label ?? p.data.kind}
+                  <span class="spec">PDF &middot; US&nbsp;Letter &middot; 1&nbsp;page</span>
                 </p>
-                <a class="btn btn-primary" href={u(p.data.download)}><Icon name="ui-download" /> Download PDF</a>
+                {/* Every card's button reads "Download & print", so the
+                    label carries which sheet — a screen reader listing the
+                    links otherwise hears the same words three times. */}
+                <a class="btn btn-primary" href={u(p.data.download)} download
+                   aria-label={`Download and print: ${p.data.title} (PDF, US Letter, 1 page)`}>
+                  <Icon name="ui-download" /> Download &amp; print
+                </a>
               </li>
             ))}
           </ul>
@@ -143,15 +162,49 @@ const groups = [
   .blurb { color: var(--gg-ink-soft); margin-top: 4px; }
   .dl-grid {
     list-style: none; margin-top: 20px;
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    /* Wider than the other grids on the site: these cards carry a portrait
+       sheet of paper, and a narrow column makes the preview too small to
+       tell one coloring page from another. */
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
   }
-  .dl { padding: 20px; display: grid; gap: 10px; justify-items: start; }
-  .dl img { border-radius: var(--gg-radius-small); }
-  .kind {
-    font-size: 0.88rem; font-weight: 800; color: var(--gg-green-ink);
-    display: flex; align-items: center; gap: 0.4em;
+  .print-note {
+    display: flex; gap: 0.6em; align-items: baseline;
+    max-width: 62ch; color: var(--gg-ink-soft); font-size: var(--gg-text-small);
   }
+  .dl { padding: 20px; display: grid; gap: 10px; justify-items: stretch; }
+  .dl h3 { margin-top: 4px; }
+  /* The preview is a photograph of the printed page, so it gets to look
+     like paper: white to the edge, a hairline, and a shadow that says
+     "sheet" rather than "picture". */
+  .sheet {
+    display: block; background: var(--gg-card);
+    border: 1px solid rgba(42, 50, 56, 0.14);
+    border-radius: var(--gg-radius-small);
+    box-shadow: var(--gg-shadow);
+    overflow: hidden;
+    transition: transform var(--gg-dur-tap) ease, box-shadow var(--gg-dur-tap) ease;
+  }
+  .sheet img { display: block; width: 100%; height: auto; }
+  /* The whole card is the hover target: the sheet lifts wherever a grown-up
+     is pointing, including at the button. */
+  @media (hover: hover) {
+    .dl:hover .sheet { transform: translateY(-3px); box-shadow: var(--gg-shadow-lift); }
+  }
+  .dl:active .sheet { transform: translateY(1px); box-shadow: var(--gg-shadow-press); }
+  .dl-blurb { color: var(--gg-ink-soft); font-size: var(--gg-text-small); margin-top: -2px; }
+  .kind {
+    font-size: var(--gg-text-small); font-weight: 800; color: var(--gg-green-ink);
+    display: flex; align-items: center; gap: 0.4em; flex-wrap: wrap;
+  }
+  /* What you actually get. It takes the whole line rather than trailing the
+     kind, because at one card wide it wraps either way — and a separator
+     that wraps with it dangles at the start of the new line. */
+  .kind .spec {
+    flex: 1 0 100%;
+    color: var(--gg-ink-soft); font-weight: 700; letter-spacing: 0.01em;
+  }
+  .dl .btn { justify-self: start; margin-top: 2px; }
 
   /* — bring Gritty home — */
   .own { padding: 36px 40px; display: grid; gap: 24px; }
