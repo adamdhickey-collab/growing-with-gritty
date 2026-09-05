@@ -295,7 +295,10 @@ const tabArt = {                        /* pixel sprites for the three game tabs
 
           <div class="cab-bar">
             <button type="button" class="btn btn-gold cab-btn trail-play" data-play>
-              <Icon name="ui-play" /> Play the glowing challenge
+              {/* the button says where the tap goes: up the mountain, one
+                  stop at a time. render() swaps Start for Keep once the
+                  climb is under way. */}
+              <Icon name="ui-play" /> <span data-play-label>Start climbing the mountain</span>
             </button>
             {/* once the climb is done the summit is somewhere you can go
                 back to, not a screen that exists for one moment only */}
@@ -615,6 +618,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     const stops = [...trail.querySelectorAll<HTMLButtonElement>('[data-stop]')];
     const walker = trail.querySelector<HTMLElement>('[data-walker]')!;
     const playBtn = trail.querySelector<HTMLElement>('[data-play]')!;
+    const playLabel = trail.querySelector<HTMLElement>('[data-play-label]')!;
     const hudStop = trail.querySelector<HTMLElement>('[data-hud-stop]')!;
     const summitBtn = trail.querySelector<HTMLElement>('[data-summit]')!;
     const finale = document.querySelector<HTMLElement>('[data-finale]')!;
@@ -674,6 +678,10 @@ const tabArt = {                        /* pixel sprites for the three game tabs
       walker.style.top = `${at.y}%`;
       if (justId) replay(walker, 'hop');
       playBtn.hidden = cur === -1;
+      /* first stop starts the climb; every one after keeps it going */
+      playLabel.textContent = cur <= 0
+        ? 'Start climbing the mountain'
+        : 'Keep climbing the mountain';
       summitBtn.hidden = cur !== -1;
       /* the HUD names the glowing stop, and the challenge's HUD answers it */
       hudStop.hidden = cur === -1;
