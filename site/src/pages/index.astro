@@ -6,6 +6,7 @@ import MeadowHero from '../components/MeadowHero.astro';
 import home from '../data/homepage.json';
 import Icon from '../components/Icon.astro';
 import { u } from '../lib/url';
+import { website } from '../lib/schema';
 
 const books = (await getCollection('books')).sort((a, b) => a.data.order - b.data.order);
 ---
@@ -13,6 +14,7 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
 <Base
   title="Growing with Gritty"
   description="Stories and activities that help kids build grit, kindness, and confidence — with Gritty the Goat, by teacher and author Kim Rekowski."
+  jsonLd={website(Astro.site)}
 >
   <MeadowHero
     heading={home.heroHeading}

@@ -6,6 +6,7 @@ import { u } from '../../lib/url';
 import { buyLabel } from '../../lib/buy';
 import IconCart from '../../components/IconCart.astro';
 import Icon from '../../components/Icon.astro';
+import { book as bookSchema } from '../../lib/schema';
 
 export async function getStaticPaths() {
   const books = await getCollection('books');
@@ -14,7 +15,7 @@ export async function getStaticPaths() {
 
 const { book } = Astro.props;
 const { Content } = await render(book);
-const { title, order, cover, ages, lesson, buyLink, challenge, activitySheet, spreads } = book.data;
+const { title, order, cover, ages, tagline, lesson, buyLink, challenge, activitySheet, spreads } = book.data;
 
 /* Characters featured in this book, in series order. Missing ids are
    skipped rather than crashing — the CMS can't guarantee referential
@@ -28,7 +29,14 @@ const sheet = activitySheet ? await getEntry('printables', activitySheet) : unde
 
 <Base
   title={`${title} — Growing with Gritty`}
-  description={`${title}, book ${order} in the Gritty the Goat series by Kim Rekowski.`}
+  {/* The tagline leads, because this string is the search-result snippet:
+      what the book is about beats where it sits in the series. */}
+  description={`${tagline} Book ${order} in the Gritty the Goat series by Kim Rekowski, for ages ${ages}.`}
+  {/* Not the cover itself: it is WebP, which several preview crawlers will
+      not render, and square art crops badly at the 1.91:1 they want.
+      `npm run share-card` builds these. */}
+  image={`/share/books/${book.id}.jpg`}
+  jsonLd={bookSchema(Astro.site, book.id, book.data)}
 >
   <article>
     <section class="band">

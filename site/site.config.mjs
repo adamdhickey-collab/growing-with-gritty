@@ -4,7 +4,8 @@
 
 /* Whether search engines may index this site.
 
-   False while the site is being built and Kim is still filling in content.
+   True since 5 Sep 2026 — the site launched at grittythegoat.com and is
+   meant to be found. It was false while the site was being built.
    The mechanism that does the hiding is the `<meta name="robots"
    content="noindex">` tag in Base.astro — NOT robots.txt, which blocks
    crawling and therefore stops Google from ever reading the noindex.
@@ -13,4 +14,4 @@
      · every page drops the noindex tag
      · then request indexing in Google Search Console rather than waiting
        for an organic recrawl. */
-export const indexable = false;
+export const indexable = true;

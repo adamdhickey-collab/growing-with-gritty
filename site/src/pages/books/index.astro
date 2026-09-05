@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import BookCard from '../../components/BookCard.astro';
+import { bookSeries } from '../../lib/schema';
 
 const books = (await getCollection('books')).sort((a, b) => a.data.order - b.data.order);
 ---
@@ -9,6 +10,7 @@ const books = (await getCollection('books')).sort((a, b) => a.data.order - b.dat
 <Base
   title="Books — Growing with Gritty"
   description="The Gritty the Goat series by Kim Rekowski: four picture books about grit, friendship, healthy habits, and perseverance for ages 4–10."
+  jsonLd={bookSeries(Astro.site, books.map((b) => ({ id: b.id, title: b.data.title })))}
 >
   <section class="band">
     <div class="wrap">

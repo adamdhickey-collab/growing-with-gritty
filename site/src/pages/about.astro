@@ -2,6 +2,7 @@
 import { getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { u } from '../lib/url';
+import { aboutPage } from '../lib/schema';
 
 const about = await getEntry('pages', 'about');
 if (!about) throw new Error('src/content/pages/about.md is missing');
@@ -12,6 +13,7 @@ const { title, headshot, photo, photoCaption } = about.data;
 <Base
   title="About Kim Rekowski — Growing with Gritty"
   description="Kim Rekowski is an elementary teacher, children's book author, and illustrator — creator of Gritty the Goat."
+  jsonLd={aboutPage(Astro.site)}
 >
   <article>
     {/* Kim's own words lead, on the left and in the markup; the

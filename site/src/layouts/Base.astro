@@ -16,9 +16,22 @@ import nunitoUrl from '@fontsource-variable/nunito/files/nunito-latin-wght-norma
 import { indexable } from '../../site.config.mjs';
 import { u } from '../lib/url';
 
-interface Props { title: string; description: string }
-const { title, description } = Astro.props;
+interface Props {
+  title: string;
+  description: string;
+  /* Page-specific share image (an absolute site path, e.g. a book cover).
+     Falls back to the site-wide card. Crawlers and chat apps want a real
+     raster at a known size, so these are JPEG rather than the WebP the
+     pages themselves use. */
+  image?: string;
+  /* Schema.org JSON-LD for this page. Search engines and AI assistants read
+     it to learn what the page *is* — a book, a person, a site — rather than
+     inferring it from prose. Passed as a plain object; serialised below. */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+const { title, description, image, jsonLd } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const shareImage = new URL(u(image ?? '/share-card.jpg'), Astro.site);
 /* set only by the GitHub Pages review build */
 const tiles = import.meta.env.PUBLIC_TILES_URL;
 ---
@@ -44,6 +57,25 @@ const tiles = import.meta.env.PUBLIC_TILES_URL;
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="Growing with Gritty" />
+    <meta property="og:locale" content="en_US" />
+    {/* Kim is emailing this link to colleagues and families, so the preview
+        card is the first thing many people will see of the site. */}
+    <meta property="og:image" content={shareImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Gritty the Goat, from the Growing with Gritty books by Kim Rekowski" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={shareImage} />
+    {jsonLd && (
+      <script
+        type="application/ld+json"
+        is:inline
+        set:html={JSON.stringify(jsonLd)}
+      />
+    )}
 
     <link rel="preload" href={fredokaUrl} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={nunitoUrl} as="font" type="font/woff2" crossorigin />

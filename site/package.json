@@ -11,9 +11,11 @@
     "library": "node scripts/build-image-index.mjs",
     "add-image": "node scripts/add-image.mjs",
     "printable": "node scripts/make-printable.mjs",
-    "test:scroll": "node scripts/scroll-stability.mjs"
+    "test:scroll": "node scripts/scroll-stability.mjs",
+    "share-card": "node scripts/make-share-card.mjs"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
     "@fontsource-variable/fredoka": "^5.2.0",
     "@fontsource-variable/nunito": "^5.2.0",
     "@fontsource/patrick-hand": "^5.2.0",
