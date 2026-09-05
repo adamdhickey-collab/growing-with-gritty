@@ -233,7 +233,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
                aria-labelledby="tab-trail" tabindex="0">
         <div class="panel-head">
           <h2>Can you help Gritty?</h2>
-          <p class="note">Tap the glowing stop and climb the trail with
+          <p class="note">Tap the gold stop and climb the mountain with
           Gritty — one challenge at a time. No points and no timers, just
           you and a goat figuring it out.</p>
         </div>
@@ -683,7 +683,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
         ? 'Start climbing the mountain'
         : 'Keep climbing the mountain';
       summitBtn.hidden = cur !== -1;
-      /* the HUD names the glowing stop, and the challenge's HUD answers it */
+      /* the HUD names the gold stop, and the challenge's HUD answers it */
       hudStop.hidden = cur === -1;
       hudStop.textContent = cur === -1 ? '' : `Stop ${cur + 1}`;
     }
@@ -1290,7 +1290,7 @@ const tabArt = {                        /* pixel sprites for the three game tabs
     cursor: pointer; z-index: 2;
     font-size: calc(1.2rem + var(--row) * 0.12rem);
   }
-  /* the glowing stop's tile goes gold — ink on gold, ≈6:1 */
+  /* the stop you're on goes gold — ink on gold, ≈6:1 */
   .stop.current .stop-num {
     background: var(--gg-gold); box-shadow: 3px 3px 0 var(--gg-ink);
   }
