@@ -10,8 +10,8 @@ the deck's domain slide: Gritty gets its own address, and
 | --- | --- |
 | Registrar | **Squarespace Domains**, in Adam's account |
 | Registered | 28 Aug 2026, expires 28 Aug 2027 |
-| Nameservers | `nsb1`–`nsb4.squarespacedns.com` — still Squarespace's |
-| Apex serves | A Squarespace **"Coming Soon" parking page** |
+| Nameservers | `gordon` / `mimi.ns.cloudflare.com` — moved 5 Sep 2026 |
+| Apex serves | **The site.** Cloudflare Pages, live since 5 Sep 2026 |
 | Apex `MX` | **None.** No email exists on this domain |
 | `growingwithgritty.com` | Never registered. Does not resolve. Dead idea |
 | **DNSSEC** | **Off since 5 Sep 2026.** Was on; turned off and confirmed clear — see step 3 |
@@ -117,25 +117,57 @@ still resolving. **The nameserver change is now safe to make.**
 If DNSSEC is wanted again later, turn it on from Cloudflare's side once the
 zone is active. Do not re-enable it at Squarespace.
 
-### 4. Change the nameservers at Squarespace
+### ✅ 4. Nameservers moved — DONE (5 Sep 2026)
 
-Only once step 3 returns empty. Squarespace → Domains → grittythegoat.com →
-DNS → Nameservers → replace the four `nsb*.squarespacedns.com` entries with
-`gordon` and `mimi` above.
+Squarespace → Domains → grittythegoat.com → DNS → Domain Nameservers → **Use
+custom nameservers**. Squarespace demands a fresh Google sign-in before it
+will show the fields, which is easy to mistake for the page being broken.
 
-This is the moment the Squarespace parking page stops being served.
-Propagation is usually minutes.
+All four `nsb*.squarespacedns.com` entries were replaced by the two
+Cloudflare ones. Confirmed at the registry rather than by trusting the UI:
 
-### 5. Attach the domain to the Pages project
+```bash
+dig NS grittythegoat.com @a.gtld-servers.net +norecurse   # authority section
+whois grittythegoat.com | grep -i "^name server"
+```
 
-**This cannot be done early.** Cloudflare refuses to attach a custom domain
-whose zone is not active yet — it answers "you'll need to transfer your DNS
-to Cloudflare" and stops. So it genuinely waits for step 4.
+Both show only `gordon` and `mimi`. No Squarespace nameserver was left
+behind, which matters: a stray one would keep answering alongside Cloudflare
+and visitors would get different results depending on which server they hit.
 
-Pages project → Custom domains → add **both** `grittythegoat.com` and
-`www.grittythegoat.com`, and redirect one to the other so there is a single
-canonical address. Cloudflare writes the records and replaces the imported
-Squarespace `A` records itself. HTTPS is automatic and free.
+Cloudflare's own dashboard kept saying *"Waiting for your registrar to
+propagate"* for a while after the delegation was already live. Trust `dig`,
+not that banner.
+
+### ✅ 5. Custom domains attached — DONE (5 Sep 2026)
+
+Both `grittythegoat.com` and `www.grittythegoat.com` are on the Pages
+project. Cloudflare replaced the imported Squarespace records itself:
+
+| Was | Now |
+| --- | --- |
+| four apex `A` records → Squarespace | `CNAME @ → growing-with-gritty.pages.dev` |
+| `CNAME www → ext-sq.squarespace.com` | `CNAME www → growing-with-gritty.pages.dev` |
+
+Certificates were issued automatically, the apex within about a minute and
+`www` about three minutes later. A failed TLS handshake on `www` in that gap
+is normal and not worth debugging.
+
+**One canonical address.** A redirect rule sends `www` to the apex, built
+from the dashboard's own *Redirect from WWW to root* template with
+**Preserve query string** turned on, so campaign links survive the hop.
+Cloudflare warns that the rule "may not apply to your traffic" because it
+cannot see a proxied `www` record; that is a false positive when `www` is a
+Pages custom domain. Deploy it anyway. Do **not** accept the offer to create
+a proxied DNS record, which would fight with the Pages domain.
+
+Verified end to end:
+
+```
+http://grittythegoat.com/          → 301 → https://grittythegoat.com/
+https://www.grittythegoat.com/x?q=1 → 301 → https://grittythegoat.com/x?q=1
+https://grittythegoat.com/          → 200
+```
 
 ### 6. Only then, let it be found
 
