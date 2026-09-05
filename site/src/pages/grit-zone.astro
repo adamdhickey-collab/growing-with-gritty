@@ -296,9 +296,10 @@ const tabArt = {                        /* pixel sprites for the three game tabs
           <div class="cab-bar">
             <button type="button" class="btn btn-gold cab-btn trail-play" data-play>
               {/* the button says where the tap goes: up the mountain, one
-                  stop at a time. render() swaps Start for Keep once the
-                  climb is under way. */}
-              <Icon name="ui-play" /> <span data-play-label>Start climbing the mountain</span>
+                  stop at a time — a climber rather than a play triangle,
+                  because the tap is the climb, not a video. render() swaps
+                  Start for Keep once the climb is under way. */}
+              <Icon name="action-keep-going" /> <span data-play-label>Start climbing the mountain</span>
             </button>
             {/* once the climb is done the summit is somewhere you can go
                 back to, not a screen that exists for one moment only */}
