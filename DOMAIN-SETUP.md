@@ -169,11 +169,48 @@ https://www.grittythegoat.com/x?q=1 → 301 → https://grittythegoat.com/x?q=1
 https://grittythegoat.com/          → 200
 ```
 
-### 6. Only then, let it be found
+### A trap right after the switch: your own browser lies
+
+Confirmed on launch day. Minutes after the cutover, `curl` on the Mac
+returned the real site from Cloudflare, an independent server elsewhere on
+the internet returned the real site, and every public resolver returned the
+Cloudflare addresses — while **Chrome on that same Mac kept showing the old
+Squarespace placeholder**, including in freshly opened tabs.
+
+Nothing was wrong with the site. Chrome keeps its own address cache and its
+own open connections for the life of the process, and may resolve through
+its own "Secure DNS" provider rather than the network's.
+
+So do not debug DNS from the browser you have been using all along:
+
+```bash
+curl -sI https://grittythegoat.com/ | grep -i "^server"   # expect: cloudflare
+dig +short grittythegoat.com @1.1.1.1
+```
+
+The fastest human check is a **phone with wifi turned off** — a different
+network and resolver entirely. That is what confirmed this launch.
+
+To clear a stuck Chrome: quit fully with Cmd+Q (closing the window is not
+enough), then `chrome://net-internals/#dns` → Clear host cache, and check
+`chrome://settings/security` for Secure DNS. On macOS,
+`sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder`.
+
+First-time visitors were never affected. Only resolvers that had looked the
+domain up *before* the switch held the placeholder, and Squarespace's old
+records carried a four-hour TTL, so stragglers cleared themselves.
+
+### 6. Only then, let it be found — NOT DONE, deliberately
 
 `site/site.config.mjs` → flip `indexable` to `true`. That drops the
 `noindex` tag from every page. Then request indexing in Google Search
 Console rather than waiting for an organic recrawl.
+
+**The site is live but every page still carries `noindex, nofollow`.** That
+is the intended state: the address works for anyone Kim hands it to, and
+search engines stay out until the look is settled. This is the last switch
+and the hardest to walk back — getting a site *out* of an index is far more
+work than getting it in.
 
 ## The gate before launch
 
@@ -184,16 +221,17 @@ address from `astro.config.mjs` rather than repeating it, so it cannot go
 stale in a drawer. Verified: the PDFs were rendered 44 seconds after the
 config changed, so they carry the real address and not the dead one.
 
-What is still outstanding:
+**The site went live at https://grittythegoat.com on 5 Sep 2026.** Steps 1
+through 5 are done. What is still outstanding:
 
 - **Kim has not picked a style tile direction.** Everything downstream of
-  that pick can still change, so launching now means launching a look that
-  may be replaced.
-- **DNSSEC has to come off first**, and that has a lead time measured in
-  hours, not minutes. See step 3.
-
-Steps 1 and 2 are done and touched nothing the public can see. Step 4 is the
-point of no return for the parking page. Step 6 is the actual launch.
+  that pick can still change, so opening the site to search now means
+  indexing a look that may be replaced. This is why step 6 is still off.
+- **AI crawler settings were left at Cloudflare's defaults** on the zone,
+  which currently permits training crawlers on a site whose whole value is
+  Kim's original drawings. Adam's call; flagged, not changed.
+- **The Squarespace parking page still exists** behind the scenes. Nothing
+  points at it any more, so it is cosmetic rather than urgent.
 
 ## The deploy that would not fire, and why
 
