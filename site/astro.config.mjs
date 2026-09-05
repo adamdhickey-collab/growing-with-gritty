@@ -12,7 +12,7 @@ export default defineConfig({
      inlined as SVG at build time — nothing is fetched at runtime. Kim's own
      art still carries the nav and the two big welcome buttons. */
   integrations: [icon({ include: { 'fluent-emoji-flat': ['*'] } })],
-  site: 'https://growingwithgritty.com',
+  site: 'https://grittythegoat.com',
   base: previewBase,
   trailingSlash: 'ignore',
   server: {

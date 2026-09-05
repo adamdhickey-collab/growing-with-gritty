@@ -9,7 +9,7 @@ edits everything through simple web forms.
 | --- | --- |
 | 📋 [PLAN.md](PLAN.md) | The full plan: stack, kids-safety decisions, content model, phases |
 | 🔭 [V2-PLAN.md](V2-PLAN.md) | Style tile V2: research-driven second design direction |
-| 🌐 [DOMAIN-SETUP.md](DOMAIN-SETUP.md) | polkadotbackpack.com — current DNS, the A/B decision, and the steps |
+| 🌐 [DOMAIN-SETUP.md](DOMAIN-SETUP.md) | grittythegoat.com — the decided address, and the ordered steps to go live |
 | 📊 [deck/](deck/) | The presentation for Kim — 11 slides with speaker notes |
 | 🎨 [style-tile/](style-tile/) | The approved look, served at **[adamdhickey-collab.github.io/growing-with-gritty/style-tile](https://adamdhickey-collab.github.io/growing-with-gritty/style-tile/)** |
 | 🌱 [site/](site/) | The Astro site (Phases 1–2 built) — see [site/README.md](site/README.md) |
@@ -38,9 +38,10 @@ Every push to `main` redeploys all four:
 - **Phase 2 built**: Gritty's World — Grit Zone, Mistake Maker, Calming Corner —
   plus the meadow hero, where Gritty talks back.
 - **Not yet connected**: Cloudflare Pages + domain + Pages CMS (PLAN.md §10).
-- **Open decision**: the final web address. `polkadotbackpack.com` is already
-  live on Shopify — see [DOMAIN-SETUP.md](DOMAIN-SETUP.md). `site/astro.config.mjs`
-  still assumes `growingwithgritty.com` until that is settled.
+- **Web address decided**: **grittythegoat.com**, registered at Squarespace.
+  `polkadotbackpack.com` is left alone. The domain still serves a Squarespace
+  parking page — the ordered steps to move it to Cloudflare Pages are in
+  [DOMAIN-SETUP.md](DOMAIN-SETUP.md), gated on the coloring pages landing.
   GitHub Pages here serves *only* the style tile for review — the real site
   deploys via Cloudflare when it goes live.
 

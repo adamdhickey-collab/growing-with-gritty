@@ -243,7 +243,7 @@ From the approved mockup and the doc's own palette words:
   and nothing else. This folder then gets the one-line pointer treatment
   like the other self-contained projects.
 - **Hosting:** Cloudflare Pages, auto-deploy on push to `main`. Domain:
-  growingwithgritty.com (check availability early).
+  grittythegoat.com (registered 28 Aug 2026 at Squarespace).
 - **While building:** reuse the Door County Found patterns wholesale —
   the `?peek=` coming-soon middleware curtain, the `indexable` flag in
   `site.config.mjs` driving noindex/sitemap, self-hosted fonts via

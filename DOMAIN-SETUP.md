@@ -1,99 +1,131 @@
-# Domain setup — polkadotbackpack.com
+# Domain setup — grittythegoat.com
 
-Companion to the deck's domain slide. The deck asks Kim the questions; this
-is the technical detail for whoever does the work.
+The web address is decided. **grittythegoat.com** — this is Option B from
+the deck's domain slide: Gritty gets its own address, and
+`polkadotbackpack.com` is left completely alone.
 
-## What's true today (checked 24 Aug 2026)
+## What's true today (checked 5 Sep 2026)
 
-| Name | Resolves to | Almost certainly |
-| --- | --- | --- |
-| `polkadotbackpack.com` | `23.227.38.65` | **Shopify.** That is Shopify's documented IP for custom domains |
-| `www.polkadotbackpack.com` | `23.92.26.113` | **Something else** — a different host from the apex |
+| Fact | Value |
+| --- | --- |
+| Registrar | **Squarespace Domains**, in Adam's account |
+| Registered | 28 Aug 2026, expires 28 Aug 2027 |
+| Nameservers | `nsb1`–`nsb4.squarespacedns.com` — still Squarespace's |
+| Apex serves | A Squarespace **"Coming Soon" parking page** |
+| Apex `MX` | **None.** No email exists on this domain |
+| `growingwithgritty.com` | Never registered. Does not resolve. Dead idea |
 
-So the domain is **already registered and already serving a live site**, and
-apex and `www` point to different places. Nothing here should be changed
-until we know what that store is and whether it stays.
+Two things follow from that table:
 
-*(This was DNS-only. The sandbox network policy blocked fetching the actual
-pages, so what's rendered there is unconfirmed — open both in a browser.)*
+- There is **nothing to break.** The only thing live is Squarespace's own
+  placeholder, and no mail flows through the domain. This is the easy case —
+  the caution in the old version of this file was about a live Shopify store
+  on a different domain, and it no longer applies.
+- The domain is **not yet pointed at anything we control.** Nameservers
+  still belong to Squarespace, so DNS is edited in Squarespace, not
+  Cloudflare, until step 2 below.
 
-## What we need from Kim
+## The pattern to copy: doorcountyfound.com
 
-1. **Registrar** — where the domain was bought (GoDaddy, Namecheap, Google
-   Domains/Squarespace, Shopify itself…). If Shopify manages it, DNS is
-   edited inside Shopify admin, not at a registrar.
-2. **Account access** — her login, or a screen-share where she drives.
-3. **What the Shopify store is** and whether it's staying live.
-4. **Email** — does anything currently receive mail at this domain
-   (`kim@polkadotbackpack.com`)? **Ask before touching DNS.** Changing
-   nameservers without carrying the MX records over silently breaks email,
-   and it's the single most common way a domain move goes wrong.
+Its DNS is already the exact shape this domain needs, so use it as the
+reference rather than inventing anything:
 
-## The decision, and what each costs
+- Registered at **Squarespace** (same account, same as this domain)
+- Nameservers **delegated to Cloudflare** (`gordon` / `mimi.ns.cloudflare.com`)
+- Served from **Cloudflare** on both apex and `www`
 
-### Option A — Gritty takes the apex
+So: registrar stays Squarespace, DNS moves to Cloudflare, hosting is
+Cloudflare Pages. Nothing is transferred and nothing is bought.
 
-`polkadotbackpack.com` → the book site · `shop.polkadotbackpack.com` → the store.
+## Going live — the order matters
 
-- Best if the store is minor, dormant, or the brand is really "Polka Dot
-  Backpack = Kim's books."
-- Requires reconfiguring the Shopify store to its new subdomain, and
-  Shopify must be told about the domain change or it will keep claiming
-  the apex.
-- Any existing links/QR codes/printed material pointing at the apex now
-  land on the book site instead of the store.
+**Do these in order.** Step 3 before step 2 takes the domain dark, because
+changing nameservers to a Cloudflare zone that does not exist yet means
+nothing answers for the domain.
 
-### Option B — the book site gets its own domain
+### 1. Cloudflare Pages project
 
-Store keeps `polkadotbackpack.com` untouched; books live at e.g.
-`growingwithgritty.com`.
+Cloudflare dashboard → Workers & Pages → Create → Pages → connect to
+`adamdhickey-collab/growing-with-gritty`.
 
-- Zero risk to anything currently working. **This is the safe default** if
-  the store is active or Kim is unsure.
-- Costs the price of a second domain (~$12/yr).
-- The repo already assumes this: `site/astro.config.mjs` has
-  `site: 'https://growingwithgritty.com'`.
+| Setting | Value |
+| --- | --- |
+| Production branch | `main` |
+| Root directory | `site` |
+| Build command | `npm run build` |
+| Output directory | `dist` |
 
-## Doing it: Cloudflare Pages custom domain
+Leave `PREVIEW_BASE` and `PUBLIC_TILES_URL` **unset**. Those two exist only
+for the GitHub Pages review build; production serves from the domain root
+with no base path and no version switcher.
 
-The site deploys from this repo via Cloudflare Pages (PLAN.md §10).
+Confirm the `*.pages.dev` URL builds and looks right before going further.
 
-1. In the Cloudflare Pages project → **Custom domains** → **Set up a custom
-   domain** → enter the hostname.
-2. Cloudflare tells you which record to create. Two cases:
-   - **Domain's nameservers already point at Cloudflare** → it creates the
-     record itself. Nothing to do at the registrar.
-   - **DNS stays at the current registrar** → add a `CNAME` from the
-     hostname to `<project>.pages.dev`. For an apex, the registrar must
-     support CNAME flattening / ALIAS / ANAME (most do now); if it doesn't,
-     move nameservers to Cloudflare.
-3. HTTPS is automatic and free — Cloudflare issues the certificate once the
-   record resolves. Usually minutes; allow up to a few hours.
-4. Add **both** apex and `www`, and set one to redirect to the other so the
-   site has a single canonical address.
+### 2. Add the zone to Cloudflare
 
-### If nameservers move to Cloudflare
+Cloudflare → Add a site → `grittythegoat.com` → Free plan. Cloudflare scans
+the existing DNS and hands back two assigned nameservers.
 
-Copy **every** existing record first — especially `MX` (email), and any
-`TXT` used for SPF/DKIM or domain verification. Cloudflare's import scans
-for common records but does not reliably catch everything.
+There is nothing worth importing here — no MX, no SPF/DKIM, just the
+parking page's records — but read the scan results rather than assuming.
 
-## When the decision is made, change these
+### 3. Change the nameservers at Squarespace
 
-- `site/astro.config.mjs` → `site: 'https://<final-domain>'`
-- `site/site.config.mjs` → flip `indexable` to `true` **only when the site
-  is genuinely ready to be found**, then request indexing in Google Search
-  Console rather than waiting for an organic recrawl.
-- Cloudflare Pages → add the custom domain (above).
-- Tell Google Search Console about the final domain.
+Squarespace → Domains → grittythegoat.com → DNS → Nameservers → switch from
+Squarespace's defaults to the two Cloudflare gave you.
 
-## Email, if she wants it
+This is the one irreversible-feeling step, and the moment the Squarespace
+parking page stops being served. Propagation is usually minutes; allow up
+to a few hours.
 
-If Kim wants `kim@polkadotbackpack.com` and doesn't have it already, the
-cheapest good option once the domain is on Cloudflare is **Email Routing** —
-free forwarding to her existing Gmail, about five minutes to set up. It
-forwards only; sending *as* that address needs Gmail's "send mail as" with
-an SMTP provider, or a paid mailbox (Google Workspace / Fastmail).
+### 4. Attach the domain to the Pages project
 
-**Do not enable Email Routing on a domain whose existing MX records you
-haven't checked** — it replaces them.
+Pages project → Custom domains → add **both** `grittythegoat.com` and
+`www.grittythegoat.com`, and redirect one to the other so there is a single
+canonical address. With the zone on Cloudflare, the records are created for
+you and the apex works without any CNAME-flattening worry.
+
+HTTPS is automatic and free once the records resolve.
+
+### 5. Only then, let it be found
+
+`site/site.config.mjs` → flip `indexable` to `true`. That drops the
+`noindex` tag from every page. Then request indexing in Google Search
+Console rather than waiting for an organic recrawl.
+
+**Do not flip this until the site is genuinely ready** — see the gate below.
+
+## The gate before any of this
+
+The site is not ready to launch. Two things are outstanding:
+
+- **The coloring illustrations are not in.** `PLAN.md` §"assets" still has
+  them unchecked, and `/grown-ups` currently tells visitors in as many
+  words that Kim is still making them. Launching now ships a page that
+  advertises a dead end. This is the trigger Adam named: live *once the
+  coloring illustrations are in*.
+- **Kim has not picked a style tile direction.** Everything downstream of
+  that pick can still change.
+
+Steps 1 and 2 are safe to do early — they touch nothing the public sees, and
+having the Pages build proven ahead of time makes launch day boring. Step 3
+is the point of no return for the parking page. Step 5 is the actual launch.
+
+## Already done in the repo
+
+- `site/astro.config.mjs` → `site: 'https://grittythegoat.com'`
+- `site/scripts/lib/make-printable.mjs` → the footer printed on every
+  printable now reads `grittythegoat.com`. This one matters: it is stamped
+  onto the coloring pages themselves, so it had to be right *before* they
+  are generated, not after they are on someone's fridge.
+
+`deck/build-deck.js` still asks the old open question about
+`polkadotbackpack.com`. That deck was presented on its own date and is left
+as it was rather than rewritten after the fact.
+
+## Email, if Kim ever wants it
+
+Nothing receives mail at this domain today. Once the zone is on Cloudflare,
+**Email Routing** is free forwarding to an existing Gmail, about five
+minutes. Sending *as* the address needs Gmail's "send mail as" plus an SMTP
+provider, or a paid mailbox.
