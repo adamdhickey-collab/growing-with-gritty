@@ -28,8 +28,14 @@ interface Props {
      it to learn what the page *is* — a book, a person, a site — rather than
      inferring it from prose. Passed as a plain object; serialised below. */
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /* Keep this one page out of search even when the site is indexable.
+     A meta tag, not a robots.txt rule: robots.txt stops the fetch, which
+     also stops the crawler ever reading this tag, and a blocked page can
+     still be listed from links alone. */
+  noindex?: boolean;
 }
-const { title, description, image, jsonLd } = Astro.props;
+const { title, description, image, jsonLd, noindex = false } = Astro.props;
+const hidden = !indexable || noindex;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const shareImage = new URL(u(image ?? '/share-card.jpg'), Astro.site);
 /* set only by the GitHub Pages review build */
@@ -50,9 +56,10 @@ const tiles = import.meta.env.PUBLIC_TILES_URL;
     <link rel="icon" href={u("/icon.png")} type="image/png" />
     <link rel="apple-touch-icon" href={u("/apple-touch-icon.png")} />
     <link rel="canonical" href={canonical} />
-    {/* The switch that keeps the site out of search while it's being built —
-        flipped by site.config.mjs, never by hand here. */}
-    {!indexable && <meta name="robots" content="noindex, nofollow" />}
+    {/* Site-wide: the switch in site.config.mjs, flipped there and never by
+        hand here. Per page: the `noindex` prop, for the handful of pages
+        that are ours rather than the public's. */}
+    {hidden && <meta name="robots" content="noindex, nofollow" />}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
